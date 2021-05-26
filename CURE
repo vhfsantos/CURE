@@ -1,0 +1,636 @@
+#!/bin/bash
+
+VERSION=0.0.0
+set -e
+
+# Usage function
+usage() {
+echo -e "
+-----------------------------------------------------------
+CURE: an automated and parallel pipeline for UCE curation
+-----------------------------------------------------------
+by Vinícius H F Santos & Felipe V Freitas
+version "$VERSION"
+
+\e[4mUsage\e[0m: 
+ pipeline.sh  --baits <baits.fa> --reference <reference.fasta> \\
+              --gff <reference.gff> --phyluce-nexus <nexus_dir> \\
+              --output <output_dir>
+
+\e[4mRequired arguments\e[0m:
+  -b, --baits             Path to UCE baits file
+  -r, --reference         Path to reference genome file
+  -g, --gff               Path to annotation file in gff format
+  -p, --phyluce-nexus     Path to the directory with nexus files created with
+                          Phyluce
+  -o, --output            Output directory
+  -t, --threads           Number of threads for the analysis (Default: 10)
+
+\e[4mOptional arguments\e[0m:
+  -f, --filter            String to be filter out from the UCE name
+  --only-by-gene          Concatenate UCEs only by gene. Concatenation by region
+                          will be discarted with this flag
+  --only-by-region        Concatenate UCEs only by region. Concatenation by gene
+                          will be discarted with this flag"
+exit 2
+}
+
+# Error function
+error_exit() {
+	msg=$1
+	>&2 echo -e "\033[1;31mERROR: ${msg}\033[0m"
+	usage
+}
+
+# Check dependencies
+check_deps() {
+	for app in blastn phyluce_align_concatenate_alignments; do
+        	command -v $app >/dev/null 2>&1 || \
+			error_exit "Cannot find ${app} in your PATH variable"
+	done
+	for pkg in stringr; do
+		R --slave \
+		-e 'if(!require("'${pkg}'", quietly=T)){quit(save="no", status=1)}else{quit(save="no", status=0)}' >/dev/null 2>&1
+		if [ $? == 1 ]; then error_exit "${pkg} package is not installed."; fi
+	done
+}
+
+# Log message function (normal text)
+log() {
+	echo [$(date +%Y-%m-%d" "%H:%M:%S)] $1
+}
+# Warning message function (yellow text)
+warn() {
+	echo -e "\033[1;33m"[$(date +%Y-%m-%d" "%H:%M:%S)] $1"\033[0m"
+	}
+# "Done" message function (green text)
+DONEmsg() {
+	echo -e "\033[1;32m"[$(date +%Y-%m-%d" "%H:%M:%S)] Done!"\033[0m"
+}
+# "Bye" message function (green text)
+BYEmsg() {
+	echo -e "\033[1;32m"[$(date +%Y-%m-%d" "%H:%M:%S)] ALL DONE!"\033[0m"
+	echo -e "
+\033[1;32mThis is a goodbye message.
+Probably will have citation, mail contact, and more.
+Bye\033[0m"
+}
+# Print usage if no arg
+if [ $# -eq 0 ]; then usage; fi
+
+# Setting home dir for utils calling
+tmp=$(realpath "$0")
+HOME_DIR=${tmp%/*}
+THREADS=10
+ONLY_BY_GENE="False"
+ONLY_BY_REGION="False"
+
+# Option strings for arg parser
+SHORT=hb:r:g:p:o:f:t:
+LONG=help,baits:,reference:,gff:,phyluce-nexus:,output:,filter:,threads:,only-by-gene,only-by-region
+
+
+# Read options
+OPTS=$(getopt --options $SHORT --long $LONG --name "$0" -- "$@")
+if [ $? != 0 ] ; then error_exit "Failed to parse options...exiting."; fi
+eval set -- "$OPTS"
+
+# Extracting arguments
+while true ; do
+  case "$1" in
+    -h | --help )
+      usage
+      ;;
+    -p | --phyluce-nexus )
+      NEXUS_DIR="$2"
+      shift 2
+      ;;
+    -b | --baits )
+      BAITS_FILE="$2"
+      shift 2
+      ;;
+    -r | --reference )
+      REFERENCE_GENOME="$2"
+      shift 2
+      ;;
+	-t | --threads )
+	  THREADS="$2"
+	  shift 2
+	  ;;
+    -g | --gff )
+      GFF="$2"
+      shift 2
+      ;;
+    -o | --output )
+      OUTPUT="$2"
+      shift 2
+      ;;
+	-f | --filter )
+	  FILTER="$2"
+	  shift 2
+	  ;;
+	--only-by-gene )
+	  ONLY_BY_GENE="True"
+	  shift
+	  ;;
+	--only-by-region )
+	  ONLY_BY_REGION="True"
+	  shift
+	  ;;
+    -- )
+      shift
+      break
+      ;;
+    *)
+      error_exit "Please, supply all arguments correctly."
+      ;;
+  esac
+done
+
+# Checking if any required args is empty
+if [ -z "${NEXUS_DIR}" ] || [ -z "${BAITS_FILE}" ] || \
+   [ -z "${REFERENCE_GENOME}" ] || [ -z "${GFF}" ] || \
+   [ -z "${OUTPUT}" ]; then
+	error_exit "Please, supply all arguments correctly."
+fi
+
+# Checking if both flags were signed
+if [ "$ONLY_BY_GENE" == "True" ] && [ "$ONLY_BY_REGION" == "True" ]; then
+	error_exit "Please, chose one: --only-by-gene or --only-by-region"
+fi
+# Check deps
+check_deps
+
+# Print parameters for debuggin
+
+echo "
+        Defined parameters
+------------------------------------
+NEXUS: ${NEXUS_DIR}
+BAITS: ${BAITS_FILE}
+GENOME: ${REFERENCE_GENOME}
+GFF: ${GFF}
+OUTDIR: ${OUTPUT}
+THREADS: $THREADS
+ONLY_BY_GENE? $ONLY_BY_GENE
+ONLY_BY_REGION? $ONLY_BY_REGION
+------------------------------------"
+
+#=============================================================
+#====                       STEP 0:                       ====
+#====                 Preparing input data                ====
+#=============================================================
+
+# Create a copy os nexus dir.
+# Allow me to 'move' UCEs from there.
+# Moving avoids one UCE assigned to multiple exons/introns.
+# Also, if UCE is placed on one exon and one intron, it
+# is assigned to the exon.
+NEXUSCOPYex=${OUTPUT}/tmp/000-nexus-copy/
+mkdir -p ${NEXUSCOPYex}
+
+if [ -z "$(ls -A "${NEXUSCOPYex}")" ]; then
+	log "Preparing input data..."
+	parallel \
+	--max-procs ${THREADS} \
+	cp {} ${NEXUSCOPYex} ::: ${NEXUS_DIR}/* 2> /dev/null
+else
+	warn "Input preparation already done. Skipping"
+fi
+
+#=============================================================
+#====                       STEP 1:                       ====
+#====         Run a customize version of uce_kit.py       ====
+#=============================================================
+# Original: 
+# https://github.com/calacademy-research/ccgutils/tree/master/uce_types
+
+mkdir -p "${OUTPUT}"/tmp/
+GENOME=$(basename "${REFERENCE_GENOME}")
+
+if [[ ! -f "${OUTPUT}/${GENOME}.uce_kit_summary" ]]; then
+	log "Running uce_kit.py..."
+	python "${HOME_DIR}"/scripts/uce_kit/uce_kit.py run_pipeline \
+		"${BAITS_FILE}" \
+		"${REFERENCE_GENOME}" \
+		"${GFF}" "${OUTPUT}" \
+		-lines -merge -filt "$FILTER" 2> /dev/null
+	DONEmsg
+	else
+		warn "Script uce_kit.py already run. Skipping..."
+fi
+
+#=============================================================
+#====                       STEP 2:                       ====
+#====  Organize UCEs according to their characterization  ====
+#=============================================================
+
+# I treat each type differently.
+# Let's beggin with exons.
+NEXUSTOCONCAT=${OUTPUT}/tmp/00-characterized-uces/
+if [ ! -f "${OUTPUT}/exons.txt" ]; then
+	log "Assinging UCEs to exons..."
+	EXONS=$(mktemp)
+	# Create 2 temp files to count each assignment type
+	ASSIGNED2EXON=${OUTPUT}/tmp/assign2ex
+	ASSIGNED2INTRON=${OUTPUT}/tmp/assign2in
+	ASSIGNED2EXON_NOTMISSING=${OUTPUT}/tmp/assign2exNotMissing
+	ASSIGNED2INTRON_NOTMISSING=${OUTPUT}/tmp/assign2inNotMissing
+	touch $ASSIGNED2EXON
+	touch $ASSIGNED2INTRON
+	BEFOREALL=${OUTPUT}/tmp/2Bassign
+	# Get names of all UCEs available.
+	find ${NEXUSCOPYex} -type f | xargs -L1 -I{} basename "{}" > "$BEFOREALL"
+	TOTAL_UCEs=$(wc -l < $BEFOREALL)
+	# Get only exons from uce_kit summary.
+	awk \
+		-v FS="\t" \
+		-v OFS="\t" \
+		'{ if( $4 == "exon" ){print $1, $2, $5, $6, $10} }' \
+		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
+		> "$EXONS"
+	# Run ParseResults.R for exons.
+	"${HOME_DIR}"/scripts/parse-results.R "$EXONS" "${OUTPUT}"/exons.txt exon
+	# Read output from R script.
+	# Lines are uce name, exon ID and gene ID.
+	# So, copy uce name from nexus dir to gene/exon dir.
+	while IFS=$'\t' read uce exonID geneID; do
+		UCEfile=${NEXUSCOPYex}/$uce
+		GENEdir=${NEXUSTOCONCAT}/exons/$geneID
+		EXONdir=${GENEdir}/$exonID
+		echo "$uce" >> $ASSIGNED2EXON
+		if [[ ! -f ${UCEfile} ]]; then
+			#warn "${uce%.*} already assigned or missing in nexus dir. \
+			#Skipping this file..."
+			continue
+		else
+			mkdir -p "$EXONdir"
+			mv "$UCEfile" "${EXONdir}"/"$uce"
+		fi
+
+	done < "${OUTPUT}"/exons.txt
+	DONEmsg
+else
+	warn "Already assigned UCEs to exons. Skipping..."
+fi
+
+# Doing (almost) the same for introns.
+# Introns do not have IDs like exons.
+# Output dir will be only geneID.
+if [ ! -f "${OUTPUT}/introns.txt" ]; then
+	log "Assigning UCEs to introns..."
+	INTRONS=$(mktemp)
+	awk \
+		-v FS="\t" \
+		-v OFS="\t" \
+		'{ if( $4 == "intron" ){print $1, $2, $5, $6, $10} }' \
+		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
+		> "$INTRONS"
+	# Run ParseResults.R for introns.
+	"${HOME_DIR}"/scripts/parse-results.R "$INTRONS" "${OUTPUT}"/introns.txt intron
+	# Same as previous 'while', but for introns.
+	while IFS=$'\t' read uce geneID; do
+		UCEfile=${NEXUSCOPYex}/$uce
+		GENEdir=${NEXUSTOCONCAT}/introns/$geneID
+		echo "$uce" >> $ASSIGNED2INTRON
+		if [[ ! -f ${UCEfile} ]]; then
+			#warn "${uce%.*} already assigned or missing in nexus dir. \
+			#Skipping this file..."
+			continue
+		else
+			mkdir -p "$GENEdir"
+			mv "$UCEfile" "${GENEdir}"/"$uce"
+		fi
+	done < "${OUTPUT}"/introns.txt
+	DONEmsg
+else
+	warn "Already assigned UCEs to introns. Skipping..."
+fi
+
+# Now, the same but simpler for intergenic regions.
+# Simpler because I don't need geneID here.
+if [ ! -f "${OUTPUT}/intergenic.txt" ]; then
+	log "Assigning UCEs to intergenic regions..."
+	INTERGENIC_DIR=${OUTPUT}/intergenic-regions
+	mkdir -p "$INTERGENIC_DIR"
+	INTERGENIC=$(mktemp)
+	awk \
+		-v FS="\t" \
+		-v OFS="\t" \
+		'{ if( $6 == "intergenic" ){print $1} }' \
+		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
+		> "$INTERGENIC"
+	# Run ParseResults.R for intergenic region.
+	"${HOME_DIR}"/scripts/parse-results.R "$INTERGENIC" \
+		"${OUTPUT}"/intergenic.txt intergenic
+	# Same as previous 'while', but only with UCE name.
+	while IFS=$'\t' read uce; do
+		UCEfile=${NEXUSCOPYex}/$uce
+		if [[ ! -f ${UCEfile} ]]; then
+			#warn "${uce%.*} already assigned or missing in nexus dir. \
+			#Skipping this file..."
+			continue
+		else
+			mv "$UCEfile" "${INTERGENIC_DIR}"/"$uce"
+		fi
+	done < "${OUTPUT}"/intergenic.txt
+	DONEmsg
+else
+	warn "Already assigned UCEs to intergenic regions. Skipping..."
+fi
+	# Compute statistics.
+	# I didn't use uce_kit stats because its based on UCEs in baits file.
+	# A lot of UCEs are in baits file but not in NEXUS dir.
+	# So real stats for this should be based on UCEs in NEXUS dir.
+	grep -o -f $ASSIGNED2INTRON $BEFOREALL > $ASSIGNED2INTRON_NOTMISSING
+	grep -o -f $ASSIGNED2EXON $BEFOREALL > $ASSIGNED2EXON_NOTMISSING
+	# Count each type of assignment:
+	# E: exon
+	# I: intron
+	# EI: exon-and-intron
+	# N: intergenic regions
+	EI=$(grep -f $ASSIGNED2INTRON_NOTMISSING $ASSIGNED2EXON_NOTMISSING \
+		| uniq | wc -l)
+	E=$(grep -v -f $ASSIGNED2INTRON_NOTMISSING $ASSIGNED2EXON_NOTMISSING \
+		| uniq | wc -l)
+	I=$(grep -v -f $ASSIGNED2EXON_NOTMISSING $ASSIGNED2INTRON_NOTMISSING \
+		| uniq | wc -l)
+	N=$(find $INTERGENIC_DIR -type f | wc -l)
+	# print stats
+	log "--------------------------------------------"
+	log "SUMMARY:"
+	log "$TOTAL_UCEs UCEs in NEXUS dir:"
+	log "$E assigned to exons"
+	log "$I assigned to introns"
+	log "$EI assigned to both (accounted for exons)"
+	log "$N assigned to intergenic regions"
+	log "--------------------------------------------"
+	# Printing to csv
+	echo "type,uce.count
+total,$TOTAL_UCEs
+exons,$E
+introns,$I
+exon-and-intron,$EI
+intergenic,$N" > ${OUTPUT}/summary.csv
+
+
+#=============================================================
+#====                       STEP 3:                       ====
+#====        Concatenating UCEs by region (exons)         ====
+#=============================================================
+
+ALL_EXONS_DIR=${OUTPUT}/tmp/01-exon-data/
+mkdir -p "$ALL_EXONS_DIR"
+
+# This step turn this:
+# - output/tmp/00-.../
+#    - gene-X/
+#        - exon-1/
+#        	 - uce-1.nexus
+#            - uce-2.nexus
+#
+# Into this:
+# - output/tmp/01-.../exons/
+#    - gene-X__exon-1/
+#        - gene-X__exon-1.nexus
+
+if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
+	log "Concatenating UCEs by region (exons)..."
+	DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d)
+	N_DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d | wc -l)
+	AUX=0
+	for dir in $DIRS; do
+		# Output dir is named as gene-[geneID]__exon-[exonID]/ 
+		# (separated by two underscores)
+		GENEID__EXONID=$(echo "$dir" | rev \
+			| cut -d "/" -f 1,2 | rev | sed 's/\//__/g')
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 2 | rev)
+		AUX=$(( AUX + 1 ))
+		# concatenate with phyluce in parallel
+		sem --id $$ --max-procs "$THREADS" \
+			phyluce_align_concatenate_alignments \
+			--alignments "$dir" --nexus \
+			--output "${ALL_EXONS_DIR}"/"${GENEID__EXONID}" > /dev/null 2>&1
+		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
+	done
+	sem --id $$ --wait
+	echo "";DONEmsg
+else
+	warn "Already concatenated UCEs by exons. Skipping..."
+fi
+
+#=============================================================
+#====                       STEP 4:                       ====
+#====        Concatenating UCEs by region (introns)       ====
+#=============================================================
+
+ALL_INTRONS_DIR=${OUTPUT}/tmp/02-intron-data/
+mkdir -p "$ALL_INTRONS_DIR"
+
+# This step turn this:
+# - output/tmp/00-.../introns/
+#    - gene-X/
+#       - uce-1.nexus
+#       - uce-2.nexus
+#
+# Into this:
+# - output/tmp/02-.../
+#    - gene-X/
+#        - gene-X.nexus
+
+if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
+	log "Concatenating UCEs by region (introns)..."
+	DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d)
+	N_DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d | wc -l)
+	AUX=0
+	for dir in $DIRS; do
+		# the output dir will be named as gene-[geneID]
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
+		AUX=$(( AUX + 1 ))
+		sem --id $$ --max-procs "$THREADS" \
+			phyluce_align_concatenate_alignments \
+			--alignments "$dir" --nexus \
+			--output "${ALL_INTRONS_DIR}"/"${GENEID}" > /dev/null 2>&1
+		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
+	done
+	sem --id $$ --wait
+	echo ""; DONEmsg
+else
+	warn "Already concatenated UCEs by introns. Skipping..."
+fi
+
+#=============================================================
+#====                       STEP 5:                       ====
+#====      Prepare diff. exons (same gene) to concat      ====
+#=============================================================
+
+GENE_MERGED_PREP_BASEDIR=${OUTPUT}/tmp/03-pre-concat/
+mkdir -p "$GENE_MERGED_PREP_BASEDIR"
+
+# This step turns this:
+# - output/tmp/01-.../exons/
+#    - gene-X__exon-1/
+#        - gene-X__exon-1.nexus
+#    - gene-X__exon-2/
+#        - gene-X__exon-2.nexus
+#
+# Into this:
+# - output/tmp/03-.../
+#    - gene-X/
+#        - exon-1.nexus
+#        - exon-2.nexus
+
+if [ -z "$(ls -A "${GENE_MERGED_PREP_BASEDIR}")" ]; then
+	DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d)
+	N_DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d | wc -l)
+	log "Preparing exons for concatenation..."
+	for dir in $DIRS; do
+		# Create a copy of it in another folder.
+		# In this new location, the folders will be geneID.
+		# Will contain all exononic UCEs (same gene) merged.
+		EXONID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 2 | rev)
+		GENEID_DIR=${GENE_MERGED_PREP_BASEDIR}/${GENEID}
+		mkdir -p "${GENEID_DIR}"
+		EXONIC_UCEs_PHYLIP=${ALL_EXONS_DIR}/${GENEID}__${EXONID}/${GENEID}__${EXONID}.nexus
+		# Remove charsets from nexus to avoid error on next step.
+		cat "$EXONIC_UCEs_PHYLIP" \
+			| sed '/begin sets/,/end/d' \
+			> "${GENEID_DIR}"/"${EXONID}".nexus
+	done
+	DONEmsg
+else
+	warn "Preparation for exonic concatenation already done. Skipping..."
+fi
+
+#=============================================================
+#====                       STEP 6:                       ====
+#====     Prepare diff. introns (same gene) to concat     ====
+#=============================================================
+
+# This step turns this:
+# - output/tmp/03-.../
+#    - gene-X/
+#        - exon-1.nexus
+#        - exon-2.nexus
+# Into this:
+# - output/tmp/03-.../
+#    - gene-X/
+#        - exon-1.nexus
+#        - exon-2.nexus
+#        - introns.nexus
+
+if [ ! -f ${OUTPUT}/tmp/int.done ]; then
+	DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d)
+	N_DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d | wc -l)
+	log "Preparing introns for concatenation..."
+	for dir in $DIRS; do
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
+		GENEID_DIR=${GENE_MERGED_PREP_BASEDIR}/${GENEID}
+		mkdir -p "${GENEID_DIR}"
+		INTRONIC_UCEs_PHYLIP="${ALL_INTRONS_DIR}"/"${GENEID}"/"${GENEID}".nexus
+		# remove the charsets from nexus file to avoid error on next step
+		cat "$INTRONIC_UCEs_PHYLIP" \
+			| sed '/begin sets/,/end/d' \
+			> "${GENEID_DIR}"/introns.nexus
+		touch ${OUTPUT}/tmp/int.done
+	done
+	DONEmsg
+else
+	warn "Preparation for intronic concatenation already done. Skipping..."
+fi
+
+#=============================================================
+#====                       STEP 7:                       ====
+#====               Concatenating by gene                 ====
+#=============================================================
+
+GENE_MERGED_BASEDIR=${OUTPUT}/tmp/04-cat
+mkdir -p "$GENE_MERGED_BASEDIR"
+
+if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
+	log "Concatenating UCEs by gene..."
+	PREPDIRS=$(find "${GENE_MERGED_PREP_BASEDIR}" -mindepth 1 -type d)
+	N_PREPDIRS=$(find "${GENE_MERGED_PREP_BASEDIR}" -mindepth 1 -type d | wc -l)
+	AUX=0
+	for dir in $PREPDIRS; do
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
+		AUX=$(( AUX + 1 ))
+		sem --id $$ --max-procs "$THREADS" \
+			phyluce_align_concatenate_alignments \
+			--alignments "$dir" \
+			--phylip --input-format nexus \
+			--output "${GENE_MERGED_BASEDIR}"/"${GENEID}" \
+			> /dev/null 2> /dev/null
+		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_PREPDIRS"
+	done
+	sem --id $$ --wait
+	echo ""; DONEmsg
+else
+	warn "Data for partitioned approach already done. Skipping..."
+fi
+
+#=============================================================
+#====                       STEP 8:                       ====
+#====             Removing remporary files                ====
+#=============================================================
+
+# Final output dirs
+BY_GENE_DIR="$OUTPUT"/concatenated-by-gene
+BY_REGION_DIR="$OUTPUT"/concatenated-by-region
+
+# cleaning tmp dirs
+rm -rf ${NEXUSCOPYex} ${NEXUSTOCONCAT} "$ALL_EXONS_DIR" "$ALL_INTRONS_DIR"
+
+# Create output concatenated by region
+if [ "$ONLY_BY_REGION" == "False" ]; then
+	log "Writing alignments concatenated by gene"
+	mkdir -p "$BY_GENE_DIR"
+	CATDIRS=$(find "$GENE_MERGED_BASEDIR" -mindepth 1 -type d)
+	# If I kept final alignments in nexus format, charsets would
+	# be merged inside the file by phyluce's script.
+	# So I kept them in phylip format.
+	for dir in $CATDIRS; do
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
+		PHYLIP="$dir"/"$GENEID".phylip
+		CHARSET="$dir"/"$GENEID".charsets
+		NEWCHARSET="$BY_GENE_DIR"/"$GENEID".charsets
+
+		# Moving alignment to final output.
+		# Keep filename.
+		mv "$PHYLIP" "$BY_GENE_DIR"
+
+		# Moving chartset to final output.
+		# Add #NEXUS to first line and remove "partition combined" line.
+		sed '1i #NEXUS' "$CHARSET" | sed '/charpartition/d' > "$NEWCHARSET"
+	done
+	
+fi
+
+# Create output concatenated by region
+if [ "$ONLY_BY_GENE" == "False" ]; then
+	log "Writing alignments concatenated by region"
+	mkdir -p "$BY_REGION_DIR"
+	PRECATFILES=$(find "$GENE_MERGED_PREP_BASEDIR" -type f)
+	# Alignments format for 'by Gene' concatenation will be nexus.
+	# A good way to avoid mixing alignments between approaches.
+	for file in $PRECATFILES; do
+		# Output nexus name will be geneID and regionID separated by
+		# double underscore (__). 
+		# Exons ID already have single underscore.
+		# (e.g. exon-XM_006561541.3-5)
+		# So if I need to split geneID from regionID, I do it by "__".
+		GENEID__REGIONID=$(echo $file | rev | cut -d "/" -f 1,2 \
+			| rev | sed 's/\//__/g')
+		NEWNEXUS="$BY_REGION_DIR"/"$GENEID__REGIONID"
+
+		# Moving alignment to final output.
+		mv "$file" "$NEWNEXUS"
+	done
+	DONEmsg
+fi
+
+log "Removing temporary files"
+rm -rf ${OUTPUT}/tmp
+DONEmsg
+BYEmsg
