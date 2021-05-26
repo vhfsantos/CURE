@@ -5,7 +5,7 @@
 It concatenates UCEs in two different ways, according to the available annotation:
 
 * _by gene_: concatenates all UCEs from the same gene and treats different regions (exons ans introns) as different partitions;
-* _by region_: concatenates all UCEs from the same exons or introns of the same gene. 
+* _by region_: concatenates all UCEs from the same exons or from introns of the same gene. 
 
 By default, **CURE** runs both approaches, but it can be changed. The input files for the pipeline are the baits file used for UCE sequencing, the reference genome and annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
 
