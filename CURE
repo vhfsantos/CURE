@@ -74,6 +74,10 @@ BYEmsg() {
 Probably will have citation, mail contact, and more.
 Bye\033[0m"
 }
+
+# Check deps
+check_deps
+
 # Print usage if no arg
 if [ $# -eq 0 ]; then usage; fi
 
@@ -157,8 +161,6 @@ fi
 if [ "$ONLY_BY_GENE" == "True" ] && [ "$ONLY_BY_REGION" == "True" ]; then
 	error_exit "Please, chose one: --only-by-gene or --only-by-region"
 fi
-# Check deps
-check_deps
 
 # Print parameters for debuggin
 
