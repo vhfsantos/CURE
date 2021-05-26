@@ -23,6 +23,20 @@ By default, **CURE** runs both approaches, but it can be changed. The input file
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
+# Installation
+
+We recommend the installation of **CURE** with [conda](https://conda.io/) for the automatic installation of all dependencies.
+First, clone this repo in your local machine and enter the created directory:
+
+```
+$ git clone https://github.com/vhfsantos/CURE.git
+$ cd CURE
+```
+Then, create a conda environment for **CURE** using the `cure.yml`:
+
+```
+conda env create -n cure --file misc/cure.yml
+```
 
 # License
 
