@@ -9,6 +9,7 @@ For such, **CURE** takes as input the baits file used for UCE sequencing, the re
 
 * [Requirements](#requirements)
 * [Installation](#installation)
+* [How CURE works](#how-cure-works)
 * [Quick usage examples](#quick-usage-examples)
 * [Downstream analysis](#downstream-analysis)
     * [CURE output files](#cure-output-files)
@@ -17,3 +18,8 @@ For such, **CURE** takes as input the baits file used for UCE sequencing, the re
 * [Known issues](#known-issues)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
+
+
+# License
+
+[GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html)
