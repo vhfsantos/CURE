@@ -1,1 +1,1 @@
-<p align="center"><img src="logo.png" alt="CURE" width="1000"></p>
+<p align="center"><img src="logo.png" alt="CURE" width="80%"></p>
