@@ -1,6 +1,8 @@
 <p align="center"><img src="misc/logo.png" alt="CURE" width="40%"></p>
 
-**CURE** is an automated and parallel pipeline for curation of phylogenomic analysis of ultraconserved elements (UCEs). It works in two different approaches:
+**CURE** is an automated and parallel pipeline for curation of ultraconserved elements (UCEs) for phylogenetic analyses. It is an automation/adaptation of the strategy proposed by [Van Dam et al.] (https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768). 
+
+It concatenates UCEs in two different ways, according to the available annotation:
 
 * _by gene_: concatenates all UCEs from the same gene and treats different regions (exons ans introns) as different partitions;
 * _by region_: concatenates all UCEs from the same exons or introns of the same gene. 
