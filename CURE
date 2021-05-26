@@ -13,9 +13,8 @@ by Vinícius H F Santos & Felipe V Freitas
 version "$VERSION"
 
 \e[4mUsage\e[0m: 
- pipeline.sh  --baits <baits.fa> --reference <reference.fasta> \\
-              --gff <reference.gff> --phyluce-nexus <nexus_dir> \\
-              --output <output_dir>
+ CURE --baits <baits.fa> --reference <reference.fasta> --gff <reference.gff> \\
+      --phyluce-nexus <nexus_dir> --output <output_dir>
 
 \e[4mRequired arguments\e[0m:
   -b, --baits             Path to UCE baits file
