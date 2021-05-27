@@ -128,18 +128,18 @@ while true ; do
       OUTPUT="$2"
       shift 2
       ;;
-	-f | --filter )
-	  FILTER="$2"
-	  shift 2
-	  ;;
-	--only-by-gene )
-	  ONLY_BY_GENE="True"
-	  shift
-	  ;;
-	--only-by-region )
-	  ONLY_BY_REGION="True"
-	  shift
-	  ;;
+    -f | --filter )
+      FILTER="$2"
+      shift 2
+      ;;
+    --only-by-gene )
+      ONLY_BY_GENE="True"
+      shift
+      ;;
+    --only-by-region )
+      ONLY_BY_REGION="True"
+      shift
+      ;;
     -- )
       shift
       break
@@ -410,7 +410,7 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 		# concatenate with phyluce in parallel
 		sem --will-cite --id $$ --max-procs "$THREADS" \
 			phyluce_align_concatenate_alignments \
-			--alignments "$dir" --nexus \
+			--alignments "$dir" --nexus --log ${OUTPUT} \
 			--output "${ALL_EXONS_DIR}"/"${GENEID__EXONID}" > /dev/null 2>&1
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
 	done
@@ -450,7 +450,7 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 		AUX=$(( AUX + 1 ))
 		sem --will-cite --id $$ --max-procs "$THREADS" \
 			phyluce_align_concatenate_alignments \
-			--alignments "$dir" --nexus \
+			--alignments "$dir" --nexus --log ${OUTPUT} \
 			--output "${ALL_INTRONS_DIR}"/"${GENEID}" > /dev/null 2>&1
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
 	done
@@ -560,7 +560,7 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 		sem --will-cite --id $$ --max-procs "$THREADS" \
 			phyluce_align_concatenate_alignments \
 			--alignments "$dir" \
-			--phylip --input-format nexus \
+			--phylip --input-format nexus --log ${OUTPUT}\
 			--output "${GENE_MERGED_BASEDIR}"/"${GENEID}" \
 			> /dev/null 2> /dev/null
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_PREPDIRS"
