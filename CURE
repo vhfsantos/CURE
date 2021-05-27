@@ -100,60 +100,60 @@ eval set -- "$OPTS"
 
 # Extracting arguments
 while true ; do
-  case "$1" in
-    -h | --help )
-      usage
-      ;;
-    -p | --phyluce-nexus )
-      NEXUS_DIR="$2"
-      shift 2
-      ;;
-    -b | --baits )
-      BAITS_FILE="$2"
-      shift 2
-      ;;
-    -r | --reference )
-      REFERENCE_GENOME="$2"
-      shift 2
-      ;;
-    -t | --threads )
-     THREADS="$2"
-     shift 2
-     ;;
-    -g | --gff )
-      GFF="$2"
-      shift 2
-      ;;
-    -o | --output )
-      OUTPUT="$2"
-      shift 2
-      ;;
-    -f | --filter )
-      FILTER="$2"
-      shift 2
-      ;;
-    --only-by-gene )
-      ONLY_BY_GENE="True"
-      shift
-      ;;
-    --only-by-region )
-      ONLY_BY_REGION="True"
-      shift
-      ;;
-    -- )
-      shift
-      break
-      ;;
-    *)
-      error_exit "Please, supply all arguments correctly."
-      ;;
-  esac
+	case "$1" in
+		-h | --help )
+		usage
+		;;
+		-p | --phyluce-nexus )
+		NEXUS_DIR="$2"
+		shift 2
+		;;
+		-b | --baits )
+		BAITS_FILE="$2"
+		shift 2
+		;;
+		-r | --reference )
+		REFERENCE_GENOME="$2"
+		shift 2
+		;;
+		-t | --threads )
+		THREADS="$2"
+		shift 2
+		;;
+		-g | --gff )
+		GFF="$2"
+		shift 2
+		;;
+		-o | --output )
+		OUTPUT="$2"
+		shift 2
+		;;
+		-f | --filter )
+		FILTER="$2"
+		shift 2
+		;;
+		--only-by-gene )
+		ONLY_BY_GENE="True"
+		shift
+		;;
+		--only-by-region )
+		ONLY_BY_REGION="True"
+		shift
+		;;
+		-- )
+		shift
+		break
+		;;
+		*)
+		error_exit "Please, supply all arguments correctly."
+		;;
+	esac
 done
 
 # Checking if any required args is empty
 if [ -z "${NEXUS_DIR}" ] || [ -z "${BAITS_FILE}" ] || \
-   [ -z "${REFERENCE_GENOME}" ] || [ -z "${GFF}" ] || \
-   [ -z "${OUTPUT}" ]; then
+	[ -z "${REFERENCE_GENOME}" ] || [ -z "${GFF}" ] || \
+	[ -z "${OUTPUT}" ]; then
 	error_exit "Please, supply all arguments correctly."
 fi
 
@@ -163,7 +163,6 @@ if [ "$ONLY_BY_GENE" == "True" ] && [ "$ONLY_BY_REGION" == "True" ]; then
 fi
 
 # Print parameters for debuggin
-
 echo "
         Defined parameters
 ------------------------------------
@@ -229,7 +228,7 @@ fi
 # I treat each type differently.
 # Let's beggin with exons.
 NEXUSTOCONCAT=${OUTPUT}/tmp/00-characterized-uces/
-if [ ! -f "${OUTPUT}/exons.txt" ]; then
+if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 	log "Assinging UCEs to exons..."
 	EXONS=$(mktemp)
 	# Create 2 temp files to count each assignment type
@@ -251,7 +250,7 @@ if [ ! -f "${OUTPUT}/exons.txt" ]; then
 		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
 		> "$EXONS"
 	# Run ParseResults.R for exons.
-	"${HOME_DIR}"/scripts/parse-results.R "$EXONS" "${OUTPUT}"/exons.txt exon
+	"${HOME_DIR}"/scripts/parse-results.R "$EXONS" "${OUTPUT}"/CURE-exons.txt exon
 	# Read output from R script.
 	# Lines are uce name, exon ID and gene ID.
 	# So, copy uce name from nexus dir to gene/exon dir.
@@ -269,7 +268,7 @@ if [ ! -f "${OUTPUT}/exons.txt" ]; then
 			mv "$UCEfile" "${EXONdir}"/"$uce"
 		fi
 
-	done < "${OUTPUT}"/exons.txt
+	done < "${OUTPUT}"/CURE-exons.txt
 	DONEmsg
 else
 	warn "Already assigned UCEs to exons. Skipping..."
@@ -278,7 +277,7 @@ fi
 # Doing (almost) the same for introns.
 # Introns do not have IDs like exons.
 # Output dir will be only geneID.
-if [ ! -f "${OUTPUT}/introns.txt" ]; then
+if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 	log "Assigning UCEs to introns..."
 	INTRONS=$(mktemp)
 	awk \
@@ -288,7 +287,7 @@ if [ ! -f "${OUTPUT}/introns.txt" ]; then
 		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
 		> "$INTRONS"
 	# Run ParseResults.R for introns.
-	"${HOME_DIR}"/scripts/parse-results.R "$INTRONS" "${OUTPUT}"/introns.txt intron
+	"${HOME_DIR}"/scripts/parse-results.R "$INTRONS" "${OUTPUT}"/CURE-introns.txt intron
 	# Same as previous 'while', but for introns.
 	while IFS=$'\t' read uce geneID; do
 		UCEfile=${NEXUSCOPYex}/$uce
@@ -302,7 +301,7 @@ if [ ! -f "${OUTPUT}/introns.txt" ]; then
 			mkdir -p "$GENEdir"
 			mv "$UCEfile" "${GENEdir}"/"$uce"
 		fi
-	done < "${OUTPUT}"/introns.txt
+	done < "${OUTPUT}"/CURE-introns.txt
 	DONEmsg
 else
 	warn "Already assigned UCEs to introns. Skipping..."
@@ -310,7 +309,7 @@ fi
 
 # Now, the same but simpler for intergenic regions.
 # Simpler because I don't need geneID here.
-if [ ! -f "${OUTPUT}/intergenic.txt" ]; then
+if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 	log "Assigning UCEs to intergenic regions..."
 	INTERGENIC_DIR=${OUTPUT}/intergenic-regions
 	mkdir -p "$INTERGENIC_DIR"
@@ -323,7 +322,7 @@ if [ ! -f "${OUTPUT}/intergenic.txt" ]; then
 		> "$INTERGENIC"
 	# Run ParseResults.R for intergenic region.
 	"${HOME_DIR}"/scripts/parse-results.R "$INTERGENIC" \
-		"${OUTPUT}"/intergenic.txt intergenic
+		"${OUTPUT}"/CURE-intergenic.txt intergenic
 	# Same as previous 'while', but only with UCE name.
 	while IFS=$'\t' read uce; do
 		UCEfile=${NEXUSCOPYex}/$uce
@@ -334,7 +333,7 @@ if [ ! -f "${OUTPUT}/intergenic.txt" ]; then
 		else
 			mv "$UCEfile" "${INTERGENIC_DIR}"/"$uce"
 		fi
-	done < "${OUTPUT}"/intergenic.txt
+	done < "${OUTPUT}"/CURE-intergenic.txt
 	DONEmsg
 else
 	warn "Already assigned UCEs to intergenic regions. Skipping..."
