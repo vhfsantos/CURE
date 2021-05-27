@@ -26,7 +26,7 @@ version "$VERSION"
   -t, --threads           Number of threads for the analysis (Default: 10)
 
 \e[4mOptional arguments\e[0m:
-  -f, --filter            String to be filter out from the UCE name
+  -f, --filter-string            String from which UCE name will be discarted (Default: "_")
   --only-by-gene          Concatenate UCEs only by gene. Concatenation by region
                           will be discarted with this flag
   --only-by-region        Concatenate UCEs only by region. Concatenation by gene
@@ -87,6 +87,7 @@ HOME_DIR=${tmp%/*}
 THREADS=10
 ONLY_BY_GENE="False"
 ONLY_BY_REGION="False"
+FILTER="_"
 
 # Option strings for arg parser
 SHORT=hb:r:g:p:o:f:t:
@@ -128,7 +129,7 @@ while true ; do
 		OUTPUT="$2"
 		shift 2
 		;;
-		-f | --filter )
+		-f | --filter-string )
 		FILTER="$2"
 		shift 2
 		;;
@@ -174,6 +175,7 @@ OUTDIR: ${OUTPUT}
 THREADS: $THREADS
 ONLY_BY_GENE? $ONLY_BY_GENE
 ONLY_BY_REGION? $ONLY_BY_REGION
+FILTER_STRING $FILTER
 ------------------------------------"
 
 #=============================================================
@@ -250,7 +252,8 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
 		> "$EXONS"
 	# Run ParseResults.R for exons.
-	"${HOME_DIR}"/scripts/parse-results.R "$EXONS" "${OUTPUT}"/CURE-exons.txt exon
+	"${HOME_DIR}"/scripts/parse-results.py "$EXONS" "$FILTER" \
+		"${OUTPUT}"/CURE-exons.txt exon
 	# Read output from R script.
 	# Lines are uce name, exon ID and gene ID.
 	# So, copy uce name from nexus dir to gene/exon dir.
@@ -287,7 +290,8 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
 		> "$INTRONS"
 	# Run ParseResults.R for introns.
-	"${HOME_DIR}"/scripts/parse-results.R "$INTRONS" "${OUTPUT}"/CURE-introns.txt intron
+	"${HOME_DIR}"/scripts/parse-results.py "$INTRONS" "$FILTER" \
+		"${OUTPUT}"/CURE-introns.txt intron
 	# Same as previous 'while', but for introns.
 	while IFS=$'\t' read uce geneID; do
 		UCEfile=${NEXUSCOPYex}/$uce
@@ -321,7 +325,7 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
 		> "$INTERGENIC"
 	# Run ParseResults.R for intergenic region.
-	"${HOME_DIR}"/scripts/parse-results.R "$INTERGENIC" \
+	"${HOME_DIR}"/scripts/parse-results.py "$INTERGENIC" "$FILTER" \
 		"${OUTPUT}"/CURE-intergenic.txt intergenic
 	# Same as previous 'while', but only with UCE name.
 	while IFS=$'\t' read uce; do
