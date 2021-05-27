@@ -43,14 +43,9 @@ error_exit() {
 
 # Check dependencies
 check_deps() {
-	for app in R blastn parallel phyluce_align_concatenate_alignments; do
+	for app in blastn parallel phyluce_align_concatenate_alignments; do
         	command -v $app >/dev/null 2>&1 || \
 			error_exit "Cannot find ${app} in your PATH variable"
-	done
-	for pkg in stringr; do
-		R --slave \
-		-e 'if(!require("'${pkg}'", quietly=T)){quit(save="no", status=1)}else{quit(save="no", status=0)}'
-		if [ $? == 1 ]; then error_exit "The R package ${pkg} is not installed."; fi
 	done
 }
 
