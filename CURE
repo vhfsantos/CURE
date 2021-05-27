@@ -21,7 +21,7 @@ version "$VERSION"
   -r, --reference         Path to reference genome file
   -g, --gff               Path to annotation file in gff format
   -p, --phyluce-nexus     Path to the directory with nexus files created with
-                          Phyluce
+                          phyluce
   -o, --output            Output directory
   -t, --threads           Number of threads for the analysis (Default: 10)
 
@@ -43,13 +43,13 @@ error_exit() {
 
 # Check dependencies
 check_deps() {
-	for app in blastn phyluce_align_concatenate_alignments; do
+	for app in R blastn parallel phyluce_align_concatenate_alignments; do
         	command -v $app >/dev/null 2>&1 || \
 			error_exit "Cannot find ${app} in your PATH variable"
 	done
 	for pkg in stringr; do
 		R --slave \
-		-e 'if(!require("'${pkg}'", quietly=T)){quit(save="no", status=1)}else{quit(save="no", status=0)}' >/dev/null 2>&1
+		-e 'if(!require("'${pkg}'", quietly=T)){quit(save="no", status=1)}else{quit(save="no", status=0)}'
 		if [ $? == 1 ]; then error_exit "The R package ${pkg} is not installed."; fi
 	done
 }
@@ -116,10 +116,10 @@ while true ; do
       REFERENCE_GENOME="$2"
       shift 2
       ;;
-	-t | --threads )
-	  THREADS="$2"
-	  shift 2
-	  ;;
+    -t | --threads )
+     THREADS="$2"
+     shift 2
+     ;;
     -g | --gff )
       GFF="$2"
       shift 2
@@ -193,7 +193,7 @@ mkdir -p ${NEXUSCOPYex}
 if [ -z "$(ls -A "${NEXUSCOPYex}")" ]; then
 	log "Preparing input data..."
 	parallel \
-	--max-procs ${THREADS} \
+	--will-cite --max-procs ${THREADS} \
 	cp {} ${NEXUSCOPYex} ::: ${NEXUS_DIR}/* 2> /dev/null
 else
 	warn "Input preparation already done. Skipping"
@@ -215,7 +215,7 @@ if [[ ! -f "${OUTPUT}/${GENOME}.uce_kit_summary" ]]; then
 		"${BAITS_FILE}" \
 		"${REFERENCE_GENOME}" \
 		"${GFF}" "${OUTPUT}" \
-		-lines -merge -filt "$FILTER" 2> /dev/null
+		-lines -merge -filt "$FILTER" > /dev/null 2>&1
 	DONEmsg
 	else
 		warn "Script uce_kit.py already run. Skipping..."
@@ -408,13 +408,13 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 		GENEID=$(echo "$dir" | rev | cut -d "/" -f 2 | rev)
 		AUX=$(( AUX + 1 ))
 		# concatenate with phyluce in parallel
-		sem --id $$ --max-procs "$THREADS" \
+		sem --will-cite --id $$ --max-procs "$THREADS" \
 			phyluce_align_concatenate_alignments \
 			--alignments "$dir" --nexus \
 			--output "${ALL_EXONS_DIR}"/"${GENEID__EXONID}" > /dev/null 2>&1
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
 	done
-	sem --id $$ --wait
+	sem --will-cite --id $$ --wait
 	echo "";DONEmsg
 else
 	warn "Already concatenated UCEs by exons. Skipping..."
@@ -448,13 +448,13 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 		# the output dir will be named as gene-[geneID]
 		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
 		AUX=$(( AUX + 1 ))
-		sem --id $$ --max-procs "$THREADS" \
+		sem --will-cite --id $$ --max-procs "$THREADS" \
 			phyluce_align_concatenate_alignments \
 			--alignments "$dir" --nexus \
 			--output "${ALL_INTRONS_DIR}"/"${GENEID}" > /dev/null 2>&1
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
 	done
-	sem --id $$ --wait
+	sem --will-cite --id $$ --wait
 	echo ""; DONEmsg
 else
 	warn "Already concatenated UCEs by introns. Skipping..."
@@ -557,7 +557,7 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 	for dir in $PREPDIRS; do
 		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
 		AUX=$(( AUX + 1 ))
-		sem --id $$ --max-procs "$THREADS" \
+		sem --will-cite --id $$ --max-procs "$THREADS" \
 			phyluce_align_concatenate_alignments \
 			--alignments "$dir" \
 			--phylip --input-format nexus \
@@ -565,7 +565,7 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 			> /dev/null 2> /dev/null
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_PREPDIRS"
 	done
-	sem --id $$ --wait
+	sem --will-cite --id $$ --wait
 	echo ""; DONEmsg
 else
 	warn "Data for partitioned approach already done. Skipping..."

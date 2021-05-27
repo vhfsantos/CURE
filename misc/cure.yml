@@ -1,7 +1,7 @@
 channels:
   - faircloth-lab/label/phyluce
-  - bioconda
   - conda-forge
+  - bioconda
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
@@ -14,12 +14,15 @@ dependencies:
   - bcftools=1.11=h7c999a4_0
   - bedtools=2.30.0=hc088bd4_0
   - biopython=1.78=py36h8f6f2f9_2
+  - blast=2.5.0=hc0b0e79_3
+  - boost=1.76.0=py36h706143c_0
+  - boost-cpp=1.76.0=hc6e9bd1_0
   - brotlipy=0.7.0=py36h8f6f2f9_1001
   - bwa=0.7.17=hed695b0_7
   - bx-python=0.8.9=py36h5e0341f_2
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.17.1=h7f98852_1
-  - ca-certificates=2020.12.5=ha878542_0
+  - ca-certificates=2021.4.13=h06a4308_1
   - cairo=1.16.0=h7979940_1007
   - certifi=2020.12.5=py36h5fab9bb_1
   - cffi=1.14.5=py36hc120d54_0
@@ -102,9 +105,10 @@ dependencies:
   - openjdk=11.0.8=hacce0ff_0
   - openmp=7.0.0=h2d50403_0
   - openmpi=4.0.5=h9b22176_4
-  - openssl=1.1.1j=h7f98852_0
+  - openssl=1.1.1k=h7f98852_0
   - packaging=20.9=pyh44b312d_0
   - pandas=1.1.5=py36h284efc9_0
+  - parallel=20210422=ha770c72_0
   - pcre=8.44=he1b5a44_0
   - perl=5.32.0=h36c2ea0_0
   - phyluce=1.7.1=py36_0
@@ -131,7 +135,7 @@ dependencies:
   - pyyaml=5.4.1=py36h8f6f2f9_0
   - ratelimiter=1.2.0=py_1002
   - raxml-ng=1.0.1=h7447c1b_0
-  - readline=8.0=he28a2e2_2
+  - readline=8.1=h46c0cb4_0
   - requests=2.25.1=pyhd3deb0d_0
   - rich=9.2.0=py36h5fab9bb_0
   - samtools=1.11=h6270b1f_0
