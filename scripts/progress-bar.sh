@@ -10,4 +10,4 @@ let _left=30-$_done
 _fill=$(printf "%${_done}s")
 _empty=$(printf "%${_left}s")
 
-printf "\r└ progress: |${_fill// /▇}${_empty// /-}| ${_progress}%% ($1 genes of $2)"
+printf "\r└ progress: |${_fill// /▇}${_empty// /-}| ${_progress}%% ($1 of $2)"

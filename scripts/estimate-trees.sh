@@ -101,18 +101,58 @@ check_deps
 
 Run_IQtree_NEXUS() {
 	NEXUS_DIR="$INPUT_DIR"/"$1"
-	OUTPUT_DIR="$OUTPUT_DIR"/"$1"
-	mkdir -p "${OUTPUT_DIR}"
+	OUT_DIR="$OUTPUT_DIR"/"$1"
+	mkdir -p "${OUT_DIR}"
 	NEXUS=$(find "$NEXUS_DIR" -name *.nexus)
 	N_NEXUS=$(find "$NEXUS_DIR" -name *.nexus | wc -l)
 	AUX=0
-	echo "$NEXUS_DIR"
-	echo "$OUTPUT_DIR"
-
-#	# run
-#for alignment in $NEXUS; do
-#		file=$(basename "$alignment")
-#		iqtree -s "$alignment" --quiet --prefix
+	echo "- Estimating trees for files in $NEXUS_DIR"
+	echo "- Saving in $OUT_DIR"
+	# run
+	for alignment in $NEXUS; do
+		AUX=$(( $AUX+1 ))
+		file=$(basename "$alignment")
+		sem --will-cite --id $$ --max-procs $THREADS \
+			iqtree -s "$alignment" --quiet --prefix "$OUT_DIR"/${file%.*} \
+			-bb 1000 -alrt 1000 --threads-max 1
+		${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
+		echo "- Done"
+	done
+	sem --will-cite --id $$ --wait
 }
 
+Run_IQtree_PHYLIP() {
+	PHYLIP_DIR="$INPUT_DIR"/"$1"
+	OUT_DIR="$OUTPUT_DIR"/"$1"
+	mkdir -p "${OUT_DIR}"
+	PHYLIP=$(find "$PHYLIP_DIR" -name *.phylip)
+	N_PHYLIP=$(find "$PHYLIP_DIR" -name *.phylip | wc -l)
+	AUX=0
+	echo "- Estimating trees for files in $PHYLIP_DIR"
+	echo "- Saving in $OUT_DIR"
+	# run
+	for alignment in $PHYLIP; do
+		AUX=$(( $AUX+1 ))
+		file=$(basename "$alignment")
+		sem --will-cite --id $$ --max-procs $THREADS \
+			iqtree -s "$alignment" -spp "$PHYLIP_DIR"/${file%.*}.charsets \
+			--quiet --prefix "$OUT_DIR"/${file%.*} \
+			-bb 1000 -alrt 1000 --threads-max 1
+		${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
+		echo "- Done"
+	done
+	sem --will-cite --id $$ --wait
+}
+
+# Running for intergenic regions
 Run_IQtree_NEXUS intergenic-regions
+
+# Running for concatenated by region
+if [ "$ONLY_BY_REGION" == "False" ]; then
+	Run_IQtree_NEXUS concatenate-by-region
+fi
+
+# Create output concatenated by gene
+if [ "$ONLY_BY_REGION" == "False" ]; then
+	Run_IQtree_PHYLIP concatenate-by-gene
+fi
