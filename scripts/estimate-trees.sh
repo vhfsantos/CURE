@@ -93,14 +93,17 @@ check_deps
 Run_IQtree_NEXUS() {
 	NEXUS_DIR="$INPUT_DIR"/"$1"
 	OUTPUT_DIR="$OUTPUT_DIR"/"$1"
-	THREADS="$2"
+	mkdir -p "${OUTPUT_DIR}"
 	NEXUS=$(find "$NEXUS_DIR" -name *.nexus)
 	N_NEXUS=$(find "$NEXUS_DIR" -name *.nexus | wc -l)
 	AUX=0
-	# run
-	for alignment in $NEXUS; do
-		file=$(basename "$alignment")
-		iqtree -s "$alignment"
+	echo "$NEXUS_DIR"
+	echo "$OUTPUT_DIR"
 
-
+#	# run
+#for alignment in $NEXUS; do
+#		file=$(basename "$alignment")
+#		iqtree -s "$alignment" --quiet --prefix
 }
+
+Run_IQtree_NEXUS intergenic
