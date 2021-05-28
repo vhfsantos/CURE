@@ -45,7 +45,7 @@ error_exit() {
 check_deps() {
 	for app in blastn parallel phyluce_align_concatenate_alignments; do
         	command -v $app >/dev/null 2>&1 || \
-			error_exit "Cannot find ${app} in your PATH variable"
+			error_exit "Cannot find ${app} in your PATH variable\nDid you activate the cure environment?"
 	done
 }
 
