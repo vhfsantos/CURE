@@ -85,6 +85,13 @@ while true ; do
 		ONLY_BY_REGION="True"
 		shift
 		;;
+		-- )
+		shift
+		break
+		;;
+		*)
+		error_exit "Please, supply all arguments correctly."
+		;;
 	esac
 done
 
