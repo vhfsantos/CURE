@@ -1,3 +1,4 @@
+name: cure
 channels:
   - faircloth-lab/label/phyluce
   - conda-forge
@@ -57,6 +58,7 @@ dependencies:
   - importlib_metadata=3.7.2=hd8ed1ab_0
   - iniconfig=1.1.1=pyh9f0ad1d_0
   - ipython_genutils=0.2.0=py_1
+  - iqtree=2.1.2=h56fc30b_0
   - jpeg=9d=h36c2ea0_0
   - jsonschema=3.2.0=pyhd8ed1ab_3
   - jupyter_core=4.7.1=py36h5fab9bb_0
@@ -180,3 +182,4 @@ dependencies:
   - zipp=3.4.1=pyhd8ed1ab_0
   - zlib=1.2.11=h516909a_1010
   - zstd=1.4.9=ha95c52a_0
+prefix: /home/vinicius/miniconda3/envs/cure
