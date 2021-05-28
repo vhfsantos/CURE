@@ -48,10 +48,6 @@ def main():
     filt = args[2]
     output = args[3]
     region = args[4]
-    print('df: {}'. format(df_path))
-    print('filt: {}'. format(filt))
-    print('output: {}'. format(output))
-    print('region: {}'. format(region))
     # call function
     read_df(df_path, filt, output, region)
     

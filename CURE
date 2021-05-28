@@ -23,10 +23,10 @@ version "$VERSION"
   -p, --phyluce-nexus     Path to the directory with nexus files created with
                           phyluce
   -o, --output            Output directory
-  -t, --threads           Number of threads for the analysis (Default: 10)
 
 \e[4mOptional arguments\e[0m:
-  -f, --filter-string            String from which UCE name will be discarted (Default: "_")
+  -t, --threads           Number of threads for the analysis (Default: 10)
+  -f, --filter-string     String from which UCE name will be discarted (Default: "_")
   --only-by-gene          Concatenate UCEs only by gene. Concatenation by region
                           will be discarted with this flag
   --only-by-region        Concatenate UCEs only by region. Concatenation by gene
@@ -57,9 +57,9 @@ log() {
 warn() {
 	echo -e "\033[1;33m"[$(date +%Y-%m-%d" "%H:%M:%S)] $1"\033[0m"
 	}
-# "Done" message function (green text)
+# "Done" message function
 DONEmsg() {
-	echo -e "\033[1;32m"[$(date +%Y-%m-%d" "%H:%M:%S)] Done!"\033[0m"
+	echo -e [$(date +%Y-%m-%d" "%H:%M:%S)] Done!
 }
 # "Bye" message function (green text)
 BYEmsg() {
@@ -203,14 +203,17 @@ fi
 # https://github.com/calacademy-research/ccgutils/tree/master/uce_types
 
 mkdir -p "${OUTPUT}"/tmp/
-GENOME=$(basename "${REFERENCE_GENOME}")
+mkdir -p "${OUTPUT}"/uce_kit_output
 
-if [[ ! -f "${OUTPUT}/${GENOME}.uce_kit_summary" ]]; then
+GENOME=$(basename "${REFERENCE_GENOME}")
+UCE_KIT_SUMMARY="${OUTPUT}/uce_kit_output/${GENOME}.uce_kit_summary"
+
+if [[ ! -f "${UCE_KIT_SUMMARY}" ]]; then
 	log "Running uce_kit.py..."
 	python "${HOME_DIR}"/scripts/uce_kit/uce_kit.py run_pipeline \
 		"${BAITS_FILE}" \
 		"${REFERENCE_GENOME}" \
-		"${GFF}" "${OUTPUT}" \
+		"${GFF}" "${OUTPUT}"/uce_kit_output \
 		-lines -merge -filt "$FILTER" > /dev/null 2>&1
 	DONEmsg
 	else
@@ -224,6 +227,7 @@ fi
 
 # I treat each type differently.
 # Let's beggin with exons.
+EXONCOUNT=0
 NEXUSTOCONCAT=${OUTPUT}/tmp/00-characterized-uces/
 if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 	log "Assinging UCEs to exons..."
@@ -244,12 +248,12 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		-v FS="\t" \
 		-v OFS="\t" \
 		'{ if( $4 == "exon" ){print $1, $2, $5, $6, $10} }' \
-		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
+		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$EXONS"
-	# Run ParseResults.R for exons.
+	# Run ParseResults for exons.
 	"${HOME_DIR}"/scripts/parse-results.py "$EXONS" "$FILTER" \
 		"${OUTPUT}"/CURE-exons.txt exon
-	# Read output from R script.
+	# Read output from script.
 	# Lines are uce name, exon ID and gene ID.
 	# So, copy uce name from nexus dir to gene/exon dir.
 	while IFS=$'\t' read uce exonID geneID; do
@@ -263,6 +267,7 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 			continue
 		else
 			mkdir -p "$EXONdir"
+			EXONCOUNT=$(( $EXONCOUNT+1 ))
 			mv "$UCEfile" "${EXONdir}"/"$uce"
 		fi
 
@@ -282,9 +287,9 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 		-v FS="\t" \
 		-v OFS="\t" \
 		'{ if( $4 == "intron" ){print $1, $2, $5, $6, $10} }' \
-		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
+		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$INTRONS"
-	# Run ParseResults.R for introns.
+	# Run ParseResults for introns.
 	"${HOME_DIR}"/scripts/parse-results.py "$INTRONS" "$FILTER" \
 		"${OUTPUT}"/CURE-introns.txt intron
 	# Same as previous 'while', but for introns.
@@ -317,9 +322,9 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 		-v FS="\t" \
 		-v OFS="\t" \
 		'{ if( $6 == "intergenic" ){print $1} }' \
-		"${OUTPUT}/${GENOME}.uce_kit_summary" | uniq \
+		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$INTERGENIC"
-	# Run ParseResults.R for intergenic region.
+	# Run ParseResults for intergenic region.
 	"${HOME_DIR}"/scripts/parse-results.py "$INTERGENIC" "$FILTER" \
 		"${OUTPUT}"/CURE-intergenic.txt intergenic
 	# Same as previous 'while', but only with UCE name.
@@ -355,14 +360,19 @@ fi
 	I=$(grep -v -f $ASSIGNED2EXON_NOTMISSING $ASSIGNED2INTRON_NOTMISSING \
 		| uniq | wc -l)
 	N=$(find $INTERGENIC_DIR -type f | wc -l)
+	# move unassigned UCEs to 'intergenic' dir
+	UN=$(ls ${NEXUSCOPYex} | wc -l)
+	mv ${NEXUSCOPYex}/* "$INTERGENIC_DIR"
 	# print stats
 	log "--------------------------------------------"
-	log "SUMMARY:"
+	log "----------------- SUMMARY ------------------"
+	log "--------------------------------------------"
 	log "$TOTAL_UCEs UCEs in NEXUS dir:"
 	log "$E assigned to exons"
 	log "$I assigned to introns"
 	log "$EI assigned to both (accounted for exons)"
 	log "$N assigned to intergenic regions"
+	log "$UN unassigned (accounted for intergenic)"
 	log "--------------------------------------------"
 	# Printing to csv
 	echo "type,uce.count
@@ -370,8 +380,8 @@ total,$TOTAL_UCEs
 exons,$E
 introns,$I
 exon-and-intron,$EI
-intergenic,$N" > ${OUTPUT}/summary.csv
-
+intergenic,$N
+unassigned, $UN" > ${OUTPUT}/CURE-summary.csv
 
 #=============================================================
 #====                       STEP 3:                       ====
@@ -415,7 +425,7 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 	sem --will-cite --id $$ --wait
 	echo "";DONEmsg
 else
-	warn "Already concatenated UCEs by exons. Skipping..."
+	warn "Already concatenated UCEs from same exons. Skipping..."
 fi
 
 #=============================================================
@@ -455,12 +465,12 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 	sem --will-cite --id $$ --wait
 	echo ""; DONEmsg
 else
-	warn "Already concatenated UCEs by introns. Skipping..."
+	warn "Already concatenate UCEs from same introns. Skipping..."
 fi
 
 #=============================================================
 #====                       STEP 5:                       ====
-#====      Prepare diff. exons (same gene) to concat      ====
+#====             Prepare exons to cat by gene            ====
 #=============================================================
 
 GENE_MERGED_PREP_BASEDIR=${OUTPUT}/tmp/03-pre-concat/
@@ -482,7 +492,7 @@ mkdir -p "$GENE_MERGED_PREP_BASEDIR"
 if [ -z "$(ls -A "${GENE_MERGED_PREP_BASEDIR}")" ]; then
 	DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d)
 	N_DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d | wc -l)
-	log "Preparing exons for concatenation..."
+	log "Preparing exons for concatenation by gene..."
 	for dir in $DIRS; do
 		# Create a copy of it in another folder.
 		# In this new location, the folders will be geneID.
@@ -499,12 +509,12 @@ if [ -z "$(ls -A "${GENE_MERGED_PREP_BASEDIR}")" ]; then
 	done
 	DONEmsg
 else
-	warn "Preparation for exonic concatenation already done. Skipping..."
+	warn "Exons already prepared for concatenation by gene. Skipping..."
 fi
 
 #=============================================================
 #====                       STEP 6:                       ====
-#====     Prepare diff. introns (same gene) to concat     ====
+#====            Prepare introns to cat by gene           ====
 #=============================================================
 
 # This step turns this:
@@ -522,7 +532,7 @@ fi
 if [ ! -f ${OUTPUT}/tmp/int.done ]; then
 	DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d)
 	N_DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d | wc -l)
-	log "Preparing introns for concatenation..."
+	log "Preparing introns for concatenation by gene..."
 	for dir in $DIRS; do
 		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
 		GENEID_DIR=${GENE_MERGED_PREP_BASEDIR}/${GENEID}
@@ -536,7 +546,7 @@ if [ ! -f ${OUTPUT}/tmp/int.done ]; then
 	done
 	DONEmsg
 else
-	warn "Preparation for intronic concatenation already done. Skipping..."
+	warn "Introns already prepared for concatenation by gene. Skipping..."
 fi
 
 #=============================================================
@@ -566,7 +576,7 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 	sem --will-cite --id $$ --wait
 	echo ""; DONEmsg
 else
-	warn "Data for partitioned approach already done. Skipping..."
+	warn "Concatenation by gene already done. Skipping..."
 fi
 
 #=============================================================
@@ -603,7 +613,6 @@ if [ "$ONLY_BY_REGION" == "False" ]; then
 		# Add #NEXUS to first line and remove "partition combined" line.
 		sed '1i #NEXUS' "$CHARSET" | sed '/charpartition/d' > "$NEWCHARSET"
 	done
-	
 fi
 
 # Create output concatenated by region

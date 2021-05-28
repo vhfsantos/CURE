@@ -454,7 +454,7 @@ def run_pipeline(ops, output_dir):
     wd = wd.split("uce_kit.py")[0]
         
     # Step 1 blat (or blastn) tetrapod_uces.fasta galGal4.fna >tetrapod_uces.galGal4_matches.m8
-    m8_file = "{}.matches.m8".format(remove_ext(os.path.basename(uce)))
+    m8_file = output_dir+"/{}.matches.m8".format(remove_ext(os.path.basename(uce)))
     sys.stderr.write("\nStep 1 of 4: ") # blat_uces() will write rest of line
     if cmd_exists("blat") or cmd_exists("blatq"):
         rc = blat_uces(uce, genome, m8_file)
