@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # usage
 usage() {
 echo -e "
@@ -113,4 +115,4 @@ Run_IQtree_NEXUS() {
 #		iqtree -s "$alignment" --quiet --prefix
 }
 
-Run_IQtree_NEXUS intergenic
+Run_IQtree_NEXUS intergenic-regions
