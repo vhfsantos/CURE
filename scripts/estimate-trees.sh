@@ -2,6 +2,12 @@
 
 set -e
 
+error_exit() {
+	msg=$1
+	>&2 echo -e "\033[1;31mERROR: ${msg}\033[0m"
+	usage
+}
+
 # usage
 usage() {
 echo -e "
@@ -61,6 +67,8 @@ OPTS=$(getopt --options $SHORT --long $LONG --name "$0" -- "$@")
 if [ $? != 0 ]; then error_exit "Failed to parse options...exiting."; fi
 eval set -- "$OPTS"
 
+if [ $? != 0 ]; then error_exit "Failed to parse options...exiting."; fi
+
 # Extracting arguments
 while true ; do
 	case "$1" in
@@ -99,6 +107,11 @@ done
 
 check_deps
 
+# Checking if any required args is empty
+if [ -z "${INPUT_DIR}" ] || [ -z "${OUTPUT_DIR}" ]; then
+	error_exit "Please, supply all arguments correctly."
+fi
+
 Run_IQtree_NEXUS() {
 	NEXUS_DIR="$INPUT_DIR"/"$1"
 	OUT_DIR="$OUTPUT_DIR"/"$1"
@@ -116,9 +129,9 @@ Run_IQtree_NEXUS() {
 			iqtree -s "$alignment" --quiet --prefix "$OUT_DIR"/${file%.*} \
 			-bb 1000 -alrt 1000 --threads-max 1
 		${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
-		echo "- Done"
 	done
 	sem --will-cite --id $$ --wait
+	echo "- Done"
 }
 
 Run_IQtree_PHYLIP() {
@@ -139,9 +152,9 @@ Run_IQtree_PHYLIP() {
 			--quiet --prefix "$OUT_DIR"/${file%.*} \
 			-bb 1000 -alrt 1000 --threads-max 1
 		${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
-		echo "- Done"
 	done
 	sem --will-cite --id $$ --wait
+	echo "- Done"
 }
 
 # Running for intergenic regions
@@ -149,10 +162,10 @@ Run_IQtree_NEXUS intergenic-regions
 
 # Running for concatenated by region
 if [ "$ONLY_BY_REGION" == "False" ]; then
-	Run_IQtree_NEXUS concatenate-by-region
+	Run_IQtree_NEXUS concatenated-by-region
 fi
 
 # Create output concatenated by gene
 if [ "$ONLY_BY_REGION" == "False" ]; then
-	Run_IQtree_PHYLIP concatenate-by-gene
+	Run_IQtree_PHYLIP concatenated-by-gene
 fi
