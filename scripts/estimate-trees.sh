@@ -161,7 +161,7 @@ Run_IQtree_PHYLIP() {
 Run_IQtree_NEXUS intergenic-regions
 
 # Running for concatenated by region
-if [ "$ONLY_BY_REGION" == "False" ]; then
+if [ "$ONLY_BY_GENE" == "False" ]; then
 	Run_IQtree_NEXUS concatenated-by-region
 fi
 
