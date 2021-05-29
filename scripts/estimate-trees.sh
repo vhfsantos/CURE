@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -e
+trap ctrl_c SIGINT
+trap 'echo - Ignoring a SIGHUP received..' SIGHUP
 
 error_exit() {
 	msg=$1
@@ -8,6 +10,14 @@ error_exit() {
 	usage
 }
 
+function ctrl_c() {
+
+	echo "- Canceling all parallel jobs..."
+	killall parallel
+	echo "- Bye"
+	exit 1
+
+} 
 # usage
 usage() {
 echo -e "
