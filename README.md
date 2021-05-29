@@ -58,6 +58,13 @@ Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and 
 The intergenic file contains only the UCE names.
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
 
+Bellow all output files are summarized. Directories are written `as-code/` and files **in-bold**
+|Output|Short description|
+|------|-----------------|
+|`concatenated-by-region/`|Directory with alignment files of UCEs concatenated by region (exons and introns) in NEXUS format|
+|`concatenated-by-gene/`|Directory with alignment files of UCEs concatenated by gene in PHYLIP format and its charsets in NEXUS format|
+|**CURE-introns.txt**|......|
+
 # License
 
 [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html)
