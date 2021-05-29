@@ -53,17 +53,15 @@ The main output files produced by **CURE** are the alignments of concatenated UC
 If you run **CURE** without `--only-by-gene` or `--only-by-region`, both concatenation approaches will be done.
 In this case, your output dir will contain `concatenated-by-region/` and `concatenated-by-gene/` dirs.
 If you raised any of this flags, only the coresponding dir will be created.
+Besides, **CURE** creates the `intergenic-regions/` dir containing unmerged UCEs assigned to intergenic regions.
+
+Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEXUS format.
+Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are in NEXUS format.
 
 Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and `CURE-intergenic.txt`, which contains the UCE names assigned to each region, as well as the region ID (for exons) and gene ID (for exons and introns).
 The intergenic file contains only the UCE names.
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
 
-Bellow all output files are summarized. Directories are written `as-code/` and files **in-bold**
-|Output|Short description|
-|------|-----------------|
-|`concatenated-by-region/`|Directory with alignment files of UCEs concatenated by region (exons and introns) in NEXUS format|
-|`concatenated-by-gene/`|Directory with alignment files of UCEs concatenated by gene in PHYLIP format and its charsets in NEXUS format|
-|**CURE-introns.txt**|......|
 
 # License
 
