@@ -143,13 +143,11 @@ if [ "$ONLY_BY_REGION" == "False" ]; then
 	echo "--- By gene, all regions"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-gene/all-regions.tre \
-		-o "$ASTRAL_OUT"/by-gene/all-regions.tre \
-		2> "$ASTRAL_OUT"/by-gene/all-regions.log
+		-o "$ASTRAL_OUT"/by-gene/all-regions.tre
 	echo "--- By gene, genic regions"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-gene/only-genic-regions.tre \
-		-o "$ASTRAL_OUT"/by-gene/only-genic-regions.tre \
-		2> "$ASTRAL_OUT"/by-gene/only-genic-regions.log
+		-o "$ASTRAL_OUT"/by-gene/only-genic-regions.tre
 fi
 
 # run by region
@@ -158,23 +156,19 @@ if [ "$ONLY_BY_GENE" == "False" ]; then
 	echo "--- By region, all regions"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-region/all-regions.tre \
-		-o "$ASTRAL_OUT"/by-region/all-regions.tre \
-		2> "$ASTRAL_OUT"/by-region/all-regions.log
+		-o "$ASTRAL_OUT"/by-region/all-regions.tre 
 	echo "--- By region, genic regions"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-region/only-genic-regions.tre \
-		-o "$ASTRAL_OUT"/by-region/only-genic-regions.tre \
-		2> "$ASTRAL_OUT"/by-region/only-genic-regions.log
+		-o "$ASTRAL_OUT"/by-region/only-genic-regions.tre 
 	echo "--- By region, introns"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-region/only-introns.tre \
-		-o "$ASTRAL_OUT"/by-region/only-introns.tre \
-		2> "$ASTRAL_OUT"/by-region/only-introns.log
+		-o "$ASTRAL_OUT"/by-region/only-introns.tre
 	echo "--- By region, exons"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-region/only-exons.tre \
-		-o "$ASTRAL_OUT"/by-region/only-exons.tre \
-		2> "$ASTRAL_OUT"/by-region/only-exons.log
+		-o "$ASTRAL_OUT"/by-region/only-exons.tre
 fi
 
 echo "- All done. Bye"
