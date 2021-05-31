@@ -22,7 +22,7 @@ by Vinícius H F Santos & Felipe V Freitas
 reconstruct-species-tree.sh   --iqtree-out <path/to/iqtree-out> \\
                               --astral-in <path/to/astral-in> \\
                               --astral-out <path/to/astral-out> \\
-						      --astral-jar <Astral.X.X.X.jar>
+                              --astral-jar <Astral.X.X.X.jar>
 
 \e[4mRequired arguments\e[0m:
  --iqtree-out           Path to gene trees (produced by estimate-trees.sh)
