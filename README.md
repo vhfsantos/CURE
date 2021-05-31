@@ -20,6 +20,7 @@ By default, **CURE** runs both approaches, but it can be changed. The input file
     * [Estimating trees from output](#estimating-trees-from-output)
     * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
 * [Known issues](#known-issues)
+   * [IQtree error while estimating trees](#IQtree-error-while-estimating-trees)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
