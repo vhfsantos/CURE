@@ -100,6 +100,23 @@ for alignment in $(cat trees_not_done.txt); do
 done; sem --will-cite --wait
 ```
 
+If you had this issue for alignments in the `concatenated-by-region/` or `intergenic-regions` dir, the steps are almost the same.
+First difference is that you need to tell `find` command to look for `.nexus` files to write `trees_not_done.txt`:
+
+```
+find $ALI_DIR -name *nexus -printf "%f\n" | cut -d '.' -f 1 | grep -v -f trees_already_done.txt > trees_not_done.txt
+```
+
+Finally, IQ-tree command line needs to be changed:
+
+```
+for alignment in $(cat trees_not_done.txt); do 
+   sem --will-cite --max-procs 10 iqtree -s "$ALI_DIR"/"$alignment".nexus \
+   --prefix "$TREE_DIR"/"$alignment" \
+   -bb 1000 -alrt 1000 --threads-max 2
+done; sem --will-cite --wait
+```
+
 # License
 
 [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html)
