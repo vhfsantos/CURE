@@ -20,6 +20,7 @@ By default, **CURE** runs both approaches, but it can be changed. The input file
     * [Estimating trees from output](#estimating-trees-from-output)
     * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
 * [Known issues](#known-issues)
+   * [IQ-tree error while estimating trees](#IQ-tree-error-while-estimating-trees)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
@@ -62,6 +63,59 @@ Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and 
 The intergenic file contains only the UCE names.
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
 
+# Kwown issues
+
+## IQ-tree error while estimating trees
+
+Depending on the computer you are running on, you may face some trouble with IQ-tree while running the `estimating-trees.sh`. I am not sure why this happens, but it does. Frequently the log of `estimate-trees.sh` shows that `IQ-TREE CRASHES WITH SIGNAL ABORTED` during the model finder stage. 
+To face this, you can create a list of the alignment files that have not been run and rerun IQ-tree for them.  
+Say for instance that this happened while estimating trees for the alignments of `concatenated-by-gene/` dir.  Let's open our terminal and define some variables with the alignment dir and tree dir before starting solving this.
+
+```
+ALI_DIR=CURE-output/concatenated-by-gene/
+TREE_DIR=iqtree-output/concatenated-by-gene/
+```
+
+Now our commands might look the same.
+
+Let's write a file called `trees_already_done.txt` containing tha name of all files that did not had trouble with IQ-tree:
+
+```
+find $TREE_DIR -name *treefile -printf "%f\n" | cut -d '.' -f 1 > trees_already_done.txt
+```
+Now use `grep` to get the trees that were not done:
+
+```
+find $ALI_DIR -name *charsets -printf "%f\n" | cut -d '.' -f 1 | grep -v -f trees_already_done.txt > trees_not_done.txt
+```
+
+Now you can rerun IQ-tree for each tree in the `tree_not_done.txt`. 
+The following code will do it in parallel, running 10 trees at a time, with 2 threads each (make sure you have activate the cure environment):
+
+```
+for alignment in $(cat trees_not_done.txt); do 
+   sem --will-cite --max-procs 10 iqtree -s "$ALI_DIR"/"$alignment".phylip \
+   -spp "$ALI_DIR"/"$alignment".charsets --prefix "$TREE_DIR"/"$alignment" \
+   -bb 1000 -alrt 1000 --threads-max 2
+done; sem --will-cite --wait
+```
+
+If you had this issue for alignments in the `concatenated-by-region/` or `intergenic-regions` dir, the steps are almost the same.
+First difference is that you need to tell `find` command to look for `.nexus` files to write `trees_not_done.txt`:
+
+```
+find $ALI_DIR -name *nexus -printf "%f\n" | cut -d '.' -f 1 | grep -v -f trees_already_done.txt > trees_not_done.txt
+```
+
+Finally, IQ-tree command line needs to be changed:
+
+```
+for alignment in $(cat trees_not_done.txt); do 
+   sem --will-cite --max-procs 10 iqtree -s "$ALI_DIR"/"$alignment".nexus \
+   --prefix "$TREE_DIR"/"$alignment" \
+   -bb 1000 -alrt 1000 --threads-max 2
+done; sem --will-cite --wait
+```
 
 # License
 
