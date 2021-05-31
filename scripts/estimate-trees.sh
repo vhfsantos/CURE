@@ -29,12 +29,12 @@ CURE: an automated and parallel pipeline for UCE curation
 by Vinícius H F Santos & Felipe V Freitas
 
 \e[4mUsage\e[0m: 
- estimate-trees.sh --input-dir <path/to/input-dir> \\
-                   --output-dir <path/to/output-dir>
+ estimate-trees.sh --cure-out <path/to/cure-out> \\
+                   --iqtree-out <path/to/iqtree-out>
 
 \e[4mRequired arguments\e[0m:
- --input-dir            Path to alignments produced by CURE
- --output-dir           Output directory name
+ --cure-out             Path to alignments produced by CURE
+ --iqtree-out           Output directory name
 
 \e[4mOptional arguments\e[0m:
  --threads              Number of threads for the analysis (Default: 10)
@@ -45,7 +45,7 @@ by Vinícius H F Santos & Felipe V Freitas
  ╔══════════════════════════════════════════════════════╗
  ║                          NOTE                        ║
  ╠══════════════════════════════════════════════════════╣ 
- ║  The parameter 'input-dir' must direct to the output ║
+ ║  The parameter 'cure-out' must direct to the output  ║
  ║  of CURE. This script will enter this directory and  ║
  ║  look for the outputs produced by CURE.              ║
  ║  If you renamed them, it will raise an error.        ║
@@ -56,7 +56,7 @@ exit 2
 
 # Option strings for arg parser
 SHORT=h
-LONG=help,input-dir:,output-dir:,threads:,only-by-gene,only-by-region
+LONG=help,cure-out:,iqtree-out:,threads:,only-by-gene,only-by-region
 
 # Set deafult values
 tmp=$(realpath "$0")
@@ -85,12 +85,12 @@ while true ; do
 		-h | --help )
 		usage
 		;;
-		--input-dir )
-		INPUT_DIR="$2"
+		--cure-out )
+		CURE_OUT="$2"
 		shift 2
 		;;
-		--output-dir )
-		OUTPUT_DIR="$2"
+		--iqtree-out )
+		IQTREE_OUT="$2"
 		shift 2
 		;;
 		--threads )
@@ -118,13 +118,13 @@ done
 check_deps
 
 # Checking if any required args is empty
-if [ -z "${INPUT_DIR}" ] || [ -z "${OUTPUT_DIR}" ]; then
+if [ -z "${CURE_OUT}" ] || [ -z "${IQTREE_OUT}" ]; then
 	error_exit "Please, supply all arguments correctly."
 fi
 
 Run_IQtree_NEXUS() {
-	NEXUS_DIR="$INPUT_DIR"/"$1"
-	OUT_DIR="$OUTPUT_DIR"/"$1"
+	NEXUS_DIR="$CURE_OUT"/"$1"
+	OUT_DIR="$IQTREE_OUT"/"$1"
 	mkdir -p "${OUT_DIR}"
 	NEXUS=$(find "$NEXUS_DIR" -name *.nexus)
 	N_NEXUS=$(find "$NEXUS_DIR" -name *.nexus | wc -l)
@@ -145,8 +145,8 @@ Run_IQtree_NEXUS() {
 }
 
 Run_IQtree_PHYLIP() {
-	PHYLIP_DIR="$INPUT_DIR"/"$1"
-	OUT_DIR="$OUTPUT_DIR"/"$1"
+	PHYLIP_DIR="$CURE_OUT"/"$1"
+	OUT_DIR="$IQTREE_OUT"/"$1"
 	mkdir -p "${OUT_DIR}"
 	PHYLIP=$(find "$PHYLIP_DIR" -name *.phylip)
 	N_PHYLIP=$(find "$PHYLIP_DIR" -name *.phylip | wc -l)
@@ -168,14 +168,28 @@ Run_IQtree_PHYLIP() {
 }
 
 # Running for intergenic regions
-Run_IQtree_NEXUS intergenic-regions
+if [ -z "$(ls -A "$IQTREE_OUT"/"intergenic-regions")" ]; then
+	Run_IQtree_NEXUS intergenic-regions
+else
+	echo "- Already estimated trees of intergenic regions. Skipping..."
+fi
 
 # Running for concatenated by region
 if [ "$ONLY_BY_GENE" == "False" ]; then
-	Run_IQtree_NEXUS concatenated-by-region
+	if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-region")" ]; then
+		Run_IQtree_NEXUS concatenated-by-region
+	else
+		echo "- Already estimated trees by region. Skipping..."
+	fi
 fi
 
 # Create output concatenated by gene
 if [ "$ONLY_BY_REGION" == "False" ]; then
-	Run_IQtree_PHYLIP concatenated-by-gene
+	if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-gene")" ]; then
+		Run_IQtree_PHYLIP concatenated-by-gene
+	else
+		echo "- Already estimated trees by gene. Skipping..."
+	fi
 fi
+
+echo "- All done. Bye"
