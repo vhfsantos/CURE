@@ -93,8 +93,6 @@ while true ; do
 	esac
 done
 
-check_deps
-
 # Checking if any required args is empty
 if [ -z "${ASTRAL_OUT}" ] || [ -z "${IQTREE_OUT}" ] || \
    [ -z "${ASTRAL_IN}" ] || [ -z "${ASTRAL_JAR}" ]; then
