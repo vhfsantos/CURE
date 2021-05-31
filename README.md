@@ -69,7 +69,7 @@ The intergenic file contains only the UCE names.
 
 Depending on the computer you are running on, you may face some trouble with IQ-tree while running the `estimating-trees.sh`. I am not sure why this happens, but it does. Frequently the log of `estimate-trees.sh` shows that `IQ-TREE CRASHES WITH SIGNAL ABORTED` during the model finder stage. 
 To face this, you can create a list of the alignment files that have not been run and rerun IQ-tree for them.  
-Say for instance that this happened while estimating trees for the alignments of `concatenated-by-gene/` dir.  Let's define some variables with the alignment dir and tree dir before starting solving this.
+Say for instance that this happened while estimating trees for the alignments of `concatenated-by-gene/` dir.  Let's open our terminal and define some variables with the alignment dir and tree dir before starting solving this.
 
 ```
 ALI_DIR=CURE-output/concatenated-by-gene/
