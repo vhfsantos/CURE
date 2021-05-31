@@ -78,7 +78,7 @@ TREE_DIR=iqtree-output/concatenated-by-gene/
 
 Now our commands might look the same.
 
-Let's write a file called `trees_already_done.txt` containing tha name of all files that did not had trouble with IQtree:
+Let's write a file called `trees_already_done.txt` containing tha name of all files that did not had trouble with IQ-tree:
 
 ```
 find $TREE_DIR -name *treefile -printf "%f\n" | cut -d '.' -f 1 > trees_already_done.txt
