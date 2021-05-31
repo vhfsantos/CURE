@@ -38,6 +38,14 @@ reconstruct-species-tree.sh   --iqtree-out <path/to/iqtree-out> \\
 exit 2
 }
 
+check_deps() {
+	for app in java; do
+        	command -v $app >/dev/null 2>&1 || \
+			error_exit "Cannot find ${app} in your PATH variable\nDid you activate the cure environment?"
+	done
+}
+
+
 # Option strings for arg parser
 SHORT=h
 LONG=help,astral-in:,iqtree-out:,astral-out:,astral-jar:,only-by-gene,only-by-region
@@ -93,6 +101,8 @@ while true ; do
 	esac
 done
 
+check_deps
+
 # Checking if any required args is empty
 if [ -z "${ASTRAL_OUT}" ] || [ -z "${IQTREE_OUT}" ] || \
    [ -z "${ASTRAL_IN}" ] || [ -z "${ASTRAL_JAR}" ]; then
@@ -141,11 +151,13 @@ if [ "$ONLY_BY_REGION" == "False" ]; then
 	echo "--- By gene, all regions"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-gene/all-regions.tre \
-		-o "$ASTRAL_OUT"/by-gene/all-regions.tre
+		-o "$ASTRAL_OUT"/by-gene/all-regions.tre \
+		2> "$ASTRAL_OUT"/by-gene/all-regions.log
 	echo "--- By gene, genic regions"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-gene/only-genic-regions.tre \
-		-o "$ASTRAL_OUT"/by-gene/only-genic-regions.tre
+		-o "$ASTRAL_OUT"/by-gene/only-genic-regions.tre \
+		2> "$ASTRAL_OUT"/by-gene/only-genic-regions.log
 fi
 
 # run by region
@@ -154,19 +166,23 @@ if [ "$ONLY_BY_GENE" == "False" ]; then
 	echo "--- By region, all regions"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-region/all-regions.tre \
-		-o "$ASTRAL_OUT"/by-region/all-regions.tre 
+		-o "$ASTRAL_OUT"/by-region/all-regions.tre \
+		2> "$ASTRAL_OUT"/by-region/all-regions.log
 	echo "--- By region, genic regions"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-region/only-genic-regions.tre \
-		-o "$ASTRAL_OUT"/by-region/only-genic-regions.tre 
+		-o "$ASTRAL_OUT"/by-region/only-genic-regions.tre \
+		2> "$ASTRAL_OUT"/by-region/only-genic-regions.log
 	echo "--- By region, introns"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-region/only-introns.tre \
-		-o "$ASTRAL_OUT"/by-region/only-introns.tre
+		-o "$ASTRAL_OUT"/by-region/only-introns.tre \
+		2> "$ASTRAL_OUT"/by-region/only-introns.log
 	echo "--- By region, exons"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-region/only-exons.tre \
-		-o "$ASTRAL_OUT"/by-region/only-exons.tre
+		-o "$ASTRAL_OUT"/by-region/only-exons.tre \
+		2> "$ASTRAL_OUT"/by-region/only-exons.log
 fi
 
 echo "- All done. Bye"
