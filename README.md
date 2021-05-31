@@ -20,7 +20,7 @@ By default, **CURE** runs both approaches, but it can be changed. The input file
     * [Estimating trees from output](#estimating-trees-from-output)
     * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
 * [Known issues](#known-issues)
-   * [IQtree error while estimating trees](#IQtree-error-while-estimating-trees)
+   * [IQ-tree error while estimating trees](#IQ-tree-error-while-estimating-trees)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
@@ -65,10 +65,10 @@ The intergenic file contains only the UCE names.
 
 # Kwown issues
 
-## IQtree error while estimating trees
+## IQ-tree error while estimating trees
 
-Depending on the computer you are running on, you may face some trouble with IQtree while running the `estimating-trees.sh`. I am not sure why this happens, but it does. Frequently the log of `estimate-trees.sh` shows that `IQ-TREE CRASHES WITH SIGNAL ABORTED` during the model finder stage. 
-To face this, you can create a list of the alignment files that have not been run and rerun IQtree for them.  
+Depending on the computer you are running on, you may face some trouble with IQ-tree while running the `estimating-trees.sh`. I am not sure why this happens, but it does. Frequently the log of `estimate-trees.sh` shows that `IQ-TREE CRASHES WITH SIGNAL ABORTED` during the model finder stage. 
+To face this, you can create a list of the alignment files that have not been run and rerun IQ-tree for them.  
 Say for instance that this happened while estimating trees for the alignments of `concatenated-by-gene/` dir.  Let's define some variables with the alignment dir and tree dir before starting solving this.
 
 ```
@@ -89,7 +89,7 @@ Now use `grep` to get the trees that were not done:
 find $ALI_DIR -name *charsets -printf "%f\n" | cut -d '.' -f 1 | grep -v -f trees_already_done.txt > trees_not_done.txt
 ```
 
-Now you can rerun IQtree for each tree in the `tree_not_done.txt`. 
+Now you can rerun IQ-tree for each tree in the `tree_not_done.txt`. 
 The following code will do it in parallel, running 10 trees at a time, with 2 threads each:
 
 ```
