@@ -90,7 +90,7 @@ find $ALI_DIR -name *charsets -printf "%f\n" | cut -d '.' -f 1 | grep -v -f tree
 ```
 
 Now you can rerun IQ-tree for each tree in the `tree_not_done.txt`. 
-The following code will do it in parallel, running 10 trees at a time, with 2 threads each:
+The following code will do it in parallel, running 10 trees at a time, with 2 threads each (make sure you have activate the cure environment):
 
 ```
 for alignment in $(cat trees_not_done.txt); do 
