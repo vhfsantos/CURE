@@ -62,6 +62,40 @@ Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and 
 The intergenic file contains only the UCE names.
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
 
+# Kwown issues
+
+Depending on the computer you are running on, you may face some trouble with IQtree while estimating the trees. I am not sure why this happens, but it does. Frequently the log of `estimate-trees.sh` shows that `IQ-TREE CRASHES WITH SIGNAL ABORTED` during the model finder stage. 
+To face this, you can create a list of the alignment files that have not been run and rerun IQtree for them.  
+Say for instance that this happened while estimating trees for the alignments of `concatenated-by-gene/` dir.  Let's define some variables with the alignment dir and tree dir.
+
+```
+ALI_DIR=CURE-output/concatenated-by-gene/
+TREE_DIR=iqtree-output/concatenated-by-gene/
+```
+
+Now our commands might look the same.
+
+Let's write a file called `trees_already_done.txt` containing tha name of all files that did not had trouble with IQtree:
+
+```
+find $TREE_DIR -name *treefile -printf "%f\n" | cut -d '.' -f 1 > trees_already_done.txt
+```
+Now use `grep` to get the trees that were not done:
+
+```
+find $ALI_DIR -name *charsets -printf "%f\n" | cut -d '.' -f 1 | grep -v -f trees_already_done.txt > trees_not_done.txt
+```
+
+Now you can rerun IQtree for each tree in the `tree_not_done.txt`. 
+The following code will do it in parallel, running 10 trees at a time, with 2 threads each:
+
+```
+for alignment in $(cat trees_not_done.txt); do 
+   sem --will-cite --max-procs 10 iqtree -s "$ALI_DIR"/"$alignment".phylip \
+   -spp "$ALI_DIR"/"$alignment".charsets --prefix "$TREE_DIR"/"$alignment" \
+   -bb 1000 -alrt 1000 --threads-max 2
+done; sem --will-cite --wait
+```
 
 # License
 
