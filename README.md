@@ -33,13 +33,15 @@ First, clone this repo in your local machine and enter the created directory:
 git clone https://github.com/vhfsantos/CURE.git
 cd CURE
 ```
-Then, create a conda environment for **CURE** using the `cure.yml`:
+Then, create a conda environment for **CURE** using the `cure.yml`, and ensure all scripts have execution permission:
 
 ```
 conda env create -n cure --file misc/cure.yml
+chmod +x CURE
+chmod +x scripts/*
 ```
 
-After all installation, activate the cure environment and run **CURE** with no arguments. **CURE** will tell you if any dependency are missing.
+After all installations, activate the cure environment and run **CURE** with no arguments. **CURE** will tell you if any dependency are missing.
 
 ```
 conda activate cure
