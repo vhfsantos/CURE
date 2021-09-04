@@ -1,13 +1,13 @@
 <p align="center"><img src="misc/logo.png" alt="CURE" width="40%"></p>
 
-**CURE** is an automated and parallel pipeline for curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategy proposed by [Van Dam et al. 2021. Genomic Characterization and Curation of UCEs Improves Species Tree Reconstruction](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768). 
+**CURE** is an automated and parallel pipeline for the curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategy proposed by [Van Dam et al. 2021. Genomic Characterization and Curation of UCEs Improves Species Tree Reconstruction](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768). 
 
 It concatenates UCEs in two different ways, according to the available annotation:
 
-* _by gene_: concatenates all UCEs from the same gene and treats different regions (exons ans introns) as different partitions;
-* _by region_: concatenates all UCEs from the same exons or from introns of the same gene. 
+* _by gene_: concatenates all UCEs from the same gene and treats different regions (exons and introns) as different partitions;
+* _by region_: concatenates all UCEs from the same exons or introns of the same gene. 
 
-By default, **CURE** runs both approaches, but it can be changed. The input files for the pipeline are the baits file used for UCE sequencing, the reference genome and annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
+By default, **CURE** runs both approaches, but this can be changed. The input files for the pipeline are the baits file used for UCE sequencing, the reference genome and annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
 
 # Table of contents
 
@@ -21,7 +21,6 @@ By default, **CURE** runs both approaches, but it can be changed. The input file
     * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
 * [Known issues](#known-issues)
    * [IQ-tree error while estimating trees](#IQ-tree-error-while-estimating-trees)
-* [Acknowledgements](#acknowledgements)
 * [License](#license)
 
 # Installation
@@ -41,7 +40,7 @@ chmod +x CURE
 chmod +x scripts/*
 ```
 
-After all installations, activate the cure environment and run **CURE** with no arguments. **CURE** will tell you if any dependency are missing.
+After done all installations, activate the cure environment and run **CURE** with no arguments. **CURE** will tell you if any dependencies are missing.
 
 ```
 conda activate cure
@@ -55,7 +54,7 @@ conda activate cure
 The main output files produced by **CURE** are the alignments of concatenated UCEs.
 If you run **CURE** without `--only-by-gene` or `--only-by-region`, both concatenation approaches will be done.
 In this case, your output dir will contain `concatenated-by-region/` and `concatenated-by-gene/` dirs.
-If you raised any of this flags, only the coresponding dir will be created.
+If you raised any of these flags, only the corresponding dir will be created.
 Besides, **CURE** creates the `intergenic-regions/` dir containing unmerged UCEs assigned to intergenic regions.
 
 Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEXUS format.
@@ -65,7 +64,7 @@ Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and 
 The intergenic file contains only the UCE names.
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
 
-# Kwown issues
+# Known issues
 
 ## IQ-tree error while estimating trees
 
