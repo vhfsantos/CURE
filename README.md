@@ -16,7 +16,7 @@ By default, **CURE** runs both approaches, but this can be changed. The input fi
 * [Quick usage examples](#quick-usage-examples)
 * [Downstream analysis](#downstream-analysis)
     * [CURE output files](#cure-output-files)
-    * [Estimating trees from output](#estimating-trees-from-output)
+    * [Estimating trees from output files](#estimating-trees-from-output-files)
     * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
 * [License](#license)
 
