@@ -18,8 +18,6 @@ By default, **CURE** runs both approaches, but this can be changed. The input fi
     * [CURE output files](#cure-output-files)
     * [Estimating trees from output](#estimating-trees-from-output)
     * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
-* [Known issues](#known-issues)
-   * [IQ-tree error while estimating trees](#IQ-tree-error-while-estimating-trees)
 * [License](#license)
 
 # Installation
@@ -76,6 +74,7 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 <p align="center"><img src="misc/img/intergenic.svg" alt="input" width="60%"></p>
 
 
+# Quick usage examples
 
 
 # Downstream analysis
