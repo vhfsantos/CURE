@@ -16,10 +16,8 @@ By default, **CURE** runs both approaches, but this can be changed. The input fi
 * [Quick usage examples](#quick-usage-examples)
 * [Downstream analysis](#downstream-analysis)
     * [CURE output files](#cure-output-files)
-    * [Estimating trees from output](#estimating-trees-from-output)
+    * [Estimating trees from output files](#estimating-trees-from-output-files)
     * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
-* [Known issues](#known-issues)
-   * [IQ-tree error while estimating trees](#IQ-tree-error-while-estimating-trees)
 * [License](#license)
 
 # Installation
@@ -53,13 +51,13 @@ The main inputs of **CURE** are the UCE files and an annotated reference genome 
 <p align="center"><img src="misc/img/input.svg" alt="input" width="80%"></p>
 
 The first step of **CURE** is running a custom version of the `uce_type` tool described by [Van Dam et al. 2021](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) and available at the [ccgutils repository](https://github.com/calacademy-research/ccgutils).
-Briefly, this step assigns each UCE to an exon, intron or intergenic region of the given reference genome
+Briefly, this step assigns each UCE to an exon, intron, or intergenic region of the given reference genome
 
 <p align="center"><img src="misc/img/output1.svg" alt="input" width="60%"></p>
 
-Then **CURE** parses the results and merge the UCEs in two different ways: by gene and by region. 
+Then **CURE** parses the results and merges the UCEs in two different ways: by gene and by region. 
 
-When concatenating *by gene*, **CURE** merges all UCEs from the same gene and treats different regions (exons ans introns) as different partitions (Note that different introns are placed under the same partition). It stores the results in `phylip` format inside the `concatenated_by_gene/` directory. 
+When concatenating *by gene*, **CURE** merges all UCEs from the same gene and treats different regions (exons and introns) as different partitions (Note that different introns are placed under the same partition). It stores the results in `phylip` format inside the `concatenated_by_gene/` directory. 
 Further phylogenetic analysis of UCEs merged with this approach would yield a phylogenetic tree for each gene. 
 
 <p align="center"><img src="misc/img/cat_by_gene.svg" alt="input" width="60%"></p>
@@ -70,12 +68,13 @@ Further phylogenetic analysis of UCEs merged with this approach would yield seve
 
 <p align="center"><img src="misc/img/cat_by_region.svg" alt="input" width="60%"></p>
 
-For any of the two concatenating approaches, **CURE** leaves unmerged the UCEs in intergenic regions. 
+For any of the two concatenating approaches, **CURE** leaves unmerged UCEs in intergenic regions. 
 These UCEs are just copied to the `intergenic_regions/` directory. 
 
 <p align="center"><img src="misc/img/intergenic.svg" alt="input" width="60%"></p>
 
 
+# Quick usage examples
 
 
 # Downstream analysis
@@ -95,59 +94,9 @@ Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and 
 The intergenic file contains only the UCE names.
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
 
-# Known issues
+## Estimating trees from output files
 
-## IQ-tree error while estimating trees
-
-Depending on the computer you are running on, you may face some trouble with IQ-tree while running the `estimating-trees.sh`. I am not sure why this happens, but it does. Frequently the log of `estimate-trees.sh` shows that `IQ-TREE CRASHES WITH SIGNAL ABORTED` during the model finder stage. 
-To face this, you can create a list of the alignment files that have not been run and rerun IQ-tree for them.  
-Say for instance that this happened while estimating trees for the alignments of `concatenated-by-gene/` dir.  Let's open our terminal and define some variables with the alignment dir and tree dir before starting solving this.
-
-```
-ALI_DIR=CURE-output/concatenated-by-gene/
-TREE_DIR=iqtree-output/concatenated-by-gene/
-```
-
-Now our commands might look the same.
-
-Let's write a file called `trees_already_done.txt` containing tha name of all files that did not had trouble with IQ-tree:
-
-```
-find $TREE_DIR -name *treefile -printf "%f\n" | cut -d '.' -f 1 > trees_already_done.txt
-```
-Now use `grep` to get the trees that were not done:
-
-```
-find $ALI_DIR -name *charsets -printf "%f\n" | cut -d '.' -f 1 | grep -v -f trees_already_done.txt > trees_not_done.txt
-```
-
-Now you can rerun IQ-tree for each tree in the `tree_not_done.txt`. 
-The following code will do it in parallel, running 10 trees at a time, with 2 threads each (make sure you have activate the cure environment):
-
-```
-for alignment in $(cat trees_not_done.txt); do 
-   sem --will-cite --max-procs 10 iqtree -s "$ALI_DIR"/"$alignment".phylip \
-   -spp "$ALI_DIR"/"$alignment".charsets --prefix "$TREE_DIR"/"$alignment" \
-   -bb 1000 -alrt 1000 --threads-max 2
-done; sem --will-cite --wait
-```
-
-If you had this issue for alignments in the `concatenated-by-region/` or `intergenic-regions` dir, the steps are almost the same.
-First difference is that you need to tell `find` command to look for `.nexus` files to write `trees_not_done.txt`:
-
-```
-find $ALI_DIR -name *nexus -printf "%f\n" | cut -d '.' -f 1 | grep -v -f trees_already_done.txt > trees_not_done.txt
-```
-
-Finally, IQ-tree command line needs to be changed:
-
-```
-for alignment in $(cat trees_not_done.txt); do 
-   sem --will-cite --max-procs 10 iqtree -s "$ALI_DIR"/"$alignment".nexus \
-   --prefix "$TREE_DIR"/"$alignment" \
-   -bb 1000 -alrt 1000 --threads-max 2
-done; sem --will-cite --wait
-```
+## Summary analysis of estimated trees
 
 # License
 
