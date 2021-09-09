@@ -73,7 +73,7 @@ error_exit() {
 
 # Check dependencies
 check_deps() {
-	for app in blastn parallel phyluce_align_concatenate_alignments; do
+	for app in $CONDA_PREFIX/bin/blastn $CONDA_PREFIX/bin/parallel $CONDA_PREFIX/bin/phyluce_align_concatenate_alignments; do
         	command -v $app >/dev/null 2>&1 || \
 			error_exit "Cannot find ${app} in your PATH variable\nDid you activate the cure environment?"
 	done
@@ -197,7 +197,7 @@ mkdir -p ${NEXUSCOPYex}
 
 if [ -z "$(ls -A "${NEXUSCOPYex}")" ]; then
 	log "Preparing input data..."
-	parallel \
+	$CONDA_PREFIX/bin/parallel \
 	--will-cite --max-procs ${THREADS} \
 	cp {} ${NEXUSCOPYex} ::: ${NEXUS_DIR}/* 2> /dev/null
 else
@@ -219,7 +219,7 @@ UCE_KIT_SUMMARY="${OUTPUT}/uce_kit_output/${GENOME}.uce_kit_summary"
 
 if [[ ! -f "${UCE_KIT_SUMMARY}" ]]; then
 	log "Running uce_kit.py..."
-	python "${HOME_DIR}"/scripts/uce_kit/uce_kit.py run_pipeline \
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/scripts/uce_kit/uce_kit.py run_pipeline \
 		"${BAITS_FILE}" \
 		"${REFERENCE_GENOME}" \
 		"${GFF}" "${OUTPUT}"/uce_kit_output \
@@ -241,7 +241,7 @@ NEXUSTOCONCAT=${OUTPUT}/tmp/00-characterized-uces/
 if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 	log "Assinging UCEs to exons..."
 	EXONS=$(mktemp)
-	# Create 2 temp files to count each assignment type
+	# Create temp files to count each assignment type
 	ASSIGNED2EXON=${OUTPUT}/tmp/assign2ex
 	ASSIGNED2INTRON=${OUTPUT}/tmp/assign2in
 	ASSIGNED2EXON_NOTMISSING=${OUTPUT}/tmp/assign2exNotMissing
@@ -260,8 +260,8 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$EXONS"
 	# Run ParseResults for exons.
-	"${HOME_DIR}"/scripts/parse-results.py "$EXONS" "$FILTER" \
-		"${OUTPUT}"/CURE-exons.txt exon
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/scripts/parse-results.py "$EXONS" \
+	                "$FILTER" "${OUTPUT}"/CURE-exons.txt exon
 	# Read output from script.
 	# Lines are uce name, exon ID and gene ID.
 	# So, copy uce name from nexus dir to gene/exon dir.
@@ -299,8 +299,8 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$INTRONS"
 	# Run ParseResults for introns.
-	"${HOME_DIR}"/scripts/parse-results.py "$INTRONS" "$FILTER" \
-		"${OUTPUT}"/CURE-introns.txt intron
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/scripts/parse-results.py \
+	        "$INTRONS" "$FILTER" "${OUTPUT}"/CURE-introns.txt intron
 	# Same as previous 'while', but for introns.
 	while IFS=$'\t' read uce geneID; do
 		UCEfile=${NEXUSCOPYex}/$uce
@@ -334,8 +334,9 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$INTERGENIC"
 	# Run ParseResults for intergenic region.
-	"${HOME_DIR}"/scripts/parse-results.py "$INTERGENIC" "$FILTER" \
-		"${OUTPUT}"/CURE-intergenic.txt intergenic
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/scripts/parse-results.py \
+	        "$INTERGENIC" "$FILTER" "${OUTPUT}"/CURE-intergenic.txt \
+	        intergenic
 	# Same as previous 'while', but only with UCE name.
 	while IFS=$'\t' read uce; do
 		UCEfile=${NEXUSCOPYex}/$uce
@@ -425,13 +426,13 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 		GENEID=$(echo "$dir" | rev | cut -d "/" -f 2 | rev)
 		AUX=$(( AUX + 1 ))
 		# concatenate with phyluce in parallel
-		sem --will-cite --id $$ --max-procs "$THREADS" \
-			phyluce_align_concatenate_alignments \
+		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
+			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 			--alignments "$dir" --nexus --log ${OUTPUT} \
 			--output "${ALL_EXONS_DIR}"/"${GENEID__EXONID}" > /dev/null 2>&1
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
 	done
-	sem --will-cite --id $$ --wait
+	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	echo "";DONEmsg
 else
 	warn "Already concatenated UCEs from same exons. Skipping..."
@@ -465,13 +466,13 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 		# the output dir will be named as gene-[geneID]
 		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
 		AUX=$(( AUX + 1 ))
-		sem --will-cite --id $$ --max-procs "$THREADS" \
-			phyluce_align_concatenate_alignments \
+		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
+			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 			--alignments "$dir" --nexus --log ${OUTPUT} \
 			--output "${ALL_INTRONS_DIR}"/"${GENEID}" > /dev/null 2>&1
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
 	done
-	sem --will-cite --id $$ --wait
+	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	echo ""; DONEmsg
 else
 	warn "Already concatenate UCEs from same introns. Skipping..."
@@ -574,15 +575,15 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 	for dir in $PREPDIRS; do
 		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
 		AUX=$(( AUX + 1 ))
-		sem --will-cite --id $$ --max-procs "$THREADS" \
-			phyluce_align_concatenate_alignments \
+		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
+			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 			--alignments "$dir" \
 			--phylip --input-format nexus --log ${OUTPUT}\
 			--output "${GENE_MERGED_BASEDIR}"/"${GENEID}" \
 			> /dev/null 2> /dev/null
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_PREPDIRS"
 	done
-	sem --will-cite --id $$ --wait
+	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	echo ""; DONEmsg
 else
 	warn "Concatenation by gene already done. Skipping..."
