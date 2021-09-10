@@ -511,8 +511,10 @@ if [ -z "$(ls -A "${GENE_MERGED_PREP_BASEDIR}")" ]; then
 		# Create a copy of it in another folder.
 		# In this new location, the folders will be geneID.
 		# Will contain all exononic UCEs (same gene) merged.
-		EXONID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
-		GENEID=$(echo "$dir" | rev | cut -d "/" -f 2 | rev)
+		EXONID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev| \
+			sed 's/-/_/g')
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 2 | rev| \
+			sed 's/-/_/g')
 		GENEID_DIR=${GENE_MERGED_PREP_BASEDIR}/${GENEID}
 		mkdir -p "${GENEID_DIR}"
 		EXONIC_UCEs_PHYLIP=${ALL_EXONS_DIR}/${GENEID}__${EXONID}/${GENEID}__${EXONID}.nexus
@@ -548,7 +550,8 @@ if [ ! -f ${OUTPUT}/tmp/int.done ]; then
 	N_DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d | wc -l)
 	log "Preparing introns for concatenation by gene..."
 	for dir in $DIRS; do
-		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev | \
+			sed 's/-/_/g')
 		GENEID_DIR=${GENE_MERGED_PREP_BASEDIR}/${GENEID}
 		mkdir -p "${GENEID_DIR}"
 		INTRONIC_UCEs_PHYLIP="${ALL_INTRONS_DIR}"/"${GENEID}"/"${GENEID}".nexus
@@ -577,7 +580,8 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 	N_PREPDIRS=$(find "${GENE_MERGED_PREP_BASEDIR}" -mindepth 1 -type d | wc -l)
 	AUX=0
 	for dir in $PREPDIRS; do
-		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev | \
+			sed 's/-/_/g')
 		AUX=$(( AUX + 1 ))
 		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
