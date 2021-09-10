@@ -82,7 +82,7 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 ## CURE output files
 
 The main output files produced by **CURE** are the alignments of concatenated UCEs.
-If you run **CURE** without `--only-by-gene` or `--only-by-region`, both concatenation approaches will be done.
+If you run **CURE** without `--only-by-gene` or `--only-by-region`, both of the concatenating approaches will be done.
 In this case, your output dir will contain `concatenated-by-region/` and `concatenated-by-gene/` dirs.
 If you raised any of these flags, only the corresponding dir will be created.
 Besides, **CURE** creates the `intergenic-regions/` dir containing unmerged UCEs assigned to intergenic regions.
@@ -91,7 +91,10 @@ Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEX
 Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are in NEXUS format.
 
 Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and `CURE-intergenic.txt`, which contains the UCE names assigned to each region, as well as the region ID (for exons) and gene ID (for exons and introns).
-The intergenic file contains only the UCE names.
+The `CURE-intergenic.txt` file contains only the UCE names.
+Besidess, **CURE** outputs the `CURE-summary.csv` file containing the UCE count assigned to exons, to introns, to both exon and intron, to intergenic regions, and unassigned UCEs. 
+Unassaigned UCEs might be those that are present in the baits file, but without an associated alignment file. 
+
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
 
 ## Estimating trees from output files
