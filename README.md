@@ -76,6 +76,37 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 
 # Quick usage examples
 
+### Running the test dataset
+
+You can test **CURE** with the test dataset. 
+It usually takes about two minutes to run with 10 threads.
+With the command line bellow, **CURE** will run the two concatenating approaches.
+
+```sh
+CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
+     --phyluce-nexus test_data/uce_nexus/ --output ./test_data_output
+```
+
+### Running only one of the concatenating approaches
+
+By default, **CURE** runs both concatenating approaches. 
+However, you can raise the `--only-by-gene` or `--only-by-region` flag to select only a single approach
+
+#### Only by gene
+
+```sh
+CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
+     --phyluce-nexus test_data/uce_nexus/ --output ./test_data_output \
+     --only-by-gene
+```
+
+#### Only by region
+
+```sh
+CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
+     --phyluce-nexus test_data/uce_nexus/ --output ./test_data_output \
+     --only-by-region
+```
 
 # Downstream analysis
 
