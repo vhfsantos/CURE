@@ -424,7 +424,8 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 		# Output dir is named as gene-[geneID]__exon-[exonID]/ 
 		# (separated by two underscores)
 		GENEID__EXONID=$(echo "$dir" | rev \
-			| cut -d "/" -f 1,2 | rev | sed 's/\//__/g')
+			| cut -d "/" -f 1,2 | rev | sed 's/\//__/g' | \
+			sed 's/-/_/g')
 		GENEID=$(echo "$dir" | rev | cut -d "/" -f 2 | rev)
 		AUX=$(( AUX + 1 ))
 		# concatenate with phyluce in parallel
@@ -466,7 +467,8 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 	AUX=0
 	for dir in $DIRS; do
 		# the output dir will be named as gene-[geneID]
-		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev)
+		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev  | \
+			sed 's/-/_/g'))
 		AUX=$(( AUX + 1 ))
 		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
