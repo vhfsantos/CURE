@@ -56,7 +56,7 @@ version "$VERSION"
 
 \e[4mOptional arguments\e[0m:
   -t, --threads           Number of threads for the analysis (Default: 10)
-  -f, --filter-string     String from which UCE name will be discarted (Default: "_")
+  -f, --filter-string     UCEs whose name beggins with this string will be discarted (Default: "_")
   --only-by-gene          Concatenate UCEs only by gene. Concatenation by region
                           will be discarted with this flag
   --only-by-region        Concatenate UCEs only by region. Concatenation by gene
@@ -95,7 +95,7 @@ FILTER="_"
 
 # Option strings for arg parser
 SHORT=hb:r:g:p:o:f:t:
-LONG=help,baits:,reference:,gff:,phyluce-nexus:,output:,filter:,threads:,only-by-gene,only-by-region
+LONG=help,baits:,reference:,gff:,phyluce-nexus:,output:,filter-string:,threads:,only-by-gene,only-by-region
 
 
 # Read options
@@ -652,5 +652,6 @@ fi
 
 log "Removing temporary files..."
 rm -rf ${OUTPUT}/tmp
+rm -rf ${OUTPUT}/phyluce_align_concatenate_alignments.log
 DONEmsg
 BYEmsg
