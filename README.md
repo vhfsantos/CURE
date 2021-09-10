@@ -92,8 +92,8 @@ Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are
 
 Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and `CURE-intergenic.txt`, which contains the UCE names assigned to each region, as well as the region ID (for exons) and gene ID (for exons and introns).
 The `CURE-intergenic.txt` file contains only the UCE names.
-Besidess, **CURE** outputs the `CURE-summary.csv` file containing the UCE count assigned to exons, to introns, to both exon and intron, to intergenic regions, and unassigned UCEs. 
-Unassaigned UCEs might be those that are present in the baits file, but without an associated alignment file. 
+Besidess, **CURE** outputs the `CURE-summary.csv` file containing the UCE count assigned to exons, to introns, to both exon and intron, to intergenic regions, and unassigned UCEs.
+UCEs assigned to both exon and intron are accounted for exons, and unassgned UCEs are accounted for intergenic regions.
 
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
 
