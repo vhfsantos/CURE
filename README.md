@@ -48,30 +48,30 @@ conda activate cure
 
 The main inputs of **CURE** are the UCE files and an annotated reference genome (note that **CURE** also needs to be provided with the baits file used in the UCE sequencing)
 
-<p align="center"><img src="misc/img/input.svg" alt="input" width="80%"></p>
+<p align="center"><img src="misc/img/input.png" alt="input" width="80%"></p>
 
 The first step of **CURE** is running a custom version of the `uce_type` tool described by [Van Dam et al. 2021](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) and available at the [ccgutils repository](https://github.com/calacademy-research/ccgutils).
 Briefly, this step assigns each UCE to an exon, intron, or intergenic region of the given reference genome
 
-<p align="center"><img src="misc/img/output1.svg" alt="input" width="60%"></p>
+<p align="center"><img src="misc/img/output1.png" alt="input" width="60%"></p>
 
 Then **CURE** parses the results and merges the UCEs in two different ways: by gene and by region. 
 
 When concatenating *by gene*, **CURE** merges all UCEs from the same gene and treats different regions (exons and introns) as different partitions (Note that different introns are placed under the same partition). It stores the results in `phylip` format inside the `concatenated_by_gene/` directory. 
 Further phylogenetic analysis of UCEs merged with this approach would yield a phylogenetic tree for each gene. 
 
-<p align="center"><img src="misc/img/cat_by_gene.svg" alt="input" width="60%"></p>
+<p align="center"><img src="misc/img/cat_by_gene.png" alt="input" width="60%"></p>
 
 When concatenating *by region*, **CURE** merges only UCEs from the region of the same gene.
 It stores the results in `nexus` format inside the `concatenated_by_region/` directory. 
 Further phylogenetic analysis of UCEs merged with this approach would yield several phylogenetic trees, one originated from each region. 
 
-<p align="center"><img src="misc/img/cat_by_region.svg" alt="input" width="60%"></p>
+<p align="center"><img src="misc/img/cat_by_region.png" alt="input" width="60%"></p>
 
 For any of the two concatenating approaches, **CURE** leaves unmerged UCEs in intergenic regions. 
 These UCEs are just copied to the `intergenic_regions/` directory. 
 
-<p align="center"><img src="misc/img/intergenic.svg" alt="input" width="60%"></p>
+<p align="center"><img src="misc/img/intergenic.png" alt="input" width="60%"></p>
 
 
 # Quick usage examples
