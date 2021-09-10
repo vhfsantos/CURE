@@ -468,7 +468,7 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 	for dir in $DIRS; do
 		# the output dir will be named as gene-[geneID]
 		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev  | \
-			sed 's/-/_/g'))
+			sed 's/-/_/g')
 		AUX=$(( AUX + 1 ))
 		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
