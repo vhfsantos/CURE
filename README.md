@@ -90,6 +90,8 @@ Besides, **CURE** creates the `intergenic-regions/` dir containing unmerged UCEs
 Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEXUS format.
 Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are in NEXUS format.
 
+> To avoid troubles with further phylogenetic analysis, **CURE** replaces "-" with <p>_</p> in the gene and exon ID. 
+
 Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and `CURE-intergenic.txt`, which contains the UCE names assigned to each region, as well as the region ID (for exons) and gene ID (for exons and introns).
 The `CURE-intergenic.txt` file contains only the UCE names.
 Besidess, **CURE** outputs the `CURE-summary.csv` file containing the UCE count assigned to exons, to introns, to both exon and intron, to intergenic regions, and unassigned UCEs.
