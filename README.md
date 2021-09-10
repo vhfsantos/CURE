@@ -46,11 +46,11 @@ conda activate cure
 
 # How CURE works
 
-The main inputs of **CURE** are the UCE files and an annotated reference genome (note that **CURE** also needs to be provided with the baits file used in the UCE sequencing)
+The main inputs of **CURE** are the UCE alignments and an annotated reference genome (note that **CURE** also needs to be provided with the baits file used for the UCE sequencing)
 
 <p align="center"><img src="misc/img/input.png" alt="input" width="80%"></p>
 
-The first step of **CURE** is running a custom version of the `uce_type` tool described by [Van Dam et al. 2021](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) and available at the [ccgutils repository](https://github.com/calacademy-research/ccgutils).
+The first step of **CURE** is running a custom version of the `uce_type` tool described by [Van Dam et al. 2021](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) and available at the [Cal Academy's repository](https://github.com/calacademy-research/ccgutils).
 Briefly, this step assigns each UCE to an exon, intron, or intergenic region of the given reference genome
 
 <p align="center"><img src="misc/img/output1.png" alt="input" width="60%"></p>
