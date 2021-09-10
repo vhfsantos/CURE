@@ -14,8 +14,8 @@ By default, **CURE** runs both approaches, but this can be changed. The input fi
 * [Installation](#installation)
 * [How CURE works](#how-cure-works)
 * [Quick usage examples](#quick-usage-examples)
+* [Output files](#output-files)
 * [Downstream analysis](#downstream-analysis)
-    * [CURE output files](#cure-output-files)
     * [Estimating trees from output files](#estimating-trees-from-output-files)
     * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
 * [License](#license)
@@ -108,9 +108,7 @@ CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data
      --only-by-region
 ```
 
-# Downstream analysis
-
-## CURE output files
+# Output files
 
 The main output files produced by **CURE** are the alignments of concatenated UCEs.
 If you run **CURE** without `--only-by-gene` or `--only-by-region`, both of the concatenating approaches will be done.
@@ -129,6 +127,8 @@ Besidess, **CURE** outputs the `CURE-summary.csv` file containing the UCE count 
 UCEs assigned to both exon and intron are accounted for exons, and unassgned UCEs are accounted for intergenic regions.
 
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
+
+# Downstream analysis
 
 ## Estimating trees from output files
 
