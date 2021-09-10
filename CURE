@@ -1,8 +1,8 @@
 #!/bin/bash
 
-VERSION=0.0.0
+VERSION=0.1
 set -e
-set -e
+
 trap ctrl_c SIGINT
 trap 'echo - Ignoring a SIGHUP received..' SIGHUP
 
@@ -11,22 +11,22 @@ function ctrl_c() {
 	killall parallel
 	warn "Bye"
 	exit 1
-} 
+}
 # Log message function (normal text)
 log() {
-	echo [$(date +%Y-%m-%d" "%H:%M:%S)] $1
+	echo "[ CURE v$VERSION | $(date +%Y-%m-%d" "%H:%M:%S) ] $1"
 }
 # Warning message function (yellow text)
 warn() {
-	echo -e "\033[1;33m"[$(date +%Y-%m-%d" "%H:%M:%S)] $1"\033[0m"
+	echo -e "\033[1;33m[ CURE v$VERSION | $(date +%Y-%m-%d" "%H:%M:%S) ] $1\033[0m"
 	}
 # "Done" message function
 DONEmsg() {
-	echo -e [$(date +%Y-%m-%d" "%H:%M:%S)] Done!
+	echo -e "[ CURE v$VERSION | $(date +%Y-%m-%d" "%H:%M:%S) ] Done!"
 }
 # "Bye" message function (green text)
 BYEmsg() {
-	echo -e "\033[1;32m"[$(date +%Y-%m-%d" "%H:%M:%S)] ALL DONE!"\033[0m"
+	echo -e "\033[1;32m[ CURE v$VERSION | $(date +%Y-%m-%d" "%H:%M:%S) ] ALL DONE!\033[0m"
 	echo -e "
 \033[1;32mThis is a goodbye message.
 Probably will have citation, mail contact, and more.
@@ -42,7 +42,7 @@ CURE: an automated and parallel pipeline for UCE curation
 by Vinícius H F Santos & Felipe V Freitas
 version "$VERSION"
 
-\e[4mUsage\e[0m: 
+\e[4mUsage\e[0m:
  CURE --baits <baits.fa> --reference <reference.fasta> --gff <reference.gff> \\
       --phyluce-nexus <nexus_dir> --output <output_dir>
 
@@ -168,9 +168,11 @@ if [ "$ONLY_BY_GENE" == "True" ] && [ "$ONLY_BY_REGION" == "True" ]; then
 fi
 
 # Print parameters for debuggin
-echo "
-        Defined parameters
-------------------------------------
+echo "=========================================================================
+                             CURE (v$VERSION)
+          An automated and parallel pipeline for UCE curation
+              by Vinícius H F Santos & Felipe V Freitas
+-------------------------------------------------------------------------
 NEXUS: ${NEXUS_DIR}
 BAITS: ${BAITS_FILE}
 GENOME: ${REFERENCE_GENOME}
@@ -180,7 +182,7 @@ THREADS: $THREADS
 ONLY_BY_GENE? $ONLY_BY_GENE
 ONLY_BY_REGION? $ONLY_BY_REGION
 FILTER_STRING $FILTER
-------------------------------------"
+-------------------------------------------------------------------------"
 
 #=============================================================
 #====                       STEP 0:                       ====
@@ -433,7 +435,7 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
-	echo "";DONEmsg
+	DONEmsg
 else
 	warn "Already concatenated UCEs from same exons. Skipping..."
 fi
@@ -473,7 +475,7 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
-	echo ""; DONEmsg
+	DONEmsg
 else
 	warn "Already concatenate UCEs from same introns. Skipping..."
 fi
@@ -584,7 +586,7 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_PREPDIRS"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
-	echo ""; DONEmsg
+	DONEmsg
 else
 	warn "Concatenation by gene already done. Skipping..."
 fi
@@ -603,7 +605,7 @@ rm -rf ${NEXUSCOPYex} ${NEXUSTOCONCAT} "$ALL_EXONS_DIR" "$ALL_INTRONS_DIR"
 
 # Create output concatenated by gene
 if [ "$ONLY_BY_REGION" == "False" ]; then
-	log "Writing alignments concatenated by gene"
+	log "Writing alignments concatenated by gene..."
 	mkdir -p "$BY_GENE_DIR"
 	CATDIRS=$(find "$GENE_MERGED_BASEDIR" -mindepth 1 -type d)
 	# If I kept final alignments in nexus format, charsets would
@@ -627,7 +629,7 @@ fi
 
 # Create output concatenated by region
 if [ "$ONLY_BY_GENE" == "False" ]; then
-	log "Writing alignments concatenated by region"
+	log "Writing alignments concatenated by region..."
 	mkdir -p "$BY_REGION_DIR"
 	PRECATFILES=$(find "$GENE_MERGED_PREP_BASEDIR" -type f)
 	# Alignments format for 'by Gene' concatenation will be nexus.
@@ -648,7 +650,7 @@ if [ "$ONLY_BY_GENE" == "False" ]; then
 	DONEmsg
 fi
 
-log "Removing temporary files"
+log "Removing temporary files..."
 rm -rf ${OUTPUT}/tmp
 DONEmsg
 BYEmsg
