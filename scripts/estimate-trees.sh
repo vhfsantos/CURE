@@ -40,6 +40,39 @@ by Vinícius Franceshini-Santos & Felipe Freitas
  --threads              Number of threads for the analysis (Default: 2)
  --only-by-gene         Only estimate trees for 'concatenated-by-gene/' files
  --only-by-region       Only estimate trees for 'concatenated-by-region/' files
+ --custom-alignments    Path to a custom alignment dir. Estimate trees using
+                        alignments in this dir, ignoring other inputs.
+
+
+\e[4mExamples\e[0m:
+
+To estimate trees from alignments produced by CURE, run:
+
+    estimate-trees.sh \\
+            --cure-out CURE-output/ \\
+	    --iqtree-out estimated-trees
+
+To estimate trees only from alignments concatenated by gene, run:
+
+	estimate-trees.sh \\
+	    --cure-out CURE-output/ \\
+	    --iqtree-out estimated-trees \\
+	    --only-by-gene
+
+To estimate trees only from alignments concatenated by region, run:
+
+	estimate-trees.sh \\
+	    --cure-out CURE-output/ \\
+	    --iqtree-out estimated-trees \\
+	    --only-by-region
+
+Also, you can use this script to estimate gene trees in parallel from alignments
+produced by any other tool rather than CURE. For so, just use --custom-alignments
+parameter:
+
+        estimate-trees.sh \\
+	    --custom-alignments input-alignments/ \\
+	    --iqtree-out estimated-trees
 
 
  ╔══════════════════════════════════════════════════════╗
@@ -56,7 +89,7 @@ exit 2
 
 # Option strings for arg parser
 SHORT=h
-LONG=help,cure-out:,iqtree-out:,threads:,only-by-gene,only-by-region
+LONG=help,cure-out:,iqtree-out:,threads:,only-by-gene,only-by-region,custom-ali:
 
 # Set deafult values
 tmp=$(realpath "$0")
@@ -68,7 +101,7 @@ THREADS=2
 check_deps() {
 	for app in $CONDA_PREFIX/bin/iqtree $CONDA_PREFIX/bin/parallel; do
         	command -v $app >/dev/null 2>&1 || \
-			error_exit "Cannot find ${app} in your PATH variable\nDid you activate the cure environment?"
+			error_exit "Cannot find ${app} in your PATH variable\nDid you activate the CURE environment?"
 	done
 }
 
@@ -104,6 +137,10 @@ while true ; do
 		--only-by-region )
 		ONLY_BY_REGION="True"
 		shift
+		;;
+		--custom-alignments )
+		CUSTOM_ALI="$2"
+		shift 2
 		;;
 		-- )
 		shift
@@ -173,36 +210,67 @@ Run_IQtree_PHYLIP() {
 	echo "- Done"
 }
 
-# Running for intergenic regions
-if [ -z "$(ls -A "$IQTREE_OUT"/"intergenic-regions")" ]; then
-	Run_IQtree_NEXUS intergenic-regions Run
-	echo "- Checking..."
-	Run_IQtree_NEXUS intergenic-regions Check
+Run_IQtree_CUSTOM() {
+	NEXUS_DIR="$1"
+	OUT_DIR="$IQTREE_OUT"/
+	TODO="$2"
+	mkdir -p "${OUT_DIR}"
+	NEXUS=$(find "$NEXUS_DIR" -name "*.fa" -o -name "*.fasta" -o -name "*.phy"\
+	 -o -name "*.nex" -o -name "*.nexus" -o -name "*.phylip")
+	N_NEXUS=$(echo $NEXUS | wc -w)
+	if [ $N_NEXUS -eq 0 ]; then error_exit "Custom alignments must be Phylip, Nexus or Fasta. Make sure the files have correct extensions."; fi
+	AUX=0
+	if [ "$TODO" == "Run" ]; then
+        	echo "- Estimating trees for files in $NEXUS_DIR"
+	        echo "- Saving in $OUT_DIR"
+	fi
+	# run
+	for alignment in $NEXUS; do
+		AUX=$(( $AUX+1 ))
+		file=$(basename "$alignment")
+		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs $THREADS \
+			$CONDA_PREFIX/bin/iqtree -s "$alignment" --quiet \
+			--prefix "$OUT_DIR"/${file%.*} -bb 1000 -alrt 1000 \
+			--threads-max 1
+		${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
+	done
+	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
+	echo "- Done"
+}
+
+if [ -z "$CUSTOM_ALI" ]; then
+	# Running for intergenic regions
+	if [ -z "$(ls -A "$IQTREE_OUT"/"intergenic-regions")" ]; then
+		Run_IQtree_NEXUS intergenic-regions Run
+		echo "- Checking..."
+		Run_IQtree_NEXUS intergenic-regions Check
+	else
+		echo "- Already estimated trees of intergenic regions. Skipping..."
+	fi
+
+	# Running for concatenated by region
+	if [ "$ONLY_BY_GENE" == "False" ]; then
+		if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-region")" ]; then
+			Run_IQtree_NEXUS concatenated-by-region Run
+			echo "- Checking..."
+			Run_IQtree_NEXUS concatenated-by-region Check
+
+		else
+			echo "- Already estimated trees by region. Skipping..."
+		fi
+	fi
+
+	# Create output concatenated by gene
+	if [ "$ONLY_BY_REGION" == "False" ]; then
+		if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-gene")" ]; then
+			Run_IQtree_PHYLIP concatenated-by-gene Run
+			echo "- Checking..."
+			Run_IQtree_PHYLIP concatenated-by-gene Check
+		else
+			echo "- Already estimated trees by gene. Skipping..."
+		fi
+	fi
 else
-	echo "- Already estimated trees of intergenic regions. Skipping..."
-fi
 
-# Running for concatenated by region
-if [ "$ONLY_BY_GENE" == "False" ]; then
-	if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-region")" ]; then
-		Run_IQtree_NEXUS concatenated-by-region Run
-		echo "- Checking..."
-		Run_IQtree_NEXUS concatenated-by-region Check
-
-	else
-		echo "- Already estimated trees by region. Skipping..."
-	fi
-fi
-
-# Create output concatenated by gene
-if [ "$ONLY_BY_REGION" == "False" ]; then
-	if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-gene")" ]; then
-		Run_IQtree_PHYLIP concatenated-by-gene Run
-		echo "- Checking..."
-		Run_IQtree_PHYLIP concatenated-by-gene Check
-	else
-		echo "- Already estimated trees by gene. Skipping..."
-	fi
-fi
 
 echo "- All done. Bye"
