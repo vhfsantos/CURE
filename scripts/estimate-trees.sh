@@ -207,7 +207,7 @@ Run_IQtree_PHYLIP() {
 		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs $THREADS \
 			$CONDA_PREFIX/bin/iqtree -s "$alignment" -spp "$PHYLIP_DIR"/${file%.*}.charsets \
 			--quiet --prefix "$OUT_DIR"/${file%.*} \
-			-bb 1000 -alrt 1000 --threads-max 1
+			-bb 1000 --threads-max 1
 		${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
