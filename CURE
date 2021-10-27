@@ -39,7 +39,7 @@ echo -e "
 -----------------------------------------------------------
 CURE: an automated and parallel pipeline for UCE curation
 -----------------------------------------------------------
-by Vinícius H F Santos & Felipe V Freitas
+by Vinícius Franceshini-Santos & Felipe Freitas
 version "$VERSION"
 
 \e[4mUsage\e[0m:
@@ -210,7 +210,7 @@ fi
 #====                       STEP 1:                       ====
 #====         Run a customize version of uce_kit.py       ====
 #=============================================================
-# Original: 
+# Original:
 # https://github.com/calacademy-research/ccgutils/tree/master/uce_types
 
 mkdir -p "${OUTPUT}"/tmp/
@@ -421,7 +421,7 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 	N_DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d | wc -l)
 	AUX=0
 	for dir in $DIRS; do
-		# Output dir is named as gene-[geneID]__exon-[exonID]/ 
+		# Output dir is named as gene-[geneID]__exon-[exonID]/
 		# (separated by two underscores)
 		GENEID__EXONID=$(echo "$dir" | rev \
 			| cut -d "/" -f 1,2 | rev | sed 's/\//__/g' | \
@@ -642,7 +642,7 @@ if [ "$ONLY_BY_GENE" == "False" ]; then
 	# A good way to avoid mixing alignments between approaches.
 	for file in $PRECATFILES; do
 		# Output nexus name will be geneID and regionID separated by
-		# double underscore (__). 
+		# double underscore (__).
 		# Exons ID already have single underscore.
 		# (e.g. exon-XM_006561541.3-5)
 		# So if I need to split geneID from regionID, I do it by "__".

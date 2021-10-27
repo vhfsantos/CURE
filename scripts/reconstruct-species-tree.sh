@@ -16,9 +16,9 @@ echo -e "
 -----------------------------------------------------------
 ---------------- reconstruct species tree -----------------
 -----------------------------------------------------------
-by Vinícius H F Santos & Felipe V Freitas
+by Vinícius Franceshini-Santos & Felipe Freitas
 
-\e[4mUsage\e[0m: 
+\e[4mUsage\e[0m:
 reconstruct-species-tree.sh   --iqtree-out <path/to/iqtree-out> \\
                               --astral-in <path/to/astral-in> \\
                               --astral-out <path/to/astral-out> \\
@@ -33,7 +33,7 @@ reconstruct-species-tree.sh   --iqtree-out <path/to/iqtree-out> \\
 \e[4mOptional arguments\e[0m:
  --only-by-gene         Only reconstruct species tree for 'concatenated-by-gene/' files
  --only-by-region       Only reconstruct species tree for 'concatenated-by-region/' files
- 
+
  "
 exit 2
 }
@@ -147,7 +147,7 @@ fi
 echo "- Running ASTRAL"
 # run by gene
 if [ "$ONLY_BY_REGION" == "False" ]; then
-	mkdir -p "$ASTRAL_OUT"/by-gene 
+	mkdir -p "$ASTRAL_OUT"/by-gene
 	echo "--- By gene, all regions"
 	java -jar "$ASTRAL_JAR" \
 		-i "$ASTRAL_IN"/by-gene/all-regions.tre \

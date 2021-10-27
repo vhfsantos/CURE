@@ -17,7 +17,7 @@ function ctrl_c() {
 	echo "- Bye"
 	exit 1
 
-} 
+}
 # usage
 usage() {
 echo -e "
@@ -26,9 +26,9 @@ CURE: an automated and parallel pipeline for UCE curation
 -----------------------------------------------------------
 --------------------- estimate trees ----------------------
 -----------------------------------------------------------
-by Vinícius H F Santos & Felipe V Freitas
+by Vinícius Franceshini-Santos & Felipe Freitas
 
-\e[4mUsage\e[0m: 
+\e[4mUsage\e[0m:
  estimate-trees.sh --cure-out <path/to/cure-out> \\
                    --iqtree-out <path/to/iqtree-out>
 
@@ -40,11 +40,11 @@ by Vinícius H F Santos & Felipe V Freitas
  --threads              Number of threads for the analysis (Default: 10)
  --only-by-gene         Only estimate trees for 'concatenated-by-gene/' files
  --only-by-region       Only estimate trees for 'concatenated-by-region/' files
- 
+
 
  ╔══════════════════════════════════════════════════════╗
  ║                          NOTE                        ║
- ╠══════════════════════════════════════════════════════╣ 
+ ╠══════════════════════════════════════════════════════╣
  ║  The parameter 'cure-out' must direct to the output  ║
  ║  of CURE. This script will enter this directory and  ║
  ║  look for the outputs produced by CURE.              ║
@@ -188,7 +188,7 @@ if [ "$ONLY_BY_GENE" == "False" ]; then
 		Run_IQtree_NEXUS concatenated-by-region Run
 		echo "- Checking..."
 		Run_IQtree_NEXUS concatenated-by-region Check
-		
+
 	else
 		echo "- Already estimated trees by region. Skipping..."
 	fi
