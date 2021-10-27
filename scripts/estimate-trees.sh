@@ -89,7 +89,7 @@ exit 2
 
 # Option strings for arg parser
 SHORT=h
-LONG=help,cure-out:,iqtree-out:,threads:,only-by-gene,only-by-region,custom-ali:
+LONG=help,cure-out:,iqtree-out:,threads:,only-by-gene,only-by-region,custom-alignments:
 
 # Set deafult values
 tmp=$(realpath "$0")
