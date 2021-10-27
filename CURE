@@ -171,7 +171,7 @@ fi
 echo "=========================================================================
                              CURE (v$VERSION)
           An automated and parallel pipeline for UCE curation
-              by Vinícius H F Santos & Felipe V Freitas
+          by Vinícius Franceschini-Santos & Felipe V Freitas
 -------------------------------------------------------------------------
 NEXUS: ${NEXUS_DIR}
 BAITS: ${BAITS_FILE}
