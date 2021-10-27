@@ -211,7 +211,7 @@ Run_IQtree_PHYLIP() {
 }
 
 Run_IQtree_CUSTOM() {
-	NEXUS_DIR="$1"
+	NEXUS_DIR="$CUSTOM_ALI"
 	OUT_DIR="$IQTREE_OUT"/
 	TODO="$2"
 	mkdir -p "${OUT_DIR}"
@@ -271,6 +271,9 @@ if [ -z "$CUSTOM_ALI" ]; then
 		fi
 	fi
 else
-
+	Run_IQtree_CUSTOM() Run
+	echo "- Checking..."
+	Run_IQtree_CUSTOM() Check
+fi
 
 echo "- All done. Bye"
