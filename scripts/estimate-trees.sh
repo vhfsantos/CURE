@@ -37,7 +37,7 @@ by Vinícius Franceshini-Santos & Felipe Freitas
  --iqtree-out           Output directory name
 
 \e[4mOptional arguments\e[0m:
- --threads              Number of threads for the analysis (Default: 10)
+ --threads              Number of threads for the analysis (Default: 2)
  --only-by-gene         Only estimate trees for 'concatenated-by-gene/' files
  --only-by-region       Only estimate trees for 'concatenated-by-region/' files
 
@@ -63,7 +63,7 @@ tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
 ONLY_BY_GENE="False"
 ONLY_BY_REGION="False"
-THREADS=10
+THREADS=2
 
 check_deps() {
 	for app in $CONDA_PREFIX/bin/iqtree $CONDA_PREFIX/bin/parallel; do

@@ -55,7 +55,7 @@ version "$VERSION"
   -o, --output            Output directory
 
 \e[4mOptional arguments\e[0m:
-  -t, --threads           Number of threads for the analysis (Default: 10)
+  -t, --threads           Number of threads for the analysis (Default: 2)
   -f, --filter-string     UCEs whose name beggins with this string will be discarted (Default: "_")
   --only-by-gene          Concatenate UCEs only by gene. Concatenation by region
                           will be discarted with this flag
@@ -88,7 +88,7 @@ if [ $# -eq 0 ]; then usage; fi
 # Setting home dir for utils calling
 tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
-THREADS=10
+THREADS=2
 ONLY_BY_GENE="False"
 ONLY_BY_REGION="False"
 FILTER="_"
