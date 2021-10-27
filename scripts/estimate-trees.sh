@@ -155,8 +155,12 @@ done
 check_deps
 
 # Checking if any required args is empty
-if [ -z "${CURE_OUT}" ] || [ -z "${IQTREE_OUT}" ]; then
-	error_exit "Please, supply all arguments correctly."
+if [ -z "${IQTREE_OUT}" ]; then
+	error_exit "Please, supply the output directory name."
+fi
+
+if [ -z "${CURE_OUT}" ] && [ -z "${CUSTOM_ALI}" ]; then
+ 	error_exit "Please, supply the input aligments directory."
 fi
 
 Run_IQtree_NEXUS() {
