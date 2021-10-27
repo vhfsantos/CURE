@@ -14,8 +14,8 @@ By default, **CURE** runs both approaches, but this can be changed. The input fi
 * [Installation](#installation)
 * [How CURE works](#how-cure-works)
 * [Quick usage examples](#quick-usage-examples)
+* [Output files](#output-files)
 * [Downstream analysis](#downstream-analysis)
-    * [CURE output files](#cure-output-files)
     * [Estimating trees from output files](#estimating-trees-from-output-files)
     * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
 * [License](#license)
@@ -76,10 +76,39 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 
 # Quick usage examples
 
+### Running the test dataset
 
-# Downstream analysis
+You can test **CURE** with the test dataset. 
+It usually takes about two minutes to run with 10 threads.
+With the command line bellow, **CURE** will run the two concatenating approaches.
 
-## CURE output files
+```sh
+CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
+     --phyluce-nexus test_data/uce_nexus/ --output ./test_data_output
+```
+
+### Running only one of the concatenating approaches
+
+By default, **CURE** runs both concatenating approaches. 
+However, you can raise the `--only-by-gene` or `--only-by-region` flag to select only a single approach
+
+#### Only by gene
+
+```sh
+CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
+     --phyluce-nexus test_data/uce_nexus/ --output ./test_data_output \
+     --only-by-gene
+```
+
+#### Only by region
+
+```sh
+CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
+     --phyluce-nexus test_data/uce_nexus/ --output ./test_data_output \
+     --only-by-region
+```
+
+# Output files
 
 The main output files produced by **CURE** are the alignments of concatenated UCEs.
 If you run **CURE** without `--only-by-gene` or `--only-by-region`, both of the concatenating approaches will be done.
@@ -90,12 +119,16 @@ Besides, **CURE** creates the `intergenic-regions/` dir containing unmerged UCEs
 Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEXUS format.
 Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are in NEXUS format.
 
+> To avoid troubles with further phylogenetic analysis, **CURE** replaces "-" with "_" in the gene and exon ID. 
+
 Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and `CURE-intergenic.txt`, which contains the UCE names assigned to each region, as well as the region ID (for exons) and gene ID (for exons and introns).
 The `CURE-intergenic.txt` file contains only the UCE names.
 Besidess, **CURE** outputs the `CURE-summary.csv` file containing the UCE count assigned to exons, to introns, to both exon and intron, to intergenic regions, and unassigned UCEs.
 UCEs assigned to both exon and intron are accounted for exons, and unassgned UCEs are accounted for intergenic regions.
 
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
+
+# Downstream analysis
 
 ## Estimating trees from output files
 
