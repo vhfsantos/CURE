@@ -159,7 +159,7 @@ estimate-trees.sh \
 
 Moreover, `estimate-trees.sh` can be used to estimate trees from alignments from any other source; not necessarily those produced by **CURE**.
 In this case you only need to use the parameter `--custom-alignments` instead of `--cure-out`.
-So if you have a bunch of alignments (in Phylip, Fasta or Nexus format) in a directory called `custom_alignments`, and want to run IQ-tree on them, you can call `estimate-trees.sh` as the following:
+So if you have a set of alignments (in Phylip, Fasta or Nexus format) in a directory called `custom_alignments`, and want to run IQ-tree on them, you can call `estimate-trees.sh` as the following:
 
 ```sh
 estimate-trees.sh \
