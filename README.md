@@ -1,11 +1,11 @@
 <p align="center"><img src="misc/logo.png" alt="CURE" width="60%"></p>
 
-**CURE** is an automated and parallel pipeline for the curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategy proposed by [Van Dam et al. 2021. Genomic Characterization and Curation of UCEs Improves Species Tree Reconstruction](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768). 
+**CURE** is an automated and parallel pipeline for the curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategy proposed by [Van Dam et al. 2021. Genomic Characterization and Curation of UCEs Improves Species Tree Reconstruction](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768).
 
 It concatenates UCEs in two different ways, according to the available annotation:
 
 * _by gene_: concatenates all UCEs from the same gene and treats different regions (exons and introns) as different partitions;
-* _by region_: concatenates all UCEs from the same exons or introns of the same gene. 
+* _by region_: concatenates all UCEs from the same exons or introns of the same gene.
 
 By default, **CURE** runs both approaches, but this can be changed. The input files for the pipeline are the baits file used for UCE sequencing, the reference genome and annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
 
@@ -15,9 +15,7 @@ By default, **CURE** runs both approaches, but this can be changed. The input fi
 * [How CURE works](#how-cure-works)
 * [Quick usage examples](#quick-usage-examples)
 * [Output files](#output-files)
-* [Downstream analysis](#downstream-analysis)
-    * [Estimating trees from output files](#estimating-trees-from-output-files)
-    * [Summary analysis of estimated trees](#summary-analysis-of-estimated-trees)
+* [Estimating trees from output files](#estimating-trees-from-output-files)
 * [License](#license)
 
 # Installation
@@ -55,21 +53,21 @@ Briefly, this step assigns each UCE to an exon, intron, or intergenic region of 
 
 <p align="center"><img src="misc/img/output1.png" alt="input" width="80%"></p>
 
-Then **CURE** parses the results and merges the UCEs in two different ways: by gene and by region. 
+Then **CURE** parses the results and merges the UCEs in two different ways: by gene and by region.
 
-When concatenating *by gene*, **CURE** merges all UCEs from the same gene and treats different regions (exons and introns) as different partitions (Note that different introns are placed under the same partition). It stores the results in `phylip` format inside the `concatenated_by_gene/` directory. 
-Further phylogenetic analysis of UCEs merged with this approach would yield a phylogenetic tree for each gene. 
+When concatenating *by gene*, **CURE** merges all UCEs from the same gene and treats different regions (exons and introns) as different partitions (Note that different introns are placed under the same partition). It stores the results in `phylip` format inside the `concatenated_by_gene/` directory.
+Further phylogenetic analysis of UCEs merged with this approach would yield a phylogenetic tree for each gene.
 
 <p align="center"><img src="misc/img/cat_by_gene.png" alt="input" width="80%"></p>
 
 When concatenating *by region*, **CURE** merges only UCEs from the region of the same gene.
-It stores the results in `nexus` format inside the `concatenated_by_region/` directory. 
-Further phylogenetic analysis of UCEs merged with this approach would yield several phylogenetic trees, one originated from each region. 
+It stores the results in `nexus` format inside the `concatenated_by_region/` directory.
+Further phylogenetic analysis of UCEs merged with this approach would yield several phylogenetic trees, one originated from each region.
 
 <p align="center"><img src="misc/img/cat_by_region.png" alt="input" width="80%"></p>
 
-For any of the two concatenating approaches, **CURE** leaves unmerged UCEs in intergenic regions. 
-These UCEs are just copied to the `intergenic_regions/` directory. 
+For any of the two concatenating approaches, **CURE** leaves unmerged UCEs in intergenic regions.
+These UCEs are just copied to the `intergenic_regions/` directory.
 
 <p align="center"><img src="misc/img/intergenic.png" alt="input" width="80%"></p>
 
@@ -78,25 +76,25 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 
 ### Running the test dataset
 
-You can test **CURE** with the test dataset. 
+You can test **CURE** with the test dataset.
 It usually takes about two minutes to run with 10 threads.
 With the command line bellow, **CURE** will run the two concatenating approaches.
 
 ```sh
 CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
-     --phyluce-nexus test_data/uce_nexus/ --output ./test_data_output
+     --phyluce-nexus test_data/uce_nexus/ --output ./CURE-output
 ```
 
 ### Running only one of the concatenating approaches
 
-By default, **CURE** runs both concatenating approaches. 
+By default, **CURE** runs both concatenating approaches.
 However, you can raise the `--only-by-gene` or `--only-by-region` flag to select only a single approach
 
 #### Only by gene
 
 ```sh
 CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
-     --phyluce-nexus test_data/uce_nexus/ --output ./test_data_output \
+     --phyluce-nexus test_data/uce_nexus/ --output ./CURE-output \
      --only-by-gene
 ```
 
@@ -104,7 +102,7 @@ CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data
 
 ```sh
 CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
-     --phyluce-nexus test_data/uce_nexus/ --output ./test_data_output \
+     --phyluce-nexus test_data/uce_nexus/ --output ./CURE-output \
      --only-by-region
 ```
 
@@ -119,20 +117,55 @@ Besides, **CURE** creates the `intergenic-regions/` dir containing unmerged UCEs
 Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEXUS format.
 Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are in NEXUS format.
 
-> To avoid troubles with further phylogenetic analysis, **CURE** replaces "-" with "_" in the gene and exon ID. 
+> To avoid troubles with further phylogenetic analysis, **CURE** replaces "-" with "_" in the gene and exon ID.
 
 Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and `CURE-intergenic.txt`, which contains the UCE names assigned to each region, as well as the region ID (for exons) and gene ID (for exons and introns).
 The `CURE-intergenic.txt` file contains only the UCE names.
 Besidess, **CURE** outputs the `CURE-summary.csv` file containing the UCE count assigned to exons, to introns, to both exon and intron, to intergenic regions, and unassigned UCEs.
-UCEs assigned to both exon and intron are accounted for exons, and unassgned UCEs are accounted for intergenic regions.
+UCEs assigned to both exon and intron are accounted for exons, and unassigned UCEs are accounted for intergenic regions.
 
 **CURE** also maintain in the output directory the files produces by uce_kit pipeline (`uce_kit_output/` dir)
 
-# Downstream analysis
+# Estimating trees from output files
 
-## Estimating trees from output files
+**CURE** provides the wrapper script `estimate-trees.sh` for the estimation of gene trees from the output alignments with [IQ-tree](http://www.iqtree.org/), and further summary analysis with [ASTRAL](https://github.com/smirarab/ASTRAL).
+This script runs IQ-tree in parallel using [GNU parallel](https://www.gnu.org/software/parallel/) following the structure of the **CURE** output dir.
+Then it prepares all inputs needed for a summary analysis with ASTRAL.
+For instance, if you run **CURE** setting `CURE-output` as output directory, you can call `estimate-trees.sh` as the following:
 
-## Summary analysis of estimated trees
+```sh
+estimate-trees.sh \\
+        --cure-out CURE-output/ \\
+        --estimated-trees estimated-trees
+```
+
+If you raised `--only-by-gene` or `--only-by-region` while running **CURE**, you can raise it here as well:
+
+```sh
+estimate-trees.sh \\
+    --cure-out CURE-output/ \\
+    --estimated-trees estimated-trees \\
+    --only-by-gene
+```
+
+or
+
+```sh
+estimate-trees.sh \\
+    --cure-out CURE-output/ \\
+    --estimated-trees estimated-trees \\
+    --only-by-region
+```
+
+Moreover, `estimate-trees.sh` can be used to estimate trees from alignments from any other source; not necessarily those produced by **CURE**.
+In this case you only need to use the parameter `--custom-alignments` instead of `--cure-out`.
+So if you have a bunch of alignments (in Phylip, Fasta or Nexus format) in a directory called `custom_alignments`, and want to run IQ-tree on them, you can call `estimate-trees.sh` as the following:
+
+```sh
+estimate-trees.sh \\
+    --custom-alignments input-alignments/ \\
+    --estimated-trees estimated-trees
+```
 
 # License
 
