@@ -34,7 +34,7 @@ by Vinícius Franceshini-Santos & Felipe Freitas
 
 \e[4mRequired arguments\e[0m:
  --cure-out             Path to alignments produced by CURE
- --iqtree-out           Output directory name
+ --estimated-trees           Output directory name
 
 \e[4mOptional arguments\e[0m:
  --threads              Number of threads for the analysis (Default: 2)
@@ -50,20 +50,20 @@ To estimate trees from alignments produced by CURE, run:
 
     estimate-trees.sh \\
             --cure-out CURE-output/ \\
-	    --iqtree-out estimated-trees
+	    --estimated-trees estimated-trees
 
 To estimate trees only from alignments concatenated by gene, run:
 
 	estimate-trees.sh \\
 	    --cure-out CURE-output/ \\
-	    --iqtree-out estimated-trees \\
+	    --estimated-trees estimated-trees \\
 	    --only-by-gene
 
 To estimate trees only from alignments concatenated by region, run:
 
 	estimate-trees.sh \\
 	    --cure-out CURE-output/ \\
-	    --iqtree-out estimated-trees \\
+	    --estimated-trees estimated-trees \\
 	    --only-by-region
 
 Also, you can use this script to estimate gene trees in parallel from alignments
@@ -72,7 +72,7 @@ parameter:
 
         estimate-trees.sh \\
 	    --custom-alignments input-alignments/ \\
-	    --iqtree-out estimated-trees
+	    --estimated-trees estimated-trees
 
 
  ╔══════════════════════════════════════════════════════╗
@@ -89,7 +89,7 @@ exit 2
 
 # Option strings for arg parser
 SHORT=h
-LONG=help,cure-out:,iqtree-out:,threads:,only-by-gene,only-by-region,custom-alignments:
+LONG=help,cure-out:,estimated-trees:,threads:,only-by-gene,only-by-region,custom-alignments:
 
 # Set deafult values
 tmp=$(realpath "$0")
@@ -122,8 +122,8 @@ while true ; do
 		CURE_OUT="$2"
 		shift 2
 		;;
-		--iqtree-out )
-		IQTREE_OUT="$2"
+		--estimated-trees )
+		OUT="$2"
 		shift 2
 		;;
 		--threads )
@@ -155,13 +155,21 @@ done
 check_deps
 
 # Checking if any required args is empty
-if [ -z "${IQTREE_OUT}" ]; then
+if [ -z "${OUT}" ]; then
 	error_exit "Please, supply the output directory name."
 fi
 
 if [ -z "${CURE_OUT}" ] && [ -z "${CUSTOM_ALI}" ]; then
  	error_exit "Please, supply the input aligments directory."
 fi
+
+#creating outputs
+IQTREE_OUT="$OUT"/IQtree_output
+ASTRAL_IN="$OUT"/ASTRAL_input
+mkdir -p "$IQTREE_OUT" "$ASTRAL_IN"
+#---------------
+BY_GENE="$ASTRAL_IN"/by-gene
+BY_REGION="$ASTRAL_IN"/by-region
 
 Run_IQtree_NEXUS() {
 	NEXUS_DIR="$CURE_OUT"/"$1"
@@ -258,6 +266,22 @@ if [ -z "$CUSTOM_ALI" ]; then
 			Run_IQtree_NEXUS concatenated-by-region Run
 			echo "- Checking..."
 			Run_IQtree_NEXUS concatenated-by-region Check
+			# ------------------------------------------------------
+			echo "- Preparing ASTRAL input by region"
+			mkdir -p $BY_REGION
+			# only exons
+			cat "$IQTREE_OUT"/concatenated-by-region/*__exon-*treefile \
+				> "$BY_REGION"/only-exons.tre
+			# only introns
+			cat "$IQTREE_OUT"/concatenated-by-region/*__introns.treefile \
+				> "$BY_REGION"/only-introns.tre
+			# only genic regions (exons + introns)
+			cat "$BY_REGION"/only-introns.tre "$BY_REGION"/only-exons.tre \
+				> "$BY_REGION"/only-genic-regions.tre
+			# all regions (exons + introns + intergenic regions)
+			cat "$IQTREE_OUT"/intergenic-regions/*treefile \
+				"$BY_REGION"/only-introns.tre "$BY_REGION"/only-exons.tre \
+				> "$BY_REGION"/all-regions.tre
 
 		else
 			echo "- Already estimated trees by region. Skipping..."
@@ -270,6 +294,16 @@ if [ -z "$CUSTOM_ALI" ]; then
 			Run_IQtree_PHYLIP concatenated-by-gene Run
 			echo "- Checking..."
 			Run_IQtree_PHYLIP concatenated-by-gene Check
+			# ------------------------------------------------------
+			echo "- Preparing ASTRAL input by gene"
+			mkdir -p $BY_GENE
+			# only genic regions
+			cat "$IQTREE_OUT"/concatenated-by-gene/*treefile \
+				> "$BY_GENE"/only-genic-regions.tre
+			# all regions (add intergenic)
+			cat "$IQTREE_OUT"/intergenic-regions/*treefile \
+				"$BY_GENE"/only-genic-regions.tre \
+				> "$BY_GENE"/all-regions.tre
 		else
 			echo "- Already estimated trees by gene. Skipping..."
 		fi
@@ -278,6 +312,10 @@ else
 	Run_IQtree_CUSTOM Run
 	echo "- Checking..."
 	Run_IQtree_CUSTOM Check
+	# ------------------------------------------------------
+	echo "- Preparing ASTRAL input"
+	cat "$IQTREE_OUT"/*treefile \
+		> "$ASTRAL_IN"/concatenated-trees.tre
 fi
 
 echo "- All done. Bye"
