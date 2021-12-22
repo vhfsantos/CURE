@@ -131,7 +131,8 @@ NEXUSCOPY=${OUTPUT}/tmp/000-nexus-copy/
 mkdir -p ${NEXUSCOPY}
 UCEs_in_subgroup=15
 subgroups_dir="${OUTPUT}/tmp/001-subgroups"
-n_subgroups=$((`find ${NEXUSCOPY} -maxdepth 1 -type f | wc -l`/$UCEs_in_subgroup+1))
+n_subgroups=$((`find ${NEXUSCOPY} -maxdepth 1 -type f | wc -l`/16))
+echo $n_subgroups
 if [ -z "$(ls -A "${NEXUSCOPY}")" ]; then
 	log "Preparing input data..."
         #  (1) Create a copy os nexus dir. Allows me to 'move' UCEs from there
@@ -141,9 +142,9 @@ if [ -z "$(ls -A "${NEXUSCOPY}")" ]; then
         # (2) Split in subgroups of 15 UCEs for ease parallelization
         # thanks: https://stackoverflow.com/questions/29116212/split-a-folder-into-multiple-subfolders-in-terminal-bash-script
 
-        for i in `seq 1 $n_subgroups`; do
+        for i in `seq 1 ${n_subgroups}`; do
                 # create dir for subgroup
-                mkdir -p "${subgroups_dir}/${i}";
+                mkdir -p "${subgroups_dir}/${i}"
                 # copy files to there (replace uce-9.nexus > uce_9.nexus)
                 find ${NEXUSCOPY} -type f | head -n $UCEs_in_subgroup \
                         | xargs -i mv "{}" "${subgroups_dir}/${i}"
