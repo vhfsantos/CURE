@@ -61,11 +61,11 @@ case $COMMAND in
                 Usage; exit
                 ;;
                 GeneRegion )
-                ${HOME_DIR}/scripts/GeneRegion.sh --version $VERSION $args
+                ${HOME_DIR}/scripts/GeneRegion.sh --version $VERSION $ARGS
                 BYEmsg
                 ;;
                 UCERegion )
-                echo "${HOME_DIR}/scripts/UCERegion.sh $args"
+                echo "${HOME_DIR}/scripts/UCERegion.sh --version $VERSION $ARGS"
                 BYEmsg
                 ;;
                 * )
