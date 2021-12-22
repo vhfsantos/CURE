@@ -55,7 +55,7 @@ error_exit() {
 }
 
 # Print usage if no arg
-if [ $# -eq 0 ]; then usage; fi
+if [ $# -eq 0 ]; then Usage; fi
 
 # Setting home dir for utils calling
 tmp=$(realpath "$0")
