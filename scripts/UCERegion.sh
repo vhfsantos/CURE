@@ -194,7 +194,7 @@ mkdir -p ${SWSC}
 
 SWSC_PATH="../PFinderUCE-SWSC-EN-master/py_script/SWSCEN.py"
 
-if [ -z "$(ls -A "${SUBGROUPS_SWSC}")" ]; then
+if [ -z "$(ls -A "${SWSC}")" ]; then
 	log "Running SWSC..."
         # run SWSC in parallel
         for sg in $(seq 1 $n_subgroups); do
