@@ -65,7 +65,7 @@ case $COMMAND in
                 BYEmsg
                 ;;
                 UCERegion )
-                ${HOME_DIR}/scripts/UCERegion.sh $args
+                echo "${HOME_DIR}/scripts/UCERegion.sh $args"
                 BYEmsg
                 ;;
                 * )
