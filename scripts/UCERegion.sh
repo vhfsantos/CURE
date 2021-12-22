@@ -64,8 +64,8 @@ ONLY_BY_REGION="False"
 FILTER="_"
 
 # Option strings for arg parser
-SHORT=hb:r:g:p:o:f:t:
-LONG=help,baits:,version:,reference:,gff:,phyluce-nexus:,output:,filter-string:,threads:,only-by-gene,only-by-region
+SHORT=hp:o:t:
+LONG=help,phyluce-nexus:,output:,threads:
 
 
 # Read options
