@@ -192,7 +192,7 @@ fi
 SWSC=${OUTPUT}/tmp/003-swsc/
 mkdir -p ${SWSC}
 
-SWSC_PATH="../../../../../PFinderUCE-SWSC-EN-master/py_script/SWSCEN.py"
+SWSC_PATH="../PFinderUCE-SWSC-EN-master/py_script/SWSCEN.py"
 
 if [ -z "$(ls -A "${SUBGROUPS_SWSC}")" ]; then
 	log "Running SWSC..."
