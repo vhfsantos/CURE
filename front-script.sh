@@ -58,7 +58,7 @@ ARGS=$(echo "${@:2}")
 
 case $COMMAND in
                 -h | --help )
-                Usage
+                Usage; exit
                 ;;
                 GeneRegion )
                 ${HOME_DIR}/scripts/GeneRegion.sh --version $VERSION $args
