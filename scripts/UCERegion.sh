@@ -141,7 +141,7 @@ if [ -z "$(ls -A "${NEXUSCOPY}")" ]; then
         # (2) Split in subgroups of 15 UCEs for ease parallelization
         # thanks: https://stackoverflow.com/questions/29116212/split-a-folder-into-multiple-subfolders-in-terminal-bash-script
 
-        for i in $(seq 1 $n_subgroups); do
+        for i in `seq 1 $n_subgroups`; do
                 # create dir for subgroup
                 mkdir -p "${subgroups_dir}/${i}";
                 # copy files to there (replace uce-9.nexus > uce_9.nexus)
