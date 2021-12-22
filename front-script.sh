@@ -59,11 +59,11 @@ ARGS=$(echo "${@:2}")
 case $COMMAND in
                 GeneRegion )
                 ${HOME_DIR}/scripts/GeneRegion.sh --version $VERSION $args
-                BYEmsg()
+                BYEmsg
                 ;;
                 UCERegion )
                 ${HOME_DIR}/scripts/UCERegion.sh --version $VERSION $args
-                BYEmsg()
+                BYEmsg
                 ;;
                 * )
                 error_exit "No command named $COMMAND."
