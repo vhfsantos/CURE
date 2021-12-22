@@ -146,7 +146,6 @@ if [ -z "$(ls -A "${NEXUSCOPY}")" ]; then
                 mkdir -p "${subgroups_dir}/${i}";
                 # copy files to there (replace uce-9.nexus > uce_9.nexus)
                 find ${NEXUSCOPY} -maxdepth 1 -type f \
-                        | sed 's/uce-/uce_/g' \
                         | head -n $UCEs_in_subgroup \
                         | xargs -i mv "{}" "${subgroups_dir}/${i}"
         done
