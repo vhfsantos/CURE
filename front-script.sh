@@ -65,7 +65,7 @@ case $COMMAND in
                 BYEmsg
                 ;;
                 UCERegion )
-                echo "${HOME_DIR}/scripts/UCERegion.sh --version $VERSION $ARGS"
+                ${HOME_DIR}/scripts/UCERegion.sh --version $VERSION $ARGS
                 BYEmsg
                 ;;
                 * )
