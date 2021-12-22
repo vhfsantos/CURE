@@ -1,7 +1,6 @@
 #!/bin/bash
-
-VERSION=0.1
 set -e
+VERSION="$2"
 
 trap ctrl_c SIGINT
 trap 'echo - Ignoring a SIGHUP received..' SIGHUP
@@ -34,7 +33,7 @@ Bye\033[0m"
 }
 
 # Usage function
-usage() {
+Usage() {
 echo -e "
 -----------------------------------------------------------
 CURE: an automated and parallel pipeline for UCE curation
@@ -43,8 +42,9 @@ by Vinícius Franceshini-Santos & Felipe Freitas
 version "$VERSION"
 
 \e[4mUsage\e[0m:
- CURE --baits <baits.fa> --reference <reference.fasta> --gff <reference.gff> \\
-      --phyluce-nexus <nexus_dir> --output <output_dir>
+ CURE GeneRegion --baits <baits.fa> --reference <reference.fasta> \\
+                 --gff <reference.gff> --phyluce-nexus <nexus_dir> \\
+                 --output <output_dir>
 
 \e[4mRequired arguments\e[0m:
   -b, --baits             Path to UCE baits file
@@ -54,13 +54,13 @@ version "$VERSION"
                           phyluce
   -o, --output            Output directory
 
-\e[4mOptional arguments\e[0m:
+  \e[4mOptional arguments\e[0m:
   -t, --threads           Number of threads for the analysis (Default: 2)
   -f, --filter-string     UCEs whose name beggins with this string will be discarted (Default: "_")
-  --only-by-gene          Concatenate UCEs only by gene. Concatenation by region
-                          will be discarted with this flag
-  --only-by-region        Concatenate UCEs only by region. Concatenation by gene
-                          will be discarted with this flag"
+  --only-by-gene          Concatenate UCEs only by gene. Concatenation by region will be discarted
+                          with this flag
+  --only-by-region        Concatenate UCEs only by region. Concatenation by gene will be discarted
+                          with this flag"
 exit 2
 }
 
@@ -95,7 +95,7 @@ FILTER="_"
 
 # Option strings for arg parser
 SHORT=hb:r:g:p:o:f:t:
-LONG=help,baits:,reference:,gff:,phyluce-nexus:,output:,filter-string:,threads:,only-by-gene,only-by-region
+LONG=help,baits:,version:,reference:,gff:,phyluce-nexus:,output:,filter-string:,threads:,only-by-gene,only-by-region
 
 
 # Read options
@@ -107,7 +107,11 @@ eval set -- "$OPTS"
 while true ; do
 	case "$1" in
 		-h | --help )
-		usage
+		Usage
+		;;
+		--version )
+		VERSION="$2"
+		shift 2
 		;;
 		-p | --phyluce-nexus )
 		NEXUS_DIR="$2"
@@ -172,6 +176,8 @@ echo "=========================================================================
                              CURE (v$VERSION)
           An automated and parallel pipeline for UCE curation
           by Vinícius Franceschini-Santos & Felipe V Freitas
+-------------------------------------------------------------------------
+                              GeneRegion
 -------------------------------------------------------------------------
 NEXUS: ${NEXUS_DIR}
 BAITS: ${BAITS_FILE}
@@ -433,7 +439,7 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 			--alignments "$dir" --nexus --log ${OUTPUT} \
 			--output "${ALL_EXONS_DIR}"/"${GENEID__EXONID}" > /dev/null 2>&1
-		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
+		"${HOME_DIR}"/progress-bar.sh $AUX "$N_DIRS"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	DONEmsg
@@ -660,4 +666,3 @@ log "Removing temporary files..."
 rm -rf ${OUTPUT}/tmp
 rm -rf ${OUTPUT}/phyluce_align_concatenate_alignments.log
 DONEmsg
-BYEmsg
