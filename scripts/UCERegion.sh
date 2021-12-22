@@ -177,7 +177,39 @@ if [ -z "$(ls -A "${SUBGROUPS_CAT}")" ]; then
                         --output "${SUBGROUPS_CAT}/$sg" > /dev/null 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
+        $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
         DONEmsg
 else
 	warn "UCEs concatenation already done. Skipping"
+fi
+
+
+#=============================================================
+#====                       STEP 2:                       ====
+#====                      Run SWSC                       ====
+#=============================================================
+
+SWSC=${OUTPUT}/tmp/003-swsc/
+mkdir -p ${SWSC}
+
+SWSC_PATH="../../../../../PFinderUCE-SWSC-EN-master/py_script/SWSCEN.py"
+
+if [ -z "$(ls -A "${SUBGROUPS_SWSC}")" ]; then
+	log "Running SWSC..."
+        # run SWSC in parallel
+        for sg in $(seq 1 $n_subgroups); do
+                # (1) fix uce names in .nexus files
+                sed -i 's/uce-/uce_/g' "${SUBGROUPS_CAT}/$sg/$sg.nexus"
+
+                # (2) run SWSC
+                $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
+                        $CONDA_PREFIX/python $SWSC_PATH \
+                        $( realpath ${SUBGROUPS_CAT}/${sg}/${sg}.nexus ) \
+                        $( realpath $SWSC )
+                "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
+        done
+        $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
+        DONEmsg
+else
+	warn "SWSC already run. Skipping"
 fi
