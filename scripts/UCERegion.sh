@@ -45,6 +45,13 @@ DONEmsg() {
 	echo -e "[ CURE v$VERSION | $(date +%Y-%m-%d" "%H:%M:%S) ] Done!"
 }
 
+# Error function
+error_exit() {
+       msg=$1
+       >&2 echo -e "\033[1;31mERROR: ${msg}\033[0m"
+       Usage
+}
+
 # Print usage if no arg
 if [ $# -eq 0 ]; then usage; fi
 

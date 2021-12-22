@@ -57,6 +57,9 @@ COMMAND=$1
 ARGS=$(echo "${@:2}")
 
 case $COMMAND in
+                -h | --help )
+                Usage
+                ;;
                 GeneRegion )
                 ${HOME_DIR}/scripts/GeneRegion.sh --version $VERSION $args
                 BYEmsg
