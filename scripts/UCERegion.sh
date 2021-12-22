@@ -172,7 +172,8 @@ if [ -z "$(ls -A "${SUBGROUPS_CAT}")" ]; then
                         --nexus --log ${OUTPUT}/tmp/ \
                         --output "${SUBGROUPS_CAT}/$sg" > /dev/null 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
-        DONEmsg
+                DONEmsg
+        done
 else
 	warn "UCEs concatenation already done. Skipping"
 fi
