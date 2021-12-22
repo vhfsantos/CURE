@@ -205,7 +205,7 @@ if [ -z "$(ls -A "${SUBGROUPS_SWSC}")" ]; then
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
                         $CONDA_PREFIX/bin/python $SWSC_PATH \
                         $( realpath ${SUBGROUPS_CAT}/${sg}/${sg}.nexus ) \
-                        $( realpath $SWSC )
+                        $( realpath $SWSC ) > /dev/null 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
