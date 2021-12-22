@@ -54,9 +54,6 @@ error_exit() {
        Usage
 }
 
-# Print usage if no arg
-if [ $# -eq 0 ]; then Usage; fi
-
 # Setting home dir for utils calling
 tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
