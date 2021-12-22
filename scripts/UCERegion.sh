@@ -131,7 +131,7 @@ NEXUSCOPY=${OUTPUT}/tmp/000-nexus-copy/
 mkdir -p ${NEXUSCOPY}
 UCEs_in_subgroup=15
 subgroups_dir="${OUTPUT}/tmp/001-subgroups"
-n_subgroups=$((`find ${NEXUSCOPY} -maxdepth 1 -type f | wc -l`/16))
+n_subgroups=$((`find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l`/16))
 echo $n_subgroups
 if [ -z "$(ls -A "${NEXUSCOPY}")" ]; then
 	log "Preparing input data..."
