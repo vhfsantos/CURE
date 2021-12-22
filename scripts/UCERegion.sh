@@ -65,7 +65,7 @@ FILTER="_"
 
 # Option strings for arg parser
 SHORT=hp:o:t:
-LONG=help,phyluce-nexus:,output:,threads:
+LONG=help,phyluce-nexus:,output:,threads:,version:
 
 
 # Read options
