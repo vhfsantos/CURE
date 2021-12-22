@@ -109,6 +109,10 @@ if [ -z "${NEXUS_DIR}" ] || [ -z "${OUTPUT}" ]; then
 	error_exit "Please, supply all arguments correctly."
 fi
 
+tmp=$(realpath "$0")
+HOME_DIR=${tmp%/*}
+
+
 # Print parameters for debuggin
 echo "=========================================================================
                              CURE (v$VERSION)
@@ -172,8 +176,8 @@ if [ -z "$(ls -A "${SUBGROUPS_CAT}")" ]; then
                         --nexus --log ${OUTPUT}/tmp/ \
                         --output "${SUBGROUPS_CAT}/$sg" > /dev/null 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
-                DONEmsg
         done
+        DONEmsg
 else
 	warn "UCEs concatenation already done. Skipping"
 fi
