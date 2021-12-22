@@ -30,6 +30,8 @@ version "$VERSION"
 
 \e[4mOptional arguments\e[0m:
   -t, --threads           Number of threads for the analysis (Default: 2)"
+
+exit 2
 }
 
 # Log message function (normal text)
