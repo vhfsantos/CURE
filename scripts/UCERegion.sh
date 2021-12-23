@@ -259,7 +259,7 @@ if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
         for sg in $(seq 1 $n_subgroups); do
 		# calls function in parallel
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
-                        SWSCParser $sg > /dev/null 2>&1
+                        SWSCParser $sg
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
