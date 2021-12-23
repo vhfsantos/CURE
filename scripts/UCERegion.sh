@@ -289,9 +289,9 @@ mkdir -p ${UCES_CAT}
 if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	log "Concatenating UCEs..."
 	#  (1) PPlacing all subgroups nexus to a same dir
-	$CONDA_PREFIX/bin/parallel \
-		--will-cite --max-procs ${THREADS} \
-		cp {} ${SWSC_PARSE}/*/*nexus ::: ${UCES_CAT}
+	for sg in $(seq 1 $n_subgroups); do
+	$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS"
+		cp ${SWSC_PARSE}/${sg}/* ${UCES_CAT}
         DONEmsg
 else
 	warn "UCEs already concatenated. Skipping"
