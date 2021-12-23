@@ -408,6 +408,15 @@ if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
 		"${HOME_DIR}"/progress-bar.sh $AUX "$N_UCES"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
+	DONEmsg
+
+	log "Writing final nexus files..."
+	# fix charsets and mv to output dir
+	for uce in $(find "${CAT_UCES}"/NEXUS/ -type f); do
+		uce_name=$(basename $uce)
+		cat $uce \
+		| sed 's/charpartition combined =.*//;s/.nexus//g' \
+		> ${OUTPUT}/partitioned-uces/${uce_name}
 else
 	warn "UCEs already concatenated. Skipping"
 fi
