@@ -288,13 +288,19 @@ mkdir -p ${UCES_CAT}
 
 if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	log "Concatenating UCEs..."
-	#  (1) PPlacing all subgroups nexus to a same dir
+	#  (1) Place all subgroups nexus to a same dir
 	for sg in $(seq 1 $n_subgroups); do
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS"
 		cp ${SWSC_PARSE}/${sg}/* ${UCES_CAT}
 	done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
-        DONEmsg
+
+	# (2) Concatenate
+	$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
+		--alignments "${UCES_CAT}" \
+		--nexus --log ${OUTPUT}/tmp/ \
+		--output "${OUTPUT}/Alignment" > /dev/null 2>&1
+	DONEmsg
 else
 	warn "UCEs already concatenated. Skipping"
 fi
