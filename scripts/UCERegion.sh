@@ -388,13 +388,14 @@ fi
 #====                 Concatenating UCEs                  ====
 #=============================================================
 
+
+mkdir -p "${CAT_UCES}"/NEXUS/
 if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
 	log "Concatenating UCEs..."
 	# (2) concatenating with PHYLUCE in parallel
 	UCE_DIRS=$(find ${CAT_UCES} -mindepth 1 -type d)
 	N_UCES=$(find ${CAT_UCES} -mindepth 1 -type d | wc -l)
 	AUX=0
-	mkdir -p "${CAT_UCES}"/NEXUS/
 
 	for uce in $UCE_DIRS; do
 		uce_name=$(basename $uce)
