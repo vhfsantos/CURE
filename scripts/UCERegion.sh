@@ -213,3 +213,57 @@ if [ -z "$(ls -A "${SWSC}")" ]; then
 else
 	warn "SWSC already run. Skipping"
 fi
+
+#=============================================================
+#====                       STEP 3:                       ====
+#====                   Parsing Results                   ====
+#=============================================================
+
+SWSC_PARSE=${OUTPUT}/tmp/004-swsc-parse/
+mkdir -p ${SWSC_PARSE}
+
+# assume all UCE names start with this prefix
+UCE_PREFIX="uce_"
+
+# function to parse results
+SWSCParser(){
+	subgroup=$1
+	# (1) extract flanks coordenates for this subgroup
+	   # 1st sed: adds 'charset' at the beggining of each line
+	   # 2nd sed: adds 'begin sets;' as first line
+	   # 3rd sed: adds 'end;' as last line
+	grep $UCE_PREFIX ${SWSC}/${subgroup}.nexus_entropy_partition_finder.cfg \
+		| sed 's/^/charset /g' \
+		| sed '1 i\begin sets\;' \
+		| sed -e '$aend;' > ${SWSC_PARSE}/${subgroup}.charsets
+
+	# (2) remove old charsets from nexus file of this subgroup
+	   # sed: delete all line after 'begin sets;'
+	cat ${SUBGROUPS_CAT}/${subgroup}/${subgroup}.nexus \
+		| sed '/begin sets;/,$d' > ${SWSC_PARSE}/${subgroup}.alignment
+
+	# (3) create the new nexus file with flanks as charsets
+	cat ${SWSC_PARSE}/${subgroup}.alignment \
+		${SWSC_PARSE}/${subgroup}.charsets \
+		> ${SWSC_PARSE}/${subgroup}.nexus
+
+	# (4) call phyluce to split the nexus using the charsets
+	phyluce_align_split_concat_nexus_to_loci \
+		--nexus ${SWSC_PARSE}/${subgroup}.nexus \
+		--output ${SWSC_PARSE}/${subgroup}/ --log-path ${OUTPUT}/tmp/\
+		--output-format nexus
+}
+
+if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
+	log "Parsing results..."
+        for sg in $(seq 1 $n_subgroups); do
+		# calls function in parallel
+                $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
+                        SWSCParser $sg > /dev/null 2>&1
+                "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
+        done
+        $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
+        DONEmsg
+else
+	warn "SWSC results already parsed. Skipping"
+fi
