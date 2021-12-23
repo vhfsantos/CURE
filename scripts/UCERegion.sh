@@ -290,7 +290,7 @@ mkdir -p ${UCES_CAT}
 
 if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	log "Generating input for PartitionFinder2..."
-	#  (1) Place all subgroups nexus to a same dir
+	# (1) Place all subgroups nexus to a same dir
 	for sg in $(seq 1 $n_subgroups); do
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS"
 		cp ${SWSC_PARSE}/${sg}/* ${UCES_CAT}
@@ -301,8 +301,47 @@ if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 		--alignments "${UCES_CAT}" \
 		--phylip --log ${OUTPUT}/tmp/ \
-		--output "${OUTPUT}/PF2-input" > /dev/null 2>&1
-	DONEmsg
+		--output "${UCES_CAT}/PF2-input" > /dev/null 2>&1
+
+	# (3) Header of .cfg file
+	echo "## ALIGNMENT FILE ##
+alignment = PF2-input.philip;
+
+## BRANCHLENGTHS: linked | unlinked ##
+branchlengths = linked;
+
+## MODELS OF EVOLUTION: all | allx | mrbayes | beast | gamma | gammai <list> ##
+models = GTR+G;
+
+# MODEL SELECCTION: AIC | AICc | BIC #
+model_selection = aicc;
+
+## DATA BLOCKS: see manual for how to define ##
+[data_blocks]" > ${UCES_CAT}/PF2-input/header
+
+	# (4) Body of .cfg file
+	   # 1st sed: delete all after charpartition combined
+	   # 2nd sed: remove 'begin sets;'
+	   # 3rd sed: remove 'charset ' from beggining of lines
+	cat "${UCES_CAT}"/PF2-input/PF2-input.charsets \
+		| sed '/charpartition combined/,$d' \
+		| sed 's/begin sets;//g' \
+		| sed 's/^charset //g' | tail -n +3 \
+		> ${UCES_CAT}/PF2-input/body
+
+	# (5) Footer of .cfg file
+	echo "
+## SCHEMES, search: all | user | greedy | rcluster | hcluster | kmeans ##
+[schemes]
+search = rclusterf;" > ${UCES_CAT}/PF2-input/footer
+
+	cat ${UCES_CAT}/PF2-input/header \
+		${UCES_CAT}/PF2-input/body \
+		${UCES_CAT}/PF2-input/footer \
+		> "${OUTPUT}/PF2-input/PF2-input.cfg"
+
+	# (6) Get alignment from tmp dir
+	mv ${UCES_CAT}/PF2-input/PF2-input.phylip "${OUTPUT}/PF2-input/"
 else
 	warn "PF2 input already exists. Skipping"
 fi
