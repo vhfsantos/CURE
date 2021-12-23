@@ -305,7 +305,7 @@ if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 
 	# (3) Header of .cfg file
 	echo "## ALIGNMENT FILE ##
-alignment = PF2-input.philip;
+alignment = PF2-input.phylip;
 
 ## BRANCHLENGTHS: linked | unlinked ##
 branchlengths = linked;
