@@ -292,6 +292,8 @@ if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	for sg in $(seq 1 $n_subgroups); do
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS"
 		cp ${SWSC_PARSE}/${sg}/* ${UCES_CAT}
+	done
+        $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
         DONEmsg
 else
 	warn "UCEs already concatenated. Skipping"
