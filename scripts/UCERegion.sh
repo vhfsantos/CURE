@@ -368,7 +368,7 @@ if [ -z "$(ls -A "${CAT_UCES}")" ]; then
 
 		# check if ends with _all.nexus
 		if [[ "$uce_name" == *_all.nexus ]]; then
-  			warn "No flanks found for $uce_name. It will be left as a whole"
+  			warn "No flanks found for ${uce_name/_all.nexus}. It will be left as a whole"
 			cp $uce ${OUTPUT}/partitioned-uces/${uce_name/_all}
 		else
 			mkdir -p ${CAT_UCES}/$uce_name
