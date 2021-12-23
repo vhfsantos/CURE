@@ -254,6 +254,8 @@ SWSCParser(){
 		--output-format nexus
 }
 
+export -f SWSCParser
+
 if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
 	log "Parsing results..."
         for sg in $(seq 1 $n_subgroups); do
