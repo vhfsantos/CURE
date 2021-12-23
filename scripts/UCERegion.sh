@@ -335,6 +335,7 @@ model_selection = aicc;
 [schemes]
 search = rclusterf;" > ${UCES_CAT}/PF2-input/footer
 
+	mkdir -p "${OUTPUT}/PF2-input/"
 	cat ${UCES_CAT}/PF2-input/header \
 		${UCES_CAT}/PF2-input/body \
 		${UCES_CAT}/PF2-input/footer \
