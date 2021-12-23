@@ -417,6 +417,8 @@ if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
 		cat $uce \
 		| sed 's/charpartition combined =.*//;s/.nexus//g' \
 		> ${OUTPUT}/partitioned-uces/${uce_name}
+	done
+	DONEmsg
 else
 	warn "UCEs already concatenated. Skipping"
 fi
