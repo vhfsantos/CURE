@@ -422,3 +422,15 @@ if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
 else
 	warn "UCEs already concatenated. Skipping"
 fi
+
+#=============================================================
+#====                       STEP 7:                       ====
+#====                  Remove tmp files                   ====
+#=============================================================
+
+if test -f "${OUTPUT}/tmp/phyluce_align_concatenate_alignments.log"; then
+	rm -rf ${OUTPUT}/tmp/
+	DONEmsg
+else
+	warn "Temporary files already removed. Skipping"
+fi
