@@ -140,7 +140,7 @@ n_subgroups=$((`find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l`/16))
 
 if [ -z "$(ls -A "${NEXUSCOPY}")" ]; then
 	log "Preparing input data..."
-	log "Splitted $N_UCES into $n_subgroups subgroups"
+	log "Splitted $N_UCES UCEs into $n_subgroups subgroups"
         #  (1) Create a copy os nexus dir. Allows me to 'move' UCEs from there
 	$CONDA_PREFIX/bin/parallel \
 	--will-cite --max-procs ${THREADS} \
