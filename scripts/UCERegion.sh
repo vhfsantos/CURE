@@ -378,6 +378,24 @@ if [ -z "$(ls -A "${CAT_UCES}")" ]; then
 				${CAT_UCES}/$uce_name
 		fi
         done
+
+	# (2) concatenating with PHYLUCE in parallel
+	UCE_DIRS=$(find ${CAT_UCES} -mindepth 1 -type d)
+	N_UCES=$(find ${CAT_UCES} -mindepth 1 -type d | wc -l)
+	AUX=0
+	mkdir -p "${CAT_UCES}"/NEXUS/
+
+	for uce in $UCE_DIRS; do
+		uce_name=$(basename $uce)
+		AUX=$(( AUX + 1 ))
+		# concatenate with phyluce in parallel
+		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
+			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
+			--alignments "$uce" --nexus --log ${OUTPUT}/tmp/ \
+			--output "${CAT_UCES}"/NEXUS/"${uce_name}" > /dev/null 2>&1
+		"${HOME_DIR}"/progress-bar.sh $AUX "$N_UCES"
+	done
+	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 else
 	warn "SWSC already run. Skipping"
 fi
