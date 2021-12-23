@@ -355,6 +355,7 @@ fi
 
 CAT_UCES=${OUTPUT}/tmp/006-concatenate-uces/
 mkdir -p ${CAT_UCES}
+mkdir -p ${OUTPUT}/partitioned-uces/
 
 if [ -z "$(ls -A "${CAT_UCES}")" ]; then
 	log "Concatenating UCEs..."
