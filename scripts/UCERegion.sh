@@ -345,3 +345,37 @@ search = rclusterf;" > ${UCES_CAT}/PF2-input/footer
 else
 	warn "PF2 input already exists. Skipping"
 fi
+
+
+#=============================================================
+#====                       STEP 5:                       ====
+#====                 Concatenating UCEs                  ====
+#=============================================================
+
+CAT_UCES=${OUTPUT}/tmp/006-concatenate-uces/
+mkdir -p ${CAT_UCES}
+
+if [ -z "$(ls -A "${CAT_UCES}")" ]; then
+	log "Concatenating UCEs..."
+	UCE_LIST=$(find ${SWSC_PARSE}/*/ -type f -name *nexus \
+		| sed 's/_right.nexus//g;s/_left.nexus//g;s/_core.nexus//g' \
+		| uniq)
+        # create UCE dir
+        for uce in $UCE_LIST; do
+		uce_name=$(basename $uce)
+
+		# check if ends with _all.nexus
+		if [[ "$uce_name" == *_all.nexus ]]; then
+  			warn "No flanks found for $uce_name. It will be left as a whole"
+			mv $uce ${OUTPUT}/partitioned-uces/${uce_name/_all}
+		else
+			mkdir -p ${CAT_UCES}/$uce_name
+			mv ${uce}_left.nexus \
+				${uce}_core.nexus \
+				${uce}_right.nexus \
+				${CAT_UCES}/$uce_name
+		fi
+        done
+else
+	warn "SWSC already run. Skipping"
+fi
