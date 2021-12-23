@@ -219,7 +219,7 @@ fi
 #====                   Parsing Results                   ====
 #=============================================================
 
-SWSC_PARSE=${OUTPUT}/tmp/004-swsc-parse/
+SWSC_PARSE=${OUTPUT}/tmp/004-swsc-parse
 mkdir -p ${SWSC_PARSE}
 
 # assume all UCE names start with this prefix
@@ -291,7 +291,7 @@ if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	#  (1) PPlacing all subgroups nexus to a same dir
 	$CONDA_PREFIX/bin/parallel \
 		--will-cite --max-procs ${THREADS} \
-		cp {} ${SWSC_PARSE}/*/ ::: ${UCES_CAT}
+		cp {} ${SWSC_PARSE}/*/*nexus ::: ${UCES_CAT}
         DONEmsg
 else
 	warn "UCEs already concatenated. Skipping"
