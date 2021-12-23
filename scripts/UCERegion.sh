@@ -228,6 +228,10 @@ UCE_PREFIX="uce_"
 # function to parse results
 SWSCParser(){
 	subgroup=$1
+	UCE_PREFIX=$2
+	SWSC_PARSE=$3
+	SUBGROUPS_CAT=$4
+	OUTPUT=$5
 	# (1) extract flanks coordenates for this subgroup
 	   # 1st sed: adds 'charset' at the beggining of each line
 	   # 2nd sed: adds 'begin sets;' as first line
@@ -248,7 +252,7 @@ SWSCParser(){
 		> ${SWSC_PARSE}/${subgroup}.nexus
 
 	# (4) call phyluce to split the nexus using the charsets
-	phyluce_align_split_concat_nexus_to_loci \
+	$CONDA_PREFIX/bin/phyluce_align_split_concat_nexus_to_loci \
 		--nexus ${SWSC_PARSE}/${subgroup}.nexus \
 		--output ${SWSC_PARSE}/${subgroup}/ --log-path ${OUTPUT}/tmp/\
 		--output-format nexus
@@ -261,7 +265,8 @@ if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
         for sg in $(seq 1 $n_subgroups); do
 		# calls function in parallel
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
-                        SWSCParser $sg
+                        SWSCParser $sg $UCE_PREFIX $SWSC_PARSE $SUBGROUPS_CAT \
+			$OUTPUT
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
