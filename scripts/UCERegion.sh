@@ -281,15 +281,15 @@ fi
 
 #=============================================================
 #====                       STEP 4:                       ====
-#====                  Concatenate UCEs                   ====
+#====                Generating PF2 input                 ====
 #=============================================================
 
-UCES_CAT=${OUTPUT}/tmp/005-concatenate-uces/
+UCES_CAT=${OUTPUT}/tmp/005-input-PF2/
 mkdir -p ${UCES_CAT}
 
 
 if [ -z "$(ls -A "${UCES_CAT}")" ]; then
-	log "Concatenating UCEs..."
+	log "Generating input for PartitionFinder2..."
 	#  (1) Place all subgroups nexus to a same dir
 	for sg in $(seq 1 $n_subgroups); do
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS"
@@ -300,9 +300,9 @@ if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	# (2) Concatenate
 	$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 		--alignments "${UCES_CAT}" \
-		--nexus --log ${OUTPUT}/tmp/ \
-		--output "${OUTPUT}/partitioned-UCEs" > /dev/null 2>&1
+		--phylip --log ${OUTPUT}/tmp/ \
+		--output "${OUTPUT}/PF2-input" > /dev/null 2>&1
 	DONEmsg
 else
-	warn "UCEs already concatenated. Skipping"
+	warn "PF2 input already exists. Skipping"
 fi
