@@ -135,10 +135,12 @@ NEXUSCOPY=${OUTPUT}/tmp/000-nexus-copy/
 mkdir -p ${NEXUSCOPY}
 UCEs_in_subgroup=15
 subgroups_dir="${OUTPUT}/tmp/001-subgroups"
+N_UCES=$(find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l)
 n_subgroups=$((`find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l`/16))
-echo $n_subgroups
+
 if [ -z "$(ls -A "${NEXUSCOPY}")" ]; then
 	log "Preparing input data..."
+	log "Splitted $N_UCES into $n_subgroups subgroups"
         #  (1) Create a copy os nexus dir. Allows me to 'move' UCEs from there
 	$CONDA_PREFIX/bin/parallel \
 	--will-cite --max-procs ${THREADS} \
@@ -299,7 +301,7 @@ if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 		--alignments "${UCES_CAT}" \
 		--nexus --log ${OUTPUT}/tmp/ \
-		--output "${OUTPUT}/Alignment" > /dev/null 2>&1
+		--output "${OUTPUT}/partitioned-UCEs" > /dev/null 2>&1
 	DONEmsg
 else
 	warn "UCEs already concatenated. Skipping"
