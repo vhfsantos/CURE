@@ -378,7 +378,18 @@ if [ -z "$(ls -A "${CAT_UCES}")" ]; then
 				${CAT_UCES}/$uce_name
 		fi
         done
+	DONEmsg
+else
+	warn "UCEs already prepared for concatenation. Skipping"
+fi
 
+#=============================================================
+#====                       STEP 6:                       ====
+#====                 Concatenating UCEs                  ====
+#=============================================================
+
+if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
+	log "Concatenating UCEs..."
 	# (2) concatenating with PHYLUCE in parallel
 	UCE_DIRS=$(find ${CAT_UCES} -mindepth 1 -type d)
 	N_UCES=$(find ${CAT_UCES} -mindepth 1 -type d | wc -l)
@@ -397,5 +408,5 @@ if [ -z "$(ls -A "${CAT_UCES}")" ]; then
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 else
-	warn "SWSC already run. Skipping"
+	warn "UCEs already concatenated. Skipping"
 fi
