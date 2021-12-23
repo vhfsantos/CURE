@@ -259,6 +259,7 @@ SWSCParser(){
 		--output-format nexus
 }
 
+# Need to export this function to call it with Parallel
 export -f SWSCParser
 
 if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
@@ -267,11 +268,31 @@ if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
 		# calls function in parallel
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
                         SWSCParser $sg $UCE_PREFIX $SWSC_PARSE $SUBGROUPS_CAT \
-			$OUTPUT $SWSC > /dev/null 2>&1 
+			$OUTPUT $SWSC > /dev/null 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
         DONEmsg
 else
 	warn "SWSC results already parsed. Skipping"
+fi
+
+#=============================================================
+#====                       STEP 4:                       ====
+#====                  Concatenate UCEs                   ====
+#=============================================================
+
+UCES_CAT=${OUTPUT}/tmp/005-concatenate-uces/
+mkdir -p ${UCES_CAT}
+
+
+if [ -z "$(ls -A "${UCES_CAT}")" ]; then
+	log "Concatenating UCEs..."
+	#  (1) PPlacing all subgroups nexus to a same dir
+	$CONDA_PREFIX/bin/parallel \
+		--will-cite --max-procs ${THREADS} \
+		cp {} ${SWSC_PARSE}/*/ ::: ${UCES_CAT}
+        DONEmsg
+else
+	warn "UCEs already concatenated. Skipping"
 fi
