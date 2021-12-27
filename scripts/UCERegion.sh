@@ -24,12 +24,13 @@ version "$VERSION"
  CURE UCERegion  --phyluce-nexus <nexus_dir> --output <output_dir>
 
 \e[4mRequired arguments\e[0m:
-  -p, --phyluce-nexus     Path to the directory with nexus files created with
-                          phyluce
+  -p, --phyluce-nexus     Path to the directory with nexus files created with phyluce
   -o, --output            Output directory
 
 \e[4mOptional arguments\e[0m:
-  -t, --threads           Number of threads for the analysis (Default: 2)"
+  -t, --threads           Number of threads for the analysis (Default: 2)
+  -s, --swsc              Path to SWSCEN.py script (Default: PATH variable)
+  -u, --uce-prefix        Prefix of UCE nexus files (Default: \"uce_\")"
 
 exit 2
 }
@@ -54,17 +55,17 @@ error_exit() {
        Usage
 }
 
-# Setting home dir for utils calling
+# Setting default variables
 tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
 THREADS=2
-ONLY_BY_GENE="False"
-ONLY_BY_REGION="False"
-FILTER="_"
+# assume all UCE names start with this prefix
+UCE_PREFIX="uce_"
+SWSC_PATH="SWSCEN.py"
 
 # Option strings for arg parser
-SHORT=hp:o:t:
-LONG=help,phyluce-nexus:,output:,threads:,version:
+SHORT=hp:o:t:s:u
+LONG=help,phyluce-nexus:,output:,threads:,version:swsc:,uce-prefix:
 
 
 # Read options
@@ -84,6 +85,14 @@ while true ; do
 		;;
 		-p | --phyluce-nexus )
 		NEXUS_DIR="$2"
+		shift 2
+		;;
+		-u | --uce-prefix )
+		UCE_PREFIX="$2"
+		shift 2
+		;;
+		-s | --swsc )
+		SWSC_PATH="$2"
 		shift 2
 		;;
                 -t | --threads )
@@ -124,6 +133,8 @@ echo "=========================================================================
 NEXUS: ${NEXUS_DIR}
 OUTDIR: ${OUTPUT}
 THREADS: $THREADS
+SWSC PATH: ${SWSC_PATH}
+UCE PREFIX: ${UCE_PREFIX}
 -------------------------------------------------------------------------"
 
 #=============================================================
@@ -194,8 +205,6 @@ fi
 SWSC=${OUTPUT}/tmp/003-swsc/
 mkdir -p ${SWSC}
 
-SWSC_PATH="../PFinderUCE-SWSC-EN-master/py_script/SWSCEN.py"
-
 if [ -z "$(ls -A "${SWSC}")" ]; then
 	log "Running SWSC..."
         # run SWSC in parallel
@@ -223,9 +232,6 @@ fi
 
 SWSC_PARSE=${OUTPUT}/tmp/004-swsc-parse
 mkdir -p ${SWSC_PARSE}
-
-# assume all UCE names start with this prefix
-UCE_PREFIX="uce_"
 
 # function to parse results
 SWSCParser(){
