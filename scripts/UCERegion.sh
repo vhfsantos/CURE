@@ -65,7 +65,7 @@ SWSC_PATH="SWSCEN.py"
 
 # Option strings for arg parser
 SHORT=hp:o:t:s:u
-LONG=help,phyluce-nexus:,output:,threads:,version:swsc:,uce-prefix:
+LONG=help,phyluce-nexus:,output:,threads:,version:,swsc:,uce-prefix:
 
 
 # Read options
