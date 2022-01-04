@@ -9,7 +9,7 @@ In the first strategy (Van Dam 2021) it concatenates UCEs in two different ways,
 
 By default, **CURE** runs both approaches, but this can be changed. The input files for the pipeline are the baits file used for UCE sequencing, the reference genome and annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
 
-In the second strategy (Freitas 2021) it runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532) in a parallelized way, that speeds up the process a lot, and creates charsets considering the left flank, right flank and core for each locus in a dataset for gene-tree estimation.
+In the second strategy (Freitas 2021) it runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in a parallelized way, that speeds up the process a lot, and creates charsets considering the left flank, right flank and core for each locus in a dataset for gene-tree estimation.
 
 # Table of contents
 
