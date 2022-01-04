@@ -1,15 +1,15 @@
 <p align="center"><img src="misc/logo.png" alt="CURE" width="60%"></p>
 
-**CURE** is an automated and parallel pipeline for the curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategies proposed by [Van Dam et al. 2021. Genomic Characterization and Curation of UCEs Improves Species Tree Reconstruction](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768), and [Freitas et al. 2021 Partitioned Gene-Tree Analyses and Gene-Based Topology Testing Help Resolve Incongruence in a Phylogenomic Study of Host-Specialist Bees (Apidae: Eucerinae)](https://academic.oup.com/mbe/article/38/3/1090/5976982).
+**CURE** is an automated and parallel pipeline for the curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategies proposed by [Van Dam et al. 2021. Genomic Characterization and Curation of UCEs Improves Species Tree Reconstruction](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) (named **GeneRegion** strategy), and [Freitas et al. 2021 Partitioned Gene-Tree Analyses and Gene-Based Topology Testing Help Resolve Incongruence in a Phylogenomic Study of Host-Specialist Bees (Apidae: Eucerinae)](https://academic.oup.com/mbe/article/38/3/1090/5976982) (name **UCERegion** strategy).
 
-In the first strategy (Van Dam 2021) it concatenates UCEs in two different ways, according to the available annotation:
+In the **GeneRegion** strategy (Van Dam 2021) it concatenates UCEs in two different ways, according to the available annotation:
 
 * _by gene_: concatenates all UCEs from the same gene and treats different regions (exons and introns) as different partitions;
 * _by region_: concatenates all UCEs from the same exons or introns of the same gene.
 
-By default, **CURE** runs both approaches, but this can be changed. The input files for the pipeline are the baits file used for UCE sequencing, the reference genome and annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
+By default, **CURE** runs both approaches for **GeneRegion** strategy, but this can be changed. The input files for this pipeline are the baits file used for UCE sequencing, the reference genome and annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
 
-In the second strategy (Freitas 2021) it runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in a parallelized way, that speeds up the process a lot, and creates charsets considering the left flank, right flank and core for each locus in a dataset for gene-tree estimation.
+In the **UCERegion** strategy (Freitas 2021) it runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in a parallelized way, that speeds up the process a lot, and creates charsets considering the left flank, right flank and core for each locus in a dataset for gene-tree estimation.
 
 # Table of contents
 
@@ -46,7 +46,9 @@ conda activate cure
 
 # How CURE works
 
-The main inputs of **CURE** are the UCE alignments and an annotated reference genome (note that **CURE** also needs to be provided with the baits file used for the UCE sequencing)
+## **GeneRegion** Strategy
+
+The main inputs for this strategy are the UCE alignments and an annotated reference genome (note that **CURE** also needs to be provided with the baits file used for the UCE sequencing)
 
 <p align="center"><img src="misc/img/input.png" alt="input" width="100%"></p>
 
