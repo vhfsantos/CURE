@@ -85,8 +85,11 @@ It usually takes about two minutes to run with 10 threads.
 With the command line below, **CURE** will run the two concatenating approaches.
 
 ```sh
-CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
-     --phyluce-nexus test_data/uce_nexus/ --output ./CURE-output
+CURE GeneRegion --baits test_data/baits.fasta  \
+                --reference test_data/ref.fa \
+                --gff test_data/ref.gff \
+                --phyluce-nexus test_data/uce_nexus/ \
+                --output ./CURE-output
 ```
 
 ### Running only one of the concatenating approaches
@@ -97,17 +100,23 @@ However, you can raise the `--only-by-gene` or `--only-by-region` flag to select
 #### Only by gene
 
 ```sh
-CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
-     --phyluce-nexus test_data/uce_nexus/ --output ./CURE-output \
-     --only-by-gene
+CURE GeneRegion --baits test_data/baits.fasta  \
+                --reference test_data/ref.fa \
+                --gff test_data/ref.gff \
+                --phyluce-nexus test_data/uce_nexus/ \
+                --output ./CURE-output \
+                --only-by-gene
 ```
 
 #### Only by region
 
 ```sh
-CURE --baits test_data/baits.fasta  --reference test_data/ref.fa --gff test_data/ref.gff \
-     --phyluce-nexus test_data/uce_nexus/ --output ./CURE-output \
-     --only-by-region
+CURE GeneRegion --baits test_data/baits.fasta  \
+                --reference test_data/ref.fa \
+                --gff test_data/ref.gff \
+                --phyluce-nexus test_data/uce_nexus/ \
+                --output ./CURE-output \
+                --only-by-region
 ```
 
 # Output files
