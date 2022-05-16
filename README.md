@@ -180,6 +180,12 @@ scripts/estimate-trees.sh \
     --estimated-trees estimated-trees
 ```
 
+# Citation
+
+If you use **CURE** in your research, please cite:
+
+Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A.B. Almeida, (xxxx). Phylogenomics, biogeography, and classification of long-horned bees (Apidae: Eucerini), with insights on the use of specimens with extremely degraded DNA for UCE phylogenomics. xxxxxxx
+
 # License
 
 [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html)
