@@ -147,15 +147,15 @@ Then it prepares all inputs needed for a summary analysis with ASTRAL.
 For instance, if you run **CURE** setting `CURE-output` as output directory, you can call `estimate-trees.sh` as the following:
 
 ```sh
-estimate-trees.sh \
-        --cure-out CURE-output/ \
-        --estimated-trees estimated-trees
+scripts/estimate-trees.sh \
+    --cure-out CURE-output/ \
+    --estimated-trees estimated-trees
 ```
 
 If you raised `--only-by-gene` or `--only-by-region` while running **CURE**, you can raise it here as well:
 
 ```sh
-estimate-trees.sh \
+scripts/estimate-trees.sh \
     --cure-out CURE-output/ \
     --estimated-trees estimated-trees \
     --only-by-gene
@@ -164,7 +164,7 @@ estimate-trees.sh \
 or
 
 ```sh
-estimate-trees.sh \
+scripts/estimate-trees.sh \
     --cure-out CURE-output/ \
     --estimated-trees estimated-trees \
     --only-by-region
@@ -175,7 +175,7 @@ In this case, you only need to use the parameter `--custom-alignments` instead o
 So if you have a set of alignments (in Phylip, Fasta, or Nexus format) in a directory called `input-alignments`, and want to run IQ-tree on them, you can call `estimate-trees.sh` as the following:
 
 ```sh
-estimate-trees.sh \
+scripts/estimate-trees.sh \
     --custom-alignments input-alignments/ \
     --estimated-trees estimated-trees
 ```
