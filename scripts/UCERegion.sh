@@ -95,7 +95,7 @@ while true ; do
 		SWSC_PATH="$2"
 		shift 2
 		;;
-                -t | --threads )
+        -t | --threads )
 		THREADS="$2"
 		shift 2
 		;;
