@@ -351,8 +351,8 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 	while IFS=$'\t' read uce; do
 		UCEfile=${NEXUSCOPYex}/$uce
 		if [[ ! -f ${UCEfile} ]]; then
-			#warn "${uce%.*} already assigned or missing in nexus dir. \
-			#Skipping this file..."
+			warn "${uce%.*} already assigned or missing in nexus dir. \
+			Skipping this file..."
 			continue
 		else
 			mv "$UCEfile" "${INTERGENIC_DIR}"/"$uce"
