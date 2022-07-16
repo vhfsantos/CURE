@@ -221,6 +221,8 @@ fi
 
 mkdir -p "${OUTPUT}"/tmp/
 mkdir -p "${OUTPUT}"/uce_kit_output
+LOGDIR="${OUTPUT}"/logfiles/
+mkdir -p "${LOGDIR}"
 
 GENOME=$(basename "${REFERENCE_GENOME}")
 UCE_KIT_SUMMARY="${OUTPUT}/uce_kit_output/${GENOME}.uce_kit_summary"
@@ -231,7 +233,7 @@ if [[ ! -f "${UCE_KIT_SUMMARY}" ]]; then
 		"${BAITS_FILE}" \
 		"${REFERENCE_GENOME}" \
 		"${GFF}" "${OUTPUT}"/uce_kit_output \
-		-lines -merge -filt "$FILTER" > /dev/null 2>&1
+		-lines -merge -filt "$FILTER" > "${LOGDIR}"/uce_kit.log 2>&1
 	DONEmsg
 	else
 		warn "Script uce_kit.py already run. Skipping..."
@@ -437,7 +439,7 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 		# concatenate with phyluce in parallel
 		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
-			--alignments "$dir" --nexus --log ${OUTPUT} \
+			--alignments "$dir" --nexus --log "${LOGDIR}" \
 			--output "${ALL_EXONS_DIR}"/"${GENEID__EXONID}" > /dev/null 2>&1
 		"${HOME_DIR}"/progress-bar.sh $AUX "$N_DIRS"
 	done
@@ -478,7 +480,7 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 		AUX=$(( AUX + 1 ))
 		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
-			--alignments "$dir" --nexus --log ${OUTPUT} \
+			--alignments "$dir" --nexus --log "${LOGDIR}" \
 			--output "${ALL_INTRONS_DIR}"/"${GENEID}" > /dev/null 2>&1
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
 	done
@@ -592,7 +594,7 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 			--alignments "$dir" \
-			--phylip --input-format nexus --log ${OUTPUT}\
+			--phylip --input-format nexus --log "${LOGDIR}" \
 			--output "${GENE_MERGED_BASEDIR}"/"${GENEID}" \
 			> /dev/null 2> /dev/null
 		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_PREPDIRS"
