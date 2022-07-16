@@ -287,7 +287,7 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		else
 			mkdir -p "$EXONdir"
 			EXONCOUNT=$(( $EXONCOUNT+1 ))
-			mv "$UCEfile" "${EXONdir}"/"$uce"
+			mv "${UCEfile/-/_}" "${EXONdir}"/"$uce"
 		fi
 
 	done < "${OUTPUT}"/CURE-exons.txt
@@ -322,7 +322,7 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 			continue
 		else
 			mkdir -p "$GENEdir"
-			mv "$UCEfile" "${GENEdir}"/"$uce"
+			mv "{$UCEfile/-/_}" "${GENEdir}"/"$uce"
 		fi
 	done < "${OUTPUT}"/CURE-introns.txt
 	DONEmsg
@@ -355,7 +355,7 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 			Skipping this file..."
 			continue
 		else
-			mv "$UCEfile" "${INTERGENIC_DIR}"/"$uce"
+			mv "${UCEfile/-/_}" "${INTERGENIC_DIR}"/"$uce"
 		fi
 	done < "${OUTPUT}"/CURE-intergenic.txt
 	DONEmsg
