@@ -229,7 +229,7 @@ UCE_KIT_SUMMARY="${OUTPUT}/uce_kit_output/${GENOME}.uce_kit_summary"
 
 if [[ ! -f "${UCE_KIT_SUMMARY}" ]]; then
 	log "Running uce_kit.py..."
-	$CONDA_PREFIX/bin/python "${HOME_DIR}"/scripts/uce_kit/uce_kit.py run_pipeline \
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/uce_kit/uce_kit.py run_pipeline \
 		"${BAITS_FILE}" \
 		"${REFERENCE_GENOME}" \
 		"${GFF}" "${OUTPUT}"/uce_kit_output \
@@ -270,7 +270,7 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$EXONS"
 	# Run ParseResults for exons.
-	$CONDA_PREFIX/bin/python "${HOME_DIR}"/scripts/parse-results.py "$EXONS" \
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse-results.py "$EXONS" \
 	                "$FILTER" "${OUTPUT}"/CURE-exons.txt exon
 	# Read output from script.
 	# Lines are uce name, exon ID and gene ID.
@@ -309,7 +309,7 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$INTRONS"
 	# Run ParseResults for introns.
-	$CONDA_PREFIX/bin/python "${HOME_DIR}"/scripts/parse-results.py \
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse-results.py \
 	        "$INTRONS" "$FILTER" "${OUTPUT}"/CURE-introns.txt intron
 	# Same as previous 'while', but for introns.
 	while IFS=$'\t' read uce geneID; do
@@ -344,7 +344,7 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$INTERGENIC"
 	# Run ParseResults for intergenic region.
-	$CONDA_PREFIX/bin/python "${HOME_DIR}"/scripts/parse-results.py \
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse-results.py \
 	        "$INTERGENIC" "$FILTER" "${OUTPUT}"/CURE-intergenic.txt \
 	        intergenic
 	# Same as previous 'while', but only with UCE name.
