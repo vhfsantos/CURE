@@ -68,7 +68,7 @@ exit 2
 error_exit() {
 	msg=$1
 	>&2 echo -e "\033[1;31mERROR: ${msg}\033[0m"
-	usage
+	Usage
 }
 
 # Check dependencies
