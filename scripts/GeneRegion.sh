@@ -281,8 +281,8 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		EXONdir=${GENEdir}/$exonID
 		echo "$uce" >> $ASSIGNED2EXON
 		if [[ ! -f ${UCEfile} ]]; then
-			#warn "${uce%.*} already assigned or missing in nexus dir. \
-			#Skipping this file..."
+			warn "${uce%.*} already assigned or missing in nexus dir. \
+			Skipping this file..."
 			continue
 		else
 			mkdir -p "$EXONdir"
@@ -317,8 +317,8 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 		GENEdir=${NEXUSTOCONCAT}/introns/$geneID
 		echo "$uce" >> $ASSIGNED2INTRON
 		if [[ ! -f "${UCEfile}" ]]; then
-			#warn "${uce%.*} already assigned or missing in nexus dir. \
-			#Skipping this file..."
+			warn "${uce%.*} already assigned or missing in nexus dir. \
+			Skipping this file..."
 			continue
 		else
 			mkdir -p "$GENEdir"
