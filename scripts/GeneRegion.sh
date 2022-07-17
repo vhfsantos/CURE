@@ -322,7 +322,7 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 			continue
 		else
 			mkdir -p "$GENEdir"
-			mv "{$UCEfile}" "${GENEdir}"/"$uce"
+			mv "${UCEfile}" "${GENEdir}"/"$uce"
 		fi
 	done < "${OUTPUT}"/CURE-introns.txt
 	DONEmsg
