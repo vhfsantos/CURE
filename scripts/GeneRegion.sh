@@ -383,7 +383,9 @@ I=$(grep -v -f $ASSIGNED2EXON_NOTMISSING $ASSIGNED2INTRON_NOTMISSING \
 N=$(find $INTERGENIC_DIR -type f | wc -l)
 # move unassigned UCEs to 'intergenic' dir
 UN=$(ls ${NEXUSCOPYex} | wc -l)
+echo "CHGEOU AQUI TBM "
 mv ${NEXUSCOPYex}/* "$INTERGENIC_DIR"
+echo "E AQUI TBM POOOOOO"
 # print stats
 log "--------------------------------------------"
 log "----------------- SUMMARY ------------------"
