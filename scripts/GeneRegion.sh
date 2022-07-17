@@ -362,40 +362,41 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 else
 	warn "Already assigned UCEs to intergenic regions. Skipping..."
 fi
-	# Compute statistics.
-	# I didn't use uce_kit stats because its based on UCEs in baits file.
-	# A lot of UCEs are in baits file but not in NEXUS dir.
-	# So real stats for this should be based on UCEs in NEXUS dir.
-	grep -o -f $ASSIGNED2INTRON $BEFOREALL > $ASSIGNED2INTRON_NOTMISSING
-	grep -o -f $ASSIGNED2EXON $BEFOREALL > $ASSIGNED2EXON_NOTMISSING
-	# Count each type of assignment:
-	# E: exon
-	# I: intron
-	# EI: exon-and-intron
-	# N: intergenic regions
-	EI=$(grep -f $ASSIGNED2INTRON_NOTMISSING $ASSIGNED2EXON_NOTMISSING \
-		| uniq | wc -l)
-	E=$(grep -v -f $ASSIGNED2INTRON_NOTMISSING $ASSIGNED2EXON_NOTMISSING \
-		| uniq | wc -l)
-	I=$(grep -v -f $ASSIGNED2EXON_NOTMISSING $ASSIGNED2INTRON_NOTMISSING \
-		| uniq | wc -l)
-	N=$(find $INTERGENIC_DIR -type f | wc -l)
-	# move unassigned UCEs to 'intergenic' dir
-	UN=$(ls ${NEXUSCOPYex} | wc -l)
-	mv ${NEXUSCOPYex}/* "$INTERGENIC_DIR"
-	# print stats
-	log "--------------------------------------------"
-	log "----------------- SUMMARY ------------------"
-	log "--------------------------------------------"
-	log "$TOTAL_UCEs UCEs in NEXUS dir:"
-	log "$E assigned to exons"
-	log "$I assigned to introns"
-	log "$EI assigned to both (accounted for exons)"
-	log "$N assigned to intergenic regions"
-	log "$UN unassigned (accounted for intergenic)"
-	log "--------------------------------------------"
-	# Printing to csv
-	echo "type,uce.count
+# Compute statistics.
+# I didn't use uce_kit stats because its based on UCEs in baits file.
+# A lot of UCEs are in baits file but not in NEXUS dir.
+# So real stats for this should be based on UCEs in NEXUS dir.
+echo "CHEGOU ATÈ AQUIIIIIIIII"
+grep -o -f $ASSIGNED2INTRON $BEFOREALL > $ASSIGNED2INTRON_NOTMISSING
+grep -o -f $ASSIGNED2EXON $BEFOREALL > $ASSIGNED2EXON_NOTMISSING
+# Count each type of assignment:
+# E: exon
+# I: intron
+# EI: exon-and-intron
+# N: intergenic regions
+EI=$(grep -f $ASSIGNED2INTRON_NOTMISSING $ASSIGNED2EXON_NOTMISSING \
+	| uniq | wc -l)
+E=$(grep -v -f $ASSIGNED2INTRON_NOTMISSING $ASSIGNED2EXON_NOTMISSING \
+	| uniq | wc -l)
+I=$(grep -v -f $ASSIGNED2EXON_NOTMISSING $ASSIGNED2INTRON_NOTMISSING \
+	| uniq | wc -l)
+N=$(find $INTERGENIC_DIR -type f | wc -l)
+# move unassigned UCEs to 'intergenic' dir
+UN=$(ls ${NEXUSCOPYex} | wc -l)
+mv ${NEXUSCOPYex}/* "$INTERGENIC_DIR"
+# print stats
+log "--------------------------------------------"
+log "----------------- SUMMARY ------------------"
+log "--------------------------------------------"
+log "$TOTAL_UCEs UCEs in NEXUS dir:"
+log "$E assigned to exons"
+log "$I assigned to introns"
+log "$EI assigned to both (accounted for exons)"
+log "$N assigned to intergenic regions"
+log "$UN unassigned (accounted for intergenic)"
+log "--------------------------------------------"
+# Printing to csv
+echo "type,uce.count
 total,$TOTAL_UCEs
 exons,$E
 introns,$I
