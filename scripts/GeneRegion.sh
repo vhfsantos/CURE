@@ -317,7 +317,7 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 		GENEdir=${NEXUSTOCONCAT}/introns/$geneID
 		echo "$uce" >> $ASSIGNED2INTRON
 		if [[ ! -f "${UCEfile}" ]]; then
-			warn "${uce%.*} already assigned or missing in nexus dir. \
+			warn "${UCEfile} already assigned or missing in nexus dir. \
 			Skipping this file..."
 			continue
 		else
