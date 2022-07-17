@@ -281,8 +281,8 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		EXONdir=${GENEdir}/$exonID
 		echo "$uce" >> $ASSIGNED2EXON
 		if [[ ! -f ${UCEfile} ]]; then
-			warn "${uce%.*} already assigned or missing in nexus dir. \
-			Skipping this file..."
+			#warn "${uce%.*} already assigned or missing in nexus dir. \
+			#Skipping this file..."
 			continue
 		else
 			mkdir -p "$EXONdir"
@@ -317,8 +317,8 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 		GENEdir=${NEXUSTOCONCAT}/introns/$geneID
 		echo "$uce" >> $ASSIGNED2INTRON
 		if [[ ! -f "${UCEfile}" ]]; then
-			warn "${UCEfile} already assigned or missing in nexus dir. \
-			Skipping this file..."
+			#warn "${UCEfile} already assigned or missing in nexus dir. \
+			#Skipping this file..."
 			continue
 		else
 			mkdir -p "$GENEdir"
@@ -351,8 +351,8 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 	while IFS=$'\t' read uce; do
 		UCEfile=${NEXUSCOPYex}/${uce/-/_}
 		if [[ ! -f ${UCEfile} ]]; then
-			warn "${uce%.*} already assigned or missing in nexus dir. \
-			Skipping this file..."
+			#warn "${uce%.*} already assigned or missing in nexus dir. \
+			#Skipping this file..."
 			continue
 		else
 			mv "${UCEfile}" "${INTERGENIC_DIR}"/"$uce"
@@ -366,7 +366,7 @@ fi
 # I didn't use uce_kit stats because its based on UCEs in baits file.
 # A lot of UCEs are in baits file but not in NEXUS dir.
 # So real stats for this should be based on UCEs in NEXUS dir.
-echo "CHEGOU ATÈ AQUIIIIIIIII"
+
 grep -o -f $ASSIGNED2INTRON $BEFOREALL > $ASSIGNED2INTRON_NOTMISSING
 grep -o -f $ASSIGNED2EXON $BEFOREALL > $ASSIGNED2EXON_NOTMISSING
 # Count each type of assignment:
@@ -383,9 +383,7 @@ I=$(grep -v -f $ASSIGNED2EXON_NOTMISSING $ASSIGNED2INTRON_NOTMISSING \
 N=$(find $INTERGENIC_DIR -type f | wc -l)
 # move unassigned UCEs to 'intergenic' dir
 UN=$(ls ${NEXUSCOPYex} | wc -l)
-echo "CHGEOU AQUI TBM "
 mv ${NEXUSCOPYex}/* "$INTERGENIC_DIR"
-echo "E AQUI TBM POOOOOO"
 # print stats
 log "--------------------------------------------"
 log "----------------- SUMMARY ------------------"
