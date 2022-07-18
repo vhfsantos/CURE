@@ -461,7 +461,7 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 			--alignments "$dir" --nexus --log "${LOGDIR}" \
 			--output "${ALL_INTRONS_DIR}"/"${GENEID}" > /dev/null 2>&1
-		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_DIRS"
+		"${HOME_DIR}"/progress-bar.sh $AUX "$N_DIRS"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	DONEmsg
@@ -576,7 +576,7 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 			--phylip --input-format nexus --log "${LOGDIR}" \
 			--output "${GENE_MERGED_BASEDIR}"/"${GENEID}" \
 			> /dev/null 2> /dev/null
-		"${HOME_DIR}"/scripts/progress-bar.sh $AUX "$N_PREPDIRS"
+		"${HOME_DIR}"/progress-bar.sh $AUX "$N_PREPDIRS"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	DONEmsg
