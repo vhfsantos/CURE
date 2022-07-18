@@ -39,17 +39,15 @@ plt.savefig(os.path.join(output, 'CURE_stats.pdf'))
 lbs = generate_petal_labels(all_data.values(), fmt="{size}")
 
 with open(os.path.join(output, 'CURE_stats.csv'),'w') as out_csv:
-    write_log('type, uce_count')
-    write_log('unassigned, {}'.format(lbs['0001']))
-    write_log('intron, {}'.format(lbs['0011']))
-    write_log('exon, {}'.format(lbs['0101']))
-    write_log('exon_and_intron, {}'.format(lbs['0111']))
-    write_log('intergenic, {}'.format(lbs['1001']))
+    out_csv.write('type, uce_count')
+    out_csv.write('unassigned, {}'.format(lbs['0001']))
+    out_csv.write('intron, {}'.format(lbs['0011']))
+    out_csv.write('exon, {}'.format(lbs['0101']))
+    out_csv.write('exon_and_intron, {}'.format(lbs['0111']))
+    out_csv.write('intergenic, {}'.format(lbs['1001']))
 
-sys.stdout.write("""
-Unassigned UCEs: {}\n
-Assigned to introns: {}\n
-Assigned to exons: {}\n
-Assigned to exons and introns: {}\n
-Assigned to intergenic regions: {}\n
-""".format(lbs['0001'], lbs['0011'], lbs['0101'], lbs['0111'], lbs['1001']))
+write_log('Unassigned UCEs: {}'.format(lbs['0001']))
+write_log('Assigned to introns: {}'.format(lbs['0011']))
+write_log('Assigned to exons: {}'.format(lbs['0101']))
+write_log('Assigned to exons and introns: {}'.format(lbs['0111']))
+write_log('Assigned to intergenic regions: {}'.format(lbs['1001']))
