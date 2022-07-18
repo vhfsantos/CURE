@@ -30,7 +30,7 @@ plt.savefig(os.path.join(output, 'CURE_stats.pdf'))
 # saving stats in csv file
 lbs = generate_petal_labels(all_data.values(), fmt="{size}")
 
-with open(os.path.join(output, 'CURE_stats.csv','w')) as out_csv:
+with open(os.path.join(output, 'CURE_stats.csv'),'w') as out_csv:
     out_csv.write('type, uce_count\n')
     out_csv.write('unassigned, {}\n'.format(lbs['0001']))
     out_csv.write('intron, {}\n'.format(lbs['0011']))
