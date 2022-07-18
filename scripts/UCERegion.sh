@@ -368,13 +368,12 @@ mkdir -p ${OUTPUT}/partitioned-uces/
 
 if [ -z "$(ls -A "${CAT_UCES}")" ]; then
 	log "Concatenating UCEs..."
-	UCE_LIST=$(find ${SWSC_PARSE}/*/ -type f -name *nexus \
+	UCE_LIST=$(find ${SWSC_PARSE}/*/ -type f -name "*nexus" \
 		| sed 's/_right.nexus//g;s/_left.nexus//g;s/_core.nexus//g' \
 		| sort | uniq)
-        # create UCE dir
-        for uce in $UCE_LIST; do
+    # create UCE dir
+    for uce in $UCE_LIST; do
 		uce_name=$(basename $uce)
-
 		# check if ends with _all.nexus
 		if [[ "$uce_name" == *_all.nexus ]]; then
   			warn "No flanks found for ${uce_name/_all.nexus}. It will be left as a whole"
@@ -386,7 +385,7 @@ if [ -z "$(ls -A "${CAT_UCES}")" ]; then
 				${uce}_right.nexus \
 				${CAT_UCES}/$uce_name
 		fi
-        done
+    done
 	DONEmsg
 else
 	warn "UCEs already prepared for concatenation. Skipping"
