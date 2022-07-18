@@ -11,7 +11,7 @@ exons = args[2]
 introns = args[3]
 all_uces = args[4]
 output = args[5]
-version = args[6]
+ver = args[6]
 
 def read_n_create_set(file):
     venn_list = list()
@@ -21,9 +21,9 @@ def read_n_create_set(file):
     return set(venn_list)
 
 def write_log(msg):
-   sys.stdout.write("[ CURE v{} | " + 
+   sys.stdout.write("[ CURE v{} | ".format(ver) + 
                  time.strftime("%Y-%m-%d %H:%M:%S") + 
-                 " ]".format(version) +
+                 " ]" +
                  msg)
 
 all_data = {'Assigned to intergenic regions': read_n_create_set(intergenic),
