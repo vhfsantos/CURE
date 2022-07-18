@@ -2,7 +2,7 @@ from venn import venn, generate_petal_labels, draw_venn, generate_colors
 import matplotlib.pyplot as plt
 import sys
 import os
-import datetime.datetime as dt
+import time
 
 # parse results. all below are files
 args = sys.argv
