@@ -24,7 +24,7 @@ def write_log(msg):
    sys.stdout.write("[ CURE v{} | ".format(ver) + 
                  time.strftime("%Y-%m-%d %H:%M:%S") + 
                  " ]" +
-                 msg)
+                 msg + '\n')
 
 all_data = {'Assigned to intergenic regions': read_n_create_set(intergenic),
             'Assigned to exons': read_n_create_set(exons),
