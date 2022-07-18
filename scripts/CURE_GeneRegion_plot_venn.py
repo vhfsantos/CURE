@@ -21,7 +21,7 @@ def read_n_create_set(file):
     return set(venn_list)
 
 def write_log(msg):
-   out_csv.write("[ CURE v{} | " + 
+   sys.stdout.write("[ CURE v{} | " + 
                  time.strftime("%Y-%m-%d %H:%M:%S") + 
                  " ]".format(version) +
                  msg)
