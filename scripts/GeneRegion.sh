@@ -379,7 +379,7 @@ for i in $(ls $NEXUS_DIR); do echo $i; done >> $ALL_UCES
 # plot venn diagram and get statistics
 
 ${CONDA_PREFIX}/bin/python "${HOME_DIR}"/CURE_GeneRegion_plot_venn.py \
-	$UCE_IN_INTER $UCE_IN_EXONS $UCE_IN_INTRONS $ALL_UCES ${OUTPUT}
+	$UCE_IN_INTER $UCE_IN_EXONS $UCE_IN_INTRONS $ALL_UCES ${OUTPUT} $VERSION
 # move unassigned to intergenic dir
 mv ${NEXUSCOPYex}/* "$INTERGENIC_DIR"
 

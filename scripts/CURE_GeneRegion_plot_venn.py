@@ -11,6 +11,7 @@ exons = args[2]
 introns = args[3]
 all_uces = args[4]
 output = args[5]
+version = args[6]
 
 def read_n_create_set(file):
     venn_list = list()
