@@ -121,6 +121,12 @@ CURE GeneRegion --baits test_data/baits.fasta  \
 
 # Output files
 
+## UCERegion
+
+
+
+## GeneRegion
+
 The main output files produced by **CURE** are the alignments of concatenated UCEs.
 If you run **CURE** without `--only-by-gene` or `--only-by-region`, both of the concatenating approaches will be done.
 In this case, your output-dir will contain `concatenated-by-region/` and `concatenated-by-gene/` dirs.
