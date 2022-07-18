@@ -276,10 +276,9 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 	# Lines are uce name, exon ID and gene ID.
 	# So, copy uce name from nexus dir to gene/exon dir.
 	while IFS=$'\t' read uce exonID geneID; do
-		UCEfile=${NEXUSCOPYex}/${uce/-/_}
+		UCEfile=${NEXUSCOPYex}/${uce}
 		GENEdir=${NEXUSTOCONCAT}/exons/$geneID
 		EXONdir=${GENEdir}/$exonID
-#		echo "$uce" >> $ASSIGNED2EXON
 		if [[ ! -f ${UCEfile} ]]; then
 			#warn "${uce%.*} already assigned or missing in nexus dir. \
 			#Skipping this file..."
@@ -313,7 +312,7 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 	        "$INTRONS" "$FILTER" "${OUTPUT}"/CURE-introns.txt intron
 	# Same as previous 'while', but for introns.
 	while IFS=$'\t' read uce geneID; do
-		UCEfile=${NEXUSCOPYex}/${uce/-/_}
+		UCEfile=${NEXUSCOPYex}/${uce}
 		GENEdir=${NEXUSTOCONCAT}/introns/$geneID
 #		echo "$uce" >> $ASSIGNED2INTRON
 		if [[ ! -f "${UCEfile}" ]]; then
@@ -349,7 +348,7 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 	        intergenic
 	# Same as previous 'while', but only with UCE name.
 	while IFS=$'\t' read uce; do
-		UCEfile=${NEXUSCOPYex}/${uce/-/_}
+		UCEfile=${NEXUSCOPYex}/${uce}
 		if [[ ! -f ${UCEfile} ]]; then
 			#warn "${uce%.*} already assigned or missing in nexus dir. \
 			#Skipping this file..."
