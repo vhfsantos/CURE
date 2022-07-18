@@ -64,7 +64,7 @@ UCE_PREFIX="uce_"
 SWSC_PATH="SWSCEN.py"
 
 # Option strings for arg parser
-SHORT=hp:o:t:s:u
+SHORT=hp:o:t:s:u:
 LONG=help,phyluce-nexus:,output:,threads:,version:,swsc:,uce-prefix:
 
 
@@ -179,6 +179,9 @@ fi
 SUBGROUPS_CAT=${OUTPUT}/tmp/002-subgroups-cat/
 mkdir -p ${SUBGROUPS_CAT}
 
+LOGDIR=${OUTPUT}/logfiles/
+mkdir -p "${LOGDIR}"
+
 if [ -z "$(ls -A "${SUBGROUPS_CAT}")" ]; then
 	log "Concatenating UCEs subgroups for SWSC..."
         # concatenate with phyluce in parallel
@@ -186,7 +189,7 @@ if [ -z "$(ls -A "${SUBGROUPS_CAT}")" ]; then
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
                         $CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
                         --alignments "${subgroups_dir}/$sg" \
-                        --nexus --log ${OUTPUT}/tmp/ \
+                        --nexus --log "${LOGDIR}" \
                         --output "${SUBGROUPS_CAT}/$sg" > /dev/null 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
@@ -216,7 +219,7 @@ if [ -z "$(ls -A "${SWSC}")" ]; then
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
                         $CONDA_PREFIX/bin/python $SWSC_PATH \
                         $( realpath ${SUBGROUPS_CAT}/${sg}/${sg}.nexus ) \
-                        $( realpath $SWSC ) > /dev/null 2>&1
+                        $( realpath $SWSC ) > "${LOGDIR}"/swsc.log 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
@@ -276,7 +279,7 @@ if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
 		# calls function in parallel
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
                         SWSCParser $sg $UCE_PREFIX $SWSC_PARSE $SUBGROUPS_CAT \
-			$OUTPUT $SWSC > /dev/null 2>&1
+			$OUTPUT $SWSC > "${LOGDIR}"/swsc_parser.log 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
@@ -306,7 +309,7 @@ if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	# (2) Concatenate
 	$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 		--alignments "${UCES_CAT}" \
-		--phylip --log ${OUTPUT}/tmp/ \
+		--phylip --log "${LOGDIR}" \
 		--output "${UCES_CAT}/PF2-input" > /dev/null 2>&1
 
 	# (3) Header of .cfg file
