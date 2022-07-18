@@ -39,8 +39,11 @@ check_deps() {
 BYEmsg() {
 	echo -e "\033[1;32m[ CURE v$VERSION | $(date +%Y-%m-%d" "%H:%M:%S) ] ALL DONE!\033[0m"
 	echo -e "
-\033[1;32mThis is a goodbye message.
-Probably will have citation, mail contact, and more.
+\033[1;32mIf you make use of CURE in your research, please cite:
+
+Freitas et al (2022). Phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), 
+with insights on the use of specimens with extremely degraded DNA for UCE phylogenomics. XXXXXXX
+
 Bye\033[0m"
 }
 # Check deps
