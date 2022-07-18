@@ -437,7 +437,7 @@ fi
 #=============================================================
 
 if test -f "${OUTPUT}/tmp/phyluce_align_concatenate_alignments.log"; then
-#	rm -rf ${OUTPUT}/tmp/
+	rm -rf ${OUTPUT}/tmp/
 	DONEmsg
 else
 	warn "Temporary files already removed. Skipping"
