@@ -252,16 +252,16 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 	log "Assinging UCEs to exons..."
 	EXONS=$(mktemp)
 	# Create temp files to count each assignment type
-	ASSIGNED2EXON=${OUTPUT}/tmp/assign2ex
-	ASSIGNED2INTRON=${OUTPUT}/tmp/assign2in
-	ASSIGNED2EXON_NOTMISSING=${OUTPUT}/tmp/assign2exNotMissing
-	ASSIGNED2INTRON_NOTMISSING=${OUTPUT}/tmp/assign2inNotMissing
-	touch $ASSIGNED2EXON
-	touch $ASSIGNED2INTRON
-	BEFOREALL=${OUTPUT}/tmp/2Bassign
+	#ASSIGNED2EXON=${OUTPUT}/tmp/assign2ex
+	#ASSIGNED2INTRON=${OUTPUT}/tmp/assign2in
+	#ASSIGNED2EXON_NOTMISSING=${OUTPUT}/tmp/assign2exNotMissing
+	#ASSIGNED2INTRON_NOTMISSING=${OUTPUT}/tmp/assign2inNotMissing
+	#touch $ASSIGNED2EXON
+	#touch $ASSIGNED2INTRON
+	#BEFOREALL=${OUTPUT}/tmp/2Bassign
 	# Get names of all UCEs available.
-	find ${NEXUSCOPYex} -type f | xargs -L1 -I{} basename "{}" > "$BEFOREALL"
-	TOTAL_UCEs=$(wc -l < $BEFOREALL)
+	#find ${NEXUSCOPYex} -type f | xargs -L1 -I{} basename "{}" > "$BEFOREALL"
+	#TOTAL_UCEs=$(wc -l < $BEFOREALL)
 	# Get only exons from uce_kit summary.
 	awk \
 		-v FS="\t" \
@@ -270,7 +270,7 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$EXONS"
 	# Run ParseResults for exons.
-	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse-results.py "$EXONS" \
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse_results.py "$EXONS" \
 	                "$FILTER" "${OUTPUT}"/CURE-exons.txt exon
 	# Read output from script.
 	# Lines are uce name, exon ID and gene ID.
@@ -309,7 +309,7 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$INTRONS"
 	# Run ParseResults for introns.
-	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse-results.py \
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse_results.py \
 	        "$INTRONS" "$FILTER" "${OUTPUT}"/CURE-introns.txt intron
 	# Same as previous 'while', but for introns.
 	while IFS=$'\t' read uce geneID; do
@@ -344,7 +344,7 @@ if [ ! -f "${OUTPUT}/CURE-intergenic.txt" ]; then
 		"${UCE_KIT_SUMMARY}" | uniq \
 		> "$INTERGENIC"
 	# Run ParseResults for intergenic region.
-	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse-results.py \
+	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse_results.py \
 	        "$INTERGENIC" "$FILTER" "${OUTPUT}"/CURE-intergenic.txt \
 	        intergenic
 	# Same as previous 'while', but only with UCE name.
@@ -366,43 +366,22 @@ fi
 # I didn't use uce_kit stats because its based on UCEs in baits file.
 # A lot of UCEs are in baits file but not in NEXUS dir.
 # So real stats for this should be based on UCEs in NEXUS dir.
+UCE_IN_INTER=$(mktemp)
+UCE_IN_EXONS=$(mktemp)
+UCE_IN_INTRONS=$(mktemp)
+ALL_UCES=$(mktemp)
 
-grep -o -f $ASSIGNED2INTRON $BEFOREALL > $ASSIGNED2INTRON_NOTMISSING
-grep -o -f $ASSIGNED2EXON $BEFOREALL > $ASSIGNED2EXON_NOTMISSING
-# Count each type of assignment:
-# E: exon
-# I: intron
-# EI: exon-and-intron
-# N: intergenic regions
-EI=$(grep -f $ASSIGNED2INTRON_NOTMISSING $ASSIGNED2EXON_NOTMISSING \
-	| uniq | wc -l)
-E=$(grep -v -f $ASSIGNED2INTRON_NOTMISSING $ASSIGNED2EXON_NOTMISSING \
-	| uniq | wc -l)
-I=$(grep -v -f $ASSIGNED2EXON_NOTMISSING $ASSIGNED2INTRON_NOTMISSING \
-	| uniq | wc -l)
-N=$(find $INTERGENIC_DIR -type f | wc -l)
-# move unassigned UCEs to 'intergenic' dir
-UN=$(ls ${NEXUSCOPYex} | wc -l)
+cat "${OUTPUT}/CURE-intergenic.txt" >> $UCE_IN_INTER
+cat "${OUTPUT}/CURE-exons.txt" | cut -f1 | uniq >> $UCE_IN_EXONS
+cat "${OUTPUT}/CURE-introns.txt" | cut -f1 | uniq >> $UCE_IN_INTRONS
+for i in $(ls $NEXUS_DIR); do echo $i; done >> $ALL_UCES
+
+# plot venn diagram and get statistics
+
+${CONDA_PREFIX}/bin/python "${HOME_DIR}"/CURE_GeneRegion_plot_venn.py \
+	$UCE_IN_INTER $UCE_IN_EXONS $UCE_IN_INTRONS $ALL_UCES ${OUTPUT}
+# move unassigned to intergenic dir
 mv ${NEXUSCOPYex}/* "$INTERGENIC_DIR"
-# print stats
-log "--------------------------------------------"
-log "----------------- SUMMARY ------------------"
-log "--------------------------------------------"
-log "$TOTAL_UCEs UCEs in NEXUS dir:"
-log "$E assigned to exons"
-log "$I assigned to introns"
-log "$EI assigned to both (accounted for exons)"
-log "$N assigned to intergenic regions"
-log "$UN unassigned (accounted for intergenic)"
-log "--------------------------------------------"
-# Printing to csv
-echo "type,uce.count
-total,$TOTAL_UCEs
-exons,$E
-introns,$I
-exon-and-intron,$EI
-intergenic,$N
-unassigned, $UN" > ${OUTPUT}/CURE-summary.csv
 
 #=============================================================
 #====                       STEP 3:                       ====
