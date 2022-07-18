@@ -47,12 +47,12 @@ with open(os.path.join(output, 'CURE_stats.csv'),'w') as out_csv:
     out_csv.write('intergenic, {}'.format(lbs['1001']))
 
 
-write_log('---------------------------------------')
-write_log('--------------- Summary ---------------')
-write_log('---------------------------------------')
-write_log('Unassigned UCEs: {}'.format(lbs['0001']))
+write_log('------------------------------------------------------')
+write_log('---------------------- Summary -----------------------') 
+write_log('------------------------------------------------------')
+write_log('Unassigned UCEs (accounted for intergenic): {}'.format(lbs['0001']))
 write_log('Assigned to introns: {}'.format(lbs['0011']))
 write_log('Assigned to exons: {}'.format(lbs['0101']))
-write_log('Assigned to exons and introns: {}'.format(lbs['0111']))
+write_log('Assigned to exons and introns (accounted for exons): {}'.format(lbs['0111']))
 write_log('Assigned to intergenic regions: {}'.format(lbs['1001']))
-write_log('---------------------------------------')
+write_log('------------------------------------------------------')
