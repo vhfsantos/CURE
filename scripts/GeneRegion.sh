@@ -279,7 +279,7 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		UCEfile=${NEXUSCOPYex}/${uce/-/_}
 		GENEdir=${NEXUSTOCONCAT}/exons/$geneID
 		EXONdir=${GENEdir}/$exonID
-		echo "$uce" >> $ASSIGNED2EXON
+#		echo "$uce" >> $ASSIGNED2EXON
 		if [[ ! -f ${UCEfile} ]]; then
 			#warn "${uce%.*} already assigned or missing in nexus dir. \
 			#Skipping this file..."
@@ -315,7 +315,7 @@ if [ ! -f "${OUTPUT}/CURE-introns.txt" ]; then
 	while IFS=$'\t' read uce geneID; do
 		UCEfile=${NEXUSCOPYex}/${uce/-/_}
 		GENEdir=${NEXUSTOCONCAT}/introns/$geneID
-		echo "$uce" >> $ASSIGNED2INTRON
+#		echo "$uce" >> $ASSIGNED2INTRON
 		if [[ ! -f "${UCEfile}" ]]; then
 			#warn "${UCEfile} already assigned or missing in nexus dir. \
 			#Skipping this file..."
