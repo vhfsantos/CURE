@@ -411,7 +411,7 @@ if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
 		# concatenate with phyluce in parallel
 		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
-			--alignments "$uce" --nexus --log ${OUTPUT}/tmp/ \
+			--alignments "$uce" --phylip --log ${OUTPUT}/tmp/ \
 			--output "${CAT_UCES}"/NEXUS/"${uce_name}" > /dev/null 2>&1
 		"${HOME_DIR}"/progress-bar.sh $AUX "$N_UCES"
 	done
