@@ -78,7 +78,7 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 
 # Quick usage examples
 
-### Running the test dataset
+## Running the test dataset for **Gene regions**
 
 You can test **CURE** with the test dataset.
 It usually takes about two minutes to run with 10 threads.
@@ -89,7 +89,7 @@ CURE GeneRegion --baits test_data/baits.fasta  \
                 --reference test_data/ref.fa \
                 --gff test_data/ref.gff \
                 --phyluce-nexus test_data/uce_nexus/ \
-                --output ./CURE-output
+                --output ./CURE-GeneRegion-output
 ```
 
 ### Running only one of the concatenating approaches
@@ -104,30 +104,48 @@ CURE GeneRegion --baits test_data/baits.fasta  \
                 --reference test_data/ref.fa \
                 --gff test_data/ref.gff \
                 --phyluce-nexus test_data/uce_nexus/ \
-                --output ./CURE-output \
+                --output ./CURE-GeneRegion-output \
                 --only-by-gene
 ```
 
-#### Only by region
+#### Only by gene region
 
 ```sh
 CURE GeneRegion --baits test_data/baits.fasta  \
                 --reference test_data/ref.fa \
                 --gff test_data/ref.gff \
                 --phyluce-nexus test_data/uce_nexus/ \
-                --output ./CURE-output \
+                --output ./CURE-GeneRegion-output \
                 --only-by-region
+```
+
+## **UCERegion** Strategy
+
+For this strategy you will need to provide a folder with all the alignments you want to use in nexus format (could be all your alignemnts or a subset).
+You will ned to have [SWSC-EN](https://github.com/Tagliacollo/PFinderUCE-SWSC-EN) included in yout PATH environment or use --swsc to provide the path to the script.
+What CURE will do is basically running SWSC-EN in paralell and use PHYLUCE to split the alignments according to regions identified by SWSC and re-concatenate them creating a charset file to be used in phylogenetic analyses to generate your gene-trees. For this last step check our [script](#estimating-trees-from-output-files) to do that using GNU parallel.
+
+## Running the test dataset for UCE regions
+
+```sh
+CURE UCERegion  --phyluce-nexus test_data/uce_nexus/ \
+                --output ./CURE-UCERegion-output
+                
+
 ```
 
 # Output files
 
 ## UCERegion
 
-
+**CURE** UCERegion will generate three subfolders
+1- logfiles: containing all the log files generated
+2- partitioned-uces: with all the alignemnts and their respective charsets files
+3- PF2-input: input file for PartitionFinder2 analysis
 
 ## GeneRegion
 
-The main output files produced by **CURE** are the alignments of concatenated UCEs.
+The main output files produced by **CURE** GeneRegion approach are the alignments of concatenated UCEs.
 If you run **CURE** without `--only-by-gene` or `--only-by-region`, both of the concatenating approaches will be done.
 In this case, your output-dir will contain `concatenated-by-region/` and `concatenated-by-gene/` dirs.
 If you raised any of these flags, only the corresponding dir will be created.
