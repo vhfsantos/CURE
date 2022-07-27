@@ -121,7 +121,7 @@ CURE GeneRegion --baits test_data/baits.fasta  \
 
 ## **UCERegion** Strategy
 
-For this strategy you will need to provide a folder with all the alignments you want to use in nexus format (could be all your alignemnts or a subset).
+For this strategy you will need to provide a folder with all the individual alignments you want to use in nexus format (could be all your alignemnts or a subset).
 You will ned to have [SWSC-EN](https://github.com/Tagliacollo/PFinderUCE-SWSC-EN) included in yout PATH environment or use --swsc to provide the path to the script.
 What CURE will do is basically running SWSC-EN in paralell and use PHYLUCE to split the alignments according to regions identified by SWSC and re-concatenate them creating a charset file to be used in phylogenetic analyses to generate your gene-trees. For this last step check our [script](#estimating-trees-from-output-files) to do that using GNU parallel.
 
