@@ -2,14 +2,18 @@
 
 **CURE** is an automated and parallel pipeline for the curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategies proposed by [Van Dam et al. 2021. Genomic Characterization and Curation of UCEs Improves Species Tree Reconstruction](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) (named **GeneRegion** strategy), and [Freitas et al. 2021 Partitioned Gene-Tree Analyses and Gene-Based Topology Testing Help Resolve Incongruence in a Phylogenomic Study of Host-Specialist Bees (Apidae: Eucerinae)](https://academic.oup.com/mbe/article/38/3/1090/5976982) (name **UCERegion** strategy).
 
-In the **GeneRegion** strategy (Van Dam et al. 2021) it concatenates UCEs in two different ways, according to the available annotation:
+## Curing based on the genes the UCEs are located (GeneRegion strategy)
 
-* _by gene_: concatenates all UCEs from the same gene and treats different regions (exons and introns) as different partitions;
-* _by region_: concatenates all UCEs from the same exons or introns of the same gene.
+In the **GeneRegion** strategy (Van Dam et al. 2021), **CURE** performs the curing process based on the genes that each UCE is located. **CURE** can do it in two different ways:
 
-By default, **CURE** runs both approaches for **GeneRegion** strategy, but this can be changed. The input files for this pipeline are the baits file used for UCE sequencing, the reference genome, and annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
+* _by gene_: concatenates all UCEs from the same gene and treats different genic regions (exons and introns) as different partitions;
+* _by genic region_: concatenates all UCEs from the same exons or introns of the same gene.
 
-In the **UCERegion** strategy (Freitas et al. 2021) it runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in a parallelized way, that speeds up the process a lot, and creates charsets considering the left flank, right flank and core for each locus in a dataset for gene-tree estimation.
+When using the **GeneRegion** strategy, the default behavior of **CURE** is to run these two ways but this can be changed. The input files for the **GeneRegion** pipeline are the baits file used for UCE sequencing, the reference genome, an annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
+
+## Curing based on the internal UCE regions (UCERegion strategy)
+
+In the **UCERegion** strategy (Freitas et al. 2021), **CURE** performs the curing process based on the internal regions of each UCE (right flank, core, and left flank). It runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in parallel to speed up the process, and creates charsets considering the left flank, core, and right flank as different partitions for each locus in the dataset.
 
 # Table of contents
 
@@ -64,8 +68,8 @@ Further phylogenetic analysis of UCEs merged with this approach would yield a ph
 
 <p align="center"><img src="misc/img/cat_by_gene.png" alt="input" width="80%"></p>
 
-When concatenating *by region*, **CURE** merges only UCEs from the region of the same gene.
-It stores the results in `nexus` format inside the `concatenated_by_region/` directory.
+When concatenating *by genic region*, **CURE** merges only UCEs from the region of the same gene.
+It stores the results in `nexus` format inside the `concatenated_by_genic_region/` directory.
 Further phylogenetic analysis of UCEs merged with this approach would yield several phylogenetic trees, one originating from each region.
 
 <p align="center"><img src="misc/img/cat_by_region.png" alt="input" width="80%"></p>
@@ -76,13 +80,22 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 <p align="center"><img src="misc/img/intergenic.png" alt="input" width="80%"></p>
 
 
+## **UCERegion** Strategy
+
+For this strategy, you need to provide a folder with all the individual alignments you want to use, in `nexus` format (could be all your alignemnts or a subset).
+You need to have [SWSC-EN](https://github.com/Tagliacollo/PFinderUCE-SWSC-EN) included in yout `PATH` variable, otherwise you should pass the path to the `SWSCEN.py` script to the `--swsc` parameter.
+What **CURE** does is basically run the `SWSC-EN` in paralell and use `PHYLUCE` to split the alignments according to regions identified by SWSC.
+Then, **CURE** re-concatenates them, creating a charset file to be used in phylogenetic analyses to generate your gene-trees, treating each UCE region (left flank, core, and right flank) as different partitions. 
+
+> Note that we provide the `./scripts/estimate-trees.sh` script for this last step. It automatically runs IQ-Tree in parallel, for a fast estimation of the gene-trees using the output alignment files.
+
 # Quick usage examples
 
-## Running the test dataset for **Gene regions**
+## Running the test dataset for the **GeneRegion** strategy
 
 You can test **CURE** with the test dataset.
 It usually takes about two minutes to run with 10 threads.
-With the command line below, **CURE** will run the two concatenating approaches.
+With the command line below, **CURE** will run the **GeneRegion** strategy, concatenating both _by gene_ and _by genic region_.
 
 ```sh
 CURE GeneRegion --baits test_data/baits.fasta  \
@@ -92,10 +105,10 @@ CURE GeneRegion --baits test_data/baits.fasta  \
                 --output ./CURE-GeneRegion-output
 ```
 
-### Running only one of the concatenating approaches
+### Running only one of the concatenating approaches of the **GeneRegion** strategy
 
-By default, **CURE** runs both concatenating approaches.
-However, you can raise the `--only-by-gene` or `--only-by-region` flag to select only a single approach
+By default, **CURE** runs the **GeneRegion** strategy with both concatenating approaches( _by gene_ and _by genic region_).
+However, you can raise the `--only-by-gene` or `--only-by-genic-region` flag to select only a single approach
 
 #### Only by gene
 
@@ -108,7 +121,7 @@ CURE GeneRegion --baits test_data/baits.fasta  \
                 --only-by-gene
 ```
 
-#### Only by gene region
+#### Only by genic region
 
 ```sh
 CURE GeneRegion --baits test_data/baits.fasta  \
@@ -116,49 +129,52 @@ CURE GeneRegion --baits test_data/baits.fasta  \
                 --gff test_data/ref.gff \
                 --phyluce-nexus test_data/uce_nexus/ \
                 --output ./CURE-GeneRegion-output \
-                --only-by-region
+                --only-by-genic-region
 ```
 
-## **UCERegion** Strategy
 
-For this strategy you will need to provide a folder with all the individual alignments you want to use in nexus format (could be all your alignemnts or a subset).
-You will ned to have [SWSC-EN](https://github.com/Tagliacollo/PFinderUCE-SWSC-EN) included in yout PATH environment or use --swsc to provide the path to the script.
-What CURE will do is basically running SWSC-EN in paralell and use PHYLUCE to split the alignments according to regions identified by SWSC and re-concatenate them creating a charset file to be used in phylogenetic analyses to generate your gene-trees. For this last step check our [script](#estimating-trees-from-output-files) to do that using GNU parallel.
+## Running the test dataset for the **UCERegion** strategy
 
-## Running the test dataset for UCE regions
+To run the test dataset for the **UCERegion** strategy, use the following command line:
 
 ```sh
 CURE UCERegion  --phyluce-nexus test_data/uce_nexus/ \
                 --output ./CURE-UCERegion-output
-                
-
 ```
+
+The above command should raise an error if the `SWSCEN.py` script is not in your `$PATH` variable.
+If this is your case, you can either add the script to the `$PATH` or pass the path for it in the `--swsc` parameter.
 
 # Output files
 
-## UCERegion
+The main output files produced by **CURE** are the alignments of concatenated and cured UCEs. Each of the two strategies, however, produce different output files.
 
-**CURE** UCERegion will generate three subfolders
-1- logfiles: containing all the log files generated
-2- partitioned-uces: with all the alignemnts and their respective charsets files
-3- PF2-input: input file for PartitionFinder2 analysis
+## Output files of **UCERegion** strategy
 
-## GeneRegion
+**CURE** UCERegion generates three output subdirectories:
 
-The main output files produced by **CURE** GeneRegion approach are the alignments of concatenated UCEs.
-If you run **CURE** without `--only-by-gene` or `--only-by-region`, both of the concatenating approaches will be done.
-In this case, your output-dir will contain `concatenated-by-region/` and `concatenated-by-gene/` dirs.
+* logfiles: stores all the log files generated in the analysis
+* partitioned-uces: stores all the alignemnts and their respective charsets files
+* PF2-input: stores the input file for a putative downstream analysis with PartitionFinder2
+
+## Output files of **GeneRegion** strategy
+
+
+If you run the **GeneRegion** strategy without `--only-by-gene` or `--only-by-genic-region`, both of the concatenating approaches will be done.
+In this case, your output dir will contain `concatenated-by-gene/` and `concatenated-by-genic-region/` dirs.
 If you raised any of these flags, only the corresponding dir will be created.
-Besides, **CURE** creates the `intergenic-regions/` dir containing unmerged UCEs assigned to intergenic regions.
+
+Besides, **GeneRegion** strategy creates the `intergenic-regions/` dir containing unmerged UCEs assigned to intergenic regions.
 
 Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEXUS format.
 Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are in NEXUS format.
 
 > To avoid troubles with further phylogenetic analysis, **CURE** replaces "-" with "_" in the gene and exon ID.
 
-Secondary outputs of **CURE** include `CURE-exons.txt`, `CURE-introns.txt`, and `CURE-intergenic.txt`, which contains the UCE names assigned to each region, as well as the region ID (for exons) and gene ID (for exons and introns).
+Secondary outputs of this strategy include `CURE-exons.txt`, `CURE-introns.txt`, and `CURE-intergenic.txt`, which contains the names of UCEs assigned to each genic region, as well as the region ID (for exons) and gene ID (for exons and introns).
 The `CURE-intergenic.txt` file contains only the UCE names.
-Besides, **CURE** outputs the `CURE-summary.csv` file containing the UCE count assigned to exons, to introns, to both exon and intron, to intergenic regions, and unassigned UCEs.
+
+Yet, **CURE** outputs the `CURE-summary.csv` file containing the number of UCEs assigned to exons, to introns, to both exon and intron, to intergenic regions, as well as the number of unassigned UCEs.
 UCEs assigned to both exon and intron are accounted for exons, and unassigned UCEs are accounted for intergenic regions.
 
 **CURE** also maintains in the output directory the files produces by the uce_kit pipeline (`uce_kit_output/` dir)
@@ -176,7 +192,7 @@ scripts/estimate-trees.sh \
     --estimated-trees estimated-trees
 ```
 
-If you raised `--only-by-gene` or `--only-by-region` while running **CURE**, you can raise it here as well:
+If you run the **GeneRegion** strategy with `--only-by-gene` or `--only-by-genic-region` flags, you can raise it here as well:
 
 ```sh
 scripts/estimate-trees.sh \
@@ -191,7 +207,7 @@ or
 scripts/estimate-trees.sh \
     --cure-out CURE-output/ \
     --estimated-trees estimated-trees \
-    --only-by-region
+    --only-by-genic-region
 ```
 
 Moreover, `estimate-trees.sh` can be used to estimate trees from alignments from any other source; not necessarily those produced by **CURE**.

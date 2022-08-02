@@ -21,27 +21,28 @@ function ctrl_c() {
 # usage
 usage() {
 echo -e "
------------------------------------------------------------
-CURE: an automated and parallel pipeline for UCE curation
------------------------------------------------------------
---------------------- estimate trees ----------------------
------------------------------------------------------------
-by Vinícius Franceshini-Santos & Felipe Freitas
+=========================================================================
+                                    CURE
+          An automated and parallel pipeline for UCE curation
+          by Vinícius Franceschini-Santos & Felipe V Freitas
+-------------------------------------------------------------------------
+                              estimate trees
+-------------------------------------------------------------------------
 
 \e[4mUsage\e[0m:
  estimate-trees.sh --cure-out <path/to/cure-out> \\
                    --iqtree-out <path/to/iqtree-out>
 
 \e[4mRequired arguments\e[0m:
- --cure-out             Path to alignments produced by CURE
+ --cure-out                  Path to alignments produced by CURE
  --estimated-trees           Output directory name
 
 \e[4mOptional arguments\e[0m:
- --threads              Number of threads for the analysis (Default: 2)
- --only-by-gene         Only estimate trees for 'concatenated-by-gene/' files
- --only-by-region       Only estimate trees for 'concatenated-by-region/' files
- --custom-alignments    Path to a custom alignment dir. Estimate trees using
-                        alignments in this dir, ignoring other inputs.
+ --threads                    Number of threads for the analysis (Default: 2)
+ --only-by-gene               Only estimate trees for 'concatenated-by-gene/' files
+ --only-by-genic-region       Only estimate trees for 'concatenated-by-genic-region/' files
+ --custom-alignments          Path to a custom alignment dir. Estimate trees using
+                              alignments in this dir, ignoring other inputs.
 
 
 \e[4mExamples\e[0m:
@@ -49,7 +50,7 @@ by Vinícius Franceshini-Santos & Felipe Freitas
 To estimate trees from alignments produced by CURE, run:
 
     estimate-trees.sh \\
-            --cure-out CURE-output/ \\
+        --cure-out CURE-output/ \\
 	    --estimated-trees estimated-trees
 
 To estimate trees only from alignments concatenated by gene, run:
@@ -59,12 +60,12 @@ To estimate trees only from alignments concatenated by gene, run:
 	    --estimated-trees estimated-trees \\
 	    --only-by-gene
 
-To estimate trees only from alignments concatenated by region, run:
+To estimate trees only from alignments concatenated by genic region, run:
 
 	estimate-trees.sh \\
 	    --cure-out CURE-output/ \\
 	    --estimated-trees estimated-trees \\
-	    --only-by-region
+	    --only-by-genic-region
 
 Also, you can use this script to estimate gene trees in parallel from alignments
 produced by any other tool rather than CURE. For so, just use --custom-alignments
@@ -134,7 +135,7 @@ while true ; do
 		ONLY_BY_GENE="True"
 		shift
 		;;
-		--only-by-region )
+		--only-by-genic-region )
 		ONLY_BY_REGION="True"
 		shift
 		;;
@@ -267,7 +268,7 @@ if [ -z "$CUSTOM_ALI" ]; then
 			echo "- Checking..."
 			Run_IQtree_NEXUS concatenated-by-region Check
 			# ------------------------------------------------------
-			echo "- Preparing ASTRAL input by region"
+			echo "- Preparing ASTRAL input by genic region"
 			mkdir -p $BY_REGION
 			# only exons
 			cat "$IQTREE_OUT"/concatenated-by-region/*__exon-*treefile \
@@ -284,7 +285,7 @@ if [ -z "$CUSTOM_ALI" ]; then
 				> "$BY_REGION"/all-regions.tre
 
 		else
-			echo "- Already estimated trees by region. Skipping..."
+			echo "- Already estimated trees by genic region. Skipping..."
 		fi
 	fi
 

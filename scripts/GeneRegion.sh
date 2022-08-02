@@ -57,10 +57,10 @@ version "$VERSION"
   \e[4mOptional arguments\e[0m:
   -t, --threads           Number of threads for the analysis (Default: 2)
   -f, --filter-string     UCEs whose name beggins with this string will be discarted (Default: "_")
-  --only-by-gene          Concatenate UCEs only by gene. Concatenation by region will be discarted
-                          with this flag
-  --only-by-region        Concatenate UCEs only by region. Concatenation by gene will be discarted
-                          with this flag"
+  --only-by-gene          Concatenate UCEs only by gene. Concatenation by genic region will not
+                          be performed with this flag
+  --only-by-genic-region  Concatenate UCEs only by genic region. Concatenation by gene will not 
+                          be performed with this flag"
 exit 2
 }
 
@@ -95,7 +95,7 @@ FILTER="_"
 
 # Option strings for arg parser
 SHORT=hb:r:g:p:o:f:t:
-LONG=help,baits:,version:,reference:,gff:,phyluce-nexus:,output:,filter-string:,threads:,only-by-gene,only-by-region
+LONG=help,baits:,version:,reference:,gff:,phyluce-nexus:,output:,filter-string:,threads:,only-by-gene,only-by-genic-region
 
 
 # Read options
@@ -145,7 +145,7 @@ while true ; do
 		ONLY_BY_GENE="True"
 		shift
 		;;
-		--only-by-region )
+		--only-by-genic-region )
 		ONLY_BY_REGION="True"
 		shift
 		;;
@@ -186,7 +186,7 @@ GFF: ${GFF}
 OUTDIR: ${OUTPUT}
 THREADS: $THREADS
 ONLY_BY_GENE? $ONLY_BY_GENE
-ONLY_BY_REGION? $ONLY_BY_REGION
+ONLY_BY_GENIC_REGION? $ONLY_BY_REGION
 FILTER_STRING $FILTER
 -------------------------------------------------------------------------"
 
@@ -403,7 +403,7 @@ mkdir -p "$ALL_EXONS_DIR"
 #        - gene-X__exon-1.nexus
 
 if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
-	log "Concatenating UCEs by region (exons)..."
+	log "Merging UCEs in the same exons..."
 	DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d)
 	N_DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d | wc -l)
 	AUX=0
@@ -448,7 +448,7 @@ mkdir -p "$ALL_INTRONS_DIR"
 #        - gene-X.nexus
 
 if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
-	log "Concatenating UCEs by region (introns)..."
+	log "Merging UCEs in introns of the same gene..."
 	DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d)
 	N_DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d | wc -l)
 	AUX=0
@@ -622,7 +622,7 @@ fi
 
 # Create output concatenated by region
 if [ "$ONLY_BY_GENE" == "False" ]; then
-	log "Writing alignments concatenated by region..."
+	log "Writing alignments concatenated by genic region..."
 	mkdir -p "$BY_REGION_DIR"
 	PRECATFILES=$(find "$GENE_MERGED_PREP_BASEDIR" -type f)
 	# Alignments format for 'by Gene' concatenation will be nexus.
