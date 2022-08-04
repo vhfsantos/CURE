@@ -1,4 +1,4 @@
-<p align="center"><img src="misc/logo.png" alt="CURE" width="60%"></p>
+<p align="center"><img src="misc/logo.png" alt="CURE" width="100%"></p>
 
 **Curation of UtraconseRved Elements - CURE** is an automated and parallel pipeline for the curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategies proposed by [Van Dam et al. 2021](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) (named **GeneRegion** strategy), and [Freitas et al. 2021](https://academic.oup.com/mbe/article/38/3/1090/5976982) (name **UCERegion** strategy).
 
