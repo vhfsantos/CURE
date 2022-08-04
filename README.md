@@ -1,6 +1,6 @@
 <p align="center"><img src="misc/logo.png" alt="CURE" width="60%"></p>
 
-**CURE** is an automated and parallel pipeline for the curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategies proposed by [Van Dam et al. 2021. Genomic Characterization and Curation of UCEs Improves Species Tree Reconstruction](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) (named **GeneRegion** strategy), and [Freitas et al. 2021 Partitioned Gene-Tree Analyses and Gene-Based Topology Testing Help Resolve Incongruence in a Phylogenomic Study of Host-Specialist Bees (Apidae: Eucerinae)](https://academic.oup.com/mbe/article/38/3/1090/5976982) (name **UCERegion** strategy).
+**Curation of UtraconseRved Elements -CURE** is an automated and parallel pipeline for the curation of ultraconserved elements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategies proposed by [Van Dam et al. 2021. Genomic Characterization and Curation of UCEs Improves Species Tree Reconstruction](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) (named **GeneRegion** strategy), and [Freitas et al. 2021 Partitioned Gene-Tree Analyses and Gene-Based Topology Testing Help Resolve Incongruence in a Phylogenomic Study of Host-Specialist Bees (Apidae: Eucerinae)](https://academic.oup.com/mbe/article/38/3/1090/5976982) (name **UCERegion** strategy).
 
 ## Curing based on the genes the UCEs are located (GeneRegion strategy)
 
