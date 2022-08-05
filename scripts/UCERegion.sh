@@ -25,11 +25,13 @@ version "$VERSION"
 
 \e[4mRequired arguments\e[0m:
   -p, --phyluce-nexus     Path to the directory with nexus files created with phyluce
+
   -o, --output            Output directory
 
 \e[4mOptional arguments\e[0m:
   -t, --threads           Number of threads for the analysis (Default: 2)
-  -s, --swsc              Path to SWSCEN.py script (Default: PATH variable)
+
+  -s, --swsc              Path to SWSCEN.py script (Default: PATH variable)"
 
 exit 2
 }

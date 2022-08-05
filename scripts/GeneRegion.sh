@@ -48,17 +48,24 @@ version "$VERSION"
 
 \e[4mRequired arguments\e[0m:
   -b, --baits             Path to UCE baits file
+
   -r, --reference         Path to reference genome file
+
   -g, --gff               Path to annotation file in gff format
+
   -p, --phyluce-nexus     Path to the directory with nexus files created with
                           phyluce
+
   -o, --output            Output directory
 
   \e[4mOptional arguments\e[0m:
   -t, --threads           Number of threads for the analysis (Default: 2)
+
   -f, --filter-string     UCEs whose name beggins with this string will be discarted (Default: "_")
+
   --only-by-gene          Concatenate UCEs only by gene. Concatenation by genic region will not
                           be performed with this flag
+						  
   --only-by-genic-region  Concatenate UCEs only by genic region. Concatenation by gene will not 
                           be performed with this flag"
 exit 2
