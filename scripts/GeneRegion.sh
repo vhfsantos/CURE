@@ -35,9 +35,9 @@ Bye\033[0m"
 # Usage function
 Usage() {
 echo -e "
------------------------------------------------------------
-CURE: an automated and parallel pipeline for UCE curation
------------------------------------------------------------
+-----------------------------------------
+CURE: \e[4mC\e[0muration of \e[4mU\e[0mltraconse\e[4mR\e[0mved \e[4mE\e[0mlements
+-----------------------------------------
 by Vinícius Franceshini-Santos & Felipe Freitas
 version "$VERSION"
 

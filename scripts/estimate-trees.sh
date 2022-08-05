@@ -23,7 +23,7 @@ usage() {
 echo -e "
 =========================================================================
                                     CURE
-          An automated and parallel pipeline for UCE curation
+				   \e[4mC\e[0muration of \e[4mU\e[0mltraconse\e[4mR\e[0mved \e[4mE\e[0mlements
           by Vinícius Franceschini-Santos & Felipe V Freitas
 -------------------------------------------------------------------------
                               estimate trees
