@@ -14,8 +14,8 @@ version "$VERSION"
   CURE Command ...
 
 \e[4mCommands\e[0m:
-  GeneRegion              Runs UCE curation by gene region, such as introns and exons
-  UCERegion               Runs UCE curation by UCE region, such as core and flanks
+  GeneRegion         Runs UCE curation by gene region, such as introns and exons
+  UCERegion          Runs UCE curation by UCE region, such as core and flanks
 
 "
 exit
