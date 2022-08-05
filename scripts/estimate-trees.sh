@@ -263,18 +263,18 @@ if [ -z "$CUSTOM_ALI" ]; then
 
 	# Running for concatenated by region
 	if [ "$ONLY_BY_GENE" == "False" ]; then
-		if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-region")" ]; then
-			Run_IQtree_NEXUS concatenated-by-region Run
+		if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-genic-region")" ]; then
+			Run_IQtree_NEXUS concatenated-by-genic-region Run
 			echo "- Checking..."
-			Run_IQtree_NEXUS concatenated-by-region Check
+			Run_IQtree_NEXUS concatenated-by-genic-region Check
 			# ------------------------------------------------------
 			echo "- Preparing ASTRAL input by genic region"
 			mkdir -p $BY_REGION
 			# only exons
-			cat "$IQTREE_OUT"/concatenated-by-region/*__exon-*treefile \
+			cat "$IQTREE_OUT"/concatenated-by-genic-region/*__exon-*treefile \
 				> "$BY_REGION"/only-exons.tre
 			# only introns
-			cat "$IQTREE_OUT"/concatenated-by-region/*__introns.treefile \
+			cat "$IQTREE_OUT"/concatenated-by-genic-region/*__introns.treefile \
 				> "$BY_REGION"/only-introns.tre
 			# only genic regions (exons + introns)
 			cat "$BY_REGION"/only-introns.tre "$BY_REGION"/only-exons.tre \
