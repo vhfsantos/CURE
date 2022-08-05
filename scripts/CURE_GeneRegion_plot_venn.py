@@ -39,12 +39,12 @@ plt.savefig(os.path.join(output, 'CURE_stats.pdf'))
 lbs = generate_petal_labels(all_data.values(), fmt="{size}")
 
 with open(os.path.join(output, 'CURE_stats.csv'),'w') as out_csv:
-    out_csv.write('type, uce_count')
-    out_csv.write('unassigned, {}'.format(lbs['0001']))
-    out_csv.write('intron, {}'.format(lbs['0011']))
-    out_csv.write('exon, {}'.format(lbs['0101']))
-    out_csv.write('exon_and_intron, {}'.format(lbs['0111']))
-    out_csv.write('intergenic, {}'.format(lbs['1001']))
+    out_csv.write('type, uce_count\n')
+    out_csv.write('unassigned, {}\n'.format(lbs['0001']))
+    out_csv.write('intron, {}\n'.format(lbs['0011']))
+    out_csv.write('exon, {}\n'.format(lbs['0101']))
+    out_csv.write('exon_and_intron, {}\n'.format(lbs['0111']))
+    out_csv.write('intergenic, {}\n'.format(lbs['1001']))
 
 write_log('------------------------------------------------------')
 write_log('---------------------- Summary -----------------------') 
