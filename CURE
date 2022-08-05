@@ -11,12 +11,16 @@ by Vinícius Franceshini-Santos & Felipe Freitas
 version "$VERSION"
 
 \e[4mUsage\e[0m:
-  CURE Command ...
+  CURE [Command] [args]
 
 \e[4mCommands\e[0m:
   GeneRegion         Runs UCE curation by gene region, such as introns and exons
+
   UCERegion          Runs UCE curation by UCE region, such as core and flanks
 
+To see usage of any command, type:
+
+  CURE [Command] --help
 "
 exit
 }
