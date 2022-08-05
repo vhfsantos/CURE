@@ -168,7 +168,7 @@ fi
 
 # Checking if both flags were signed
 if [ "$ONLY_BY_GENE" == "True" ] && [ "$ONLY_BY_REGION" == "True" ]; then
-	error_exit "Please, chose one: --only-by-gene or --only-by-region"
+	error_exit "Please, chose one: --only-by-gene or --only-by-genic-region"
 fi
 
 # Print parameters for debuggin
@@ -591,7 +591,7 @@ fi
 
 # Final output dirs
 BY_GENE_DIR="$OUTPUT"/concatenated-by-gene
-BY_REGION_DIR="$OUTPUT"/concatenated-by-region
+BY_REGION_DIR="$OUTPUT"/concatenated-by-genic-region
 
 # cleaning tmp dirs
 rm -rf ${NEXUSCOPYex} ${NEXUSTOCONCAT} "$ALL_EXONS_DIR" "$ALL_INTRONS_DIR"
