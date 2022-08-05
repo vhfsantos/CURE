@@ -41,9 +41,9 @@ BYEmsg() {
 	echo -e "
 \033[1;32mIf you make use of CURE in your research, please cite:
 
-Freitas et al (2022). Phylogenomics, biogeography, and classification of long-horned 
-bees (Hymenoptera: Apidae: Eucerini), with insights on the use of specimens with 
-extremely degraded DNA for UCE phylogenomics. XXXXXXX
+Freitas et al (2022). UCE phylogenomics, biogeography, and classification of long-horned 
+bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely 
+degraded DNA. In prep.
 
 Bye\033[0m"
 }
