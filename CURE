@@ -14,14 +14,16 @@ version "$VERSION"
   CURE [Command] [args]
 
 \e[4mCommands\e[0m:
-  GeneRegion         Runs UCE curation by gene region, such as introns and exons
+  GeneRegion         Runs UCE curation by the GeneRegion strategy
 
-  UCERegion          Runs UCE curation by UCE region, such as core and flanks
+  UCERegion          Runs UCE curation by UCERegion strategy
 
 To see usage of any command, type:
 
   CURE [Command] --help
-"
+
+To understand the strategies, visit: https://github.com/vhfsantos/CURE"
+
 exit
 }
 # Error function
