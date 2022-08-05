@@ -30,7 +30,6 @@ version "$VERSION"
 \e[4mOptional arguments\e[0m:
   -t, --threads           Number of threads for the analysis (Default: 2)
   -s, --swsc              Path to SWSCEN.py script (Default: PATH variable)
-  -u, --uce-prefix        Prefix of UCE nexus files (Default: \"uce_\")"
 
 exit 2
 }
@@ -59,13 +58,12 @@ error_exit() {
 tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
 THREADS=2
-# assume all UCE names start with this prefix
-UCE_PREFIX="uce_"
+
 SWSC_PATH="SWSCEN.py"
 
 # Option strings for arg parser
-SHORT=hp:o:t:s:u:
-LONG=help,phyluce-nexus:,output:,threads:,version:,swsc:,uce-prefix:
+SHORT=hp:o:t:s:
+LONG=help,phyluce-nexus:,output:,threads:,version:,swsc:
 
 
 # Read options
@@ -85,10 +83,6 @@ while true ; do
 		;;
 		-p | --phyluce-nexus )
 		NEXUS_DIR="$2"
-		shift 2
-		;;
-		-u | --uce-prefix )
-		UCE_PREFIX="$2"
 		shift 2
 		;;
 		-s | --swsc )
@@ -134,7 +128,6 @@ NEXUS: ${NEXUS_DIR}
 OUTDIR: ${OUTPUT}
 THREADS: $THREADS
 SWSC PATH: ${SWSC_PATH}
-UCE PREFIX: ${UCE_PREFIX}
 -------------------------------------------------------------------------"
 
 #=============================================================
