@@ -4,8 +4,8 @@
 # Table of contents
 
 * [Introduction](#introduction)
-	* [**GeneRegion strategy**: curing based on the genes the UCEs are located](##generegion-strategy:-curing-based-on-the-genes-the-uces-are-located)
-	* [**UCERegion strategy**: curing based on the internal UCE regions](##ucerRegion-strategy:-curing-based-on-the-internal-uce-regions)
+	* [**GeneRegion strategy**: curing based on the genes the UCEs are located](##generegion-strategy---curing-based-on-the-genes-the-uces-are-located)
+	* [**UCERegion strategy**: curing based on the internal UCE regions](##ucerRegion-strategy---curing-based-on-the-internal-uce-regions)
 * [Installation](#installation)
 * [How CURE works](#how-cure-works)
 	* [**GeneRegion** Strategy](##generegion-strategy)
@@ -29,7 +29,7 @@
 
 **CURE** is an automated and parallel pipeline for the **C**uration of **U**ltraconse**R**ved **E**lements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategies proposed by [Van Dam et al. 2021](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) (named **GeneRegion** strategy), and [Freitas et al. 2021](https://academic.oup.com/mbe/article/38/3/1090/5976982) (name **UCERegion** strategy).
 
-## **GeneRegion strategy**: curing based on the genes the UCEs are located
+## **GeneRegion strategy** - curing based on the genes the UCEs are located
 
 In the **GeneRegion** strategy (Van Dam et al. 2021), **CURE** performs the curing process based on the genes that each UCE is located. **CURE** can do it in two different ways:
 
@@ -38,7 +38,7 @@ In the **GeneRegion** strategy (Van Dam et al. 2021), **CURE** performs the curi
 
 When using the **GeneRegion** strategy, the default behavior of **CURE** is to run these two ways but this can be changed. The input files for the **GeneRegion** pipeline are the baits file used for UCE sequencing, the reference genome, an annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
 
-## **UCERegion strategy**: curing based on the internal UCE regions
+## **UCERegion strategy** - curing based on the internal UCE regions
 
 In the **UCERegion** strategy (Freitas et al. 2021), **CURE** performs the curing process based on the internal regions of each UCE (right flank, core, and left flank). It runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in parallel to speed up the process, and creates charsets considering the left flank, core, and right flank as different partitions for each locus in the dataset.
 
