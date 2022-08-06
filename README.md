@@ -196,34 +196,40 @@ Also, it accounts for intergenic regions the unassigned UCEs (84, in this test d
 **CURE** provides the wrapper script `estimate-trees.sh` for the estimation of gene trees from the output alignments with [IQ-tree](http://www.iqtree.org/), and further summary analysis with [ASTRAL](https://github.com/smirarab/ASTRAL).
 This script runs IQ-tree in parallel using [GNU Parallel](https://www.gnu.org/software/parallel/) following the structure of the **CURE** output-dir.
 Then it prepares all inputs needed for a summary analysis with ASTRAL.
-For instance, if you run **CURE** setting `CURE-output` as output directory, you can call `estimate-trees.sh` as the following:
+
+For instance, if you run **CURE** setting `CURE-GeneRegion-output` as output directory for the **GeneRegion** strategy, and `CURE-UCERegion-output` for the **UCERegion** strategy, you can call `estimate-trees.sh` as the following:
 
 ```sh
 scripts/estimate-trees.sh \
-    --cure-out CURE-output/ \
-    --estimated-trees estimated-trees
+        --gene-region-out CURE-GeneRegion-output \
+        --uce-region-out CURE-UCERegion-output \
+        --estimated-trees estimated-trees
 ```
 
 If you run the **GeneRegion** strategy with `--only-by-gene` or `--only-by-genic-region` flags, you can raise it here as well:
 
 ```sh
 scripts/estimate-trees.sh \
-    --cure-out CURE-output/ \
-    --estimated-trees estimated-trees \
-    --only-by-gene
+        --gene-region-out CURE-GeneRegion-output \
+        --uce-region-out CURE-UCERegion-output \
+        --estimated-trees estimated-trees \
+        --only-by-gene
 ```
 
 or
 
 ```sh
 scripts/estimate-trees.sh \
-    --cure-out CURE-output/ \
-    --estimated-trees estimated-trees \
-    --only-by-genic-region
+        --gene-region-out CURE-GeneRegion-output \
+        --uce-region-out CURE-UCERegion-output \
+        --estimated-trees estimated-trees \
+        --only-by-genic-region
 ```
 
+> Note that you don't need to use both `--gene-region-out` and `--uce-region-out`. If you run **CURE** with only one of the strategies, you only need to use the appropriate parameter.
+
 Moreover, `estimate-trees.sh` can be used to estimate trees from alignments from any other source; not necessarily those produced by **CURE**.
-In this case, you only need to use the parameter `--custom-alignments` instead of `--cure-out`.
+In this case, you only need to use the parameter `--custom-alignments` instead of `--gene-region-out` or `--uce-region-out`.
 So if you have a set of alignments (in Phylip, Fasta, or Nexus format) in a directory called `input-alignments`, and want to run IQ-tree on them, you can call `estimate-trees.sh` as the following:
 
 ```sh
@@ -236,7 +242,7 @@ scripts/estimate-trees.sh \
 
 If you use **CURE** in your research, please cite:
 
-Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A.B. Almeida, (xxxx). UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. xxxxxxx
+Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida, (xxxx). UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. In prep.
 
 # License
 

@@ -61,7 +61,7 @@ the trees of both outputs with the following:
 
     estimate-trees.sh \\
         --gene-region-out CURE-GeneRegion-output \\
-		--uce-region-out CURE-UCERegion-output \\
+        --uce-region-out CURE-UCERegion-output \\
         --estimated-trees estimated-trees
 
 (If only one strategy was run, you can use the appropriate: --gene-region-out or --uce-region-out)
