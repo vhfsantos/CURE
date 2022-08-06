@@ -29,7 +29,7 @@ def write_log(msg):
 all_data = {'Assigned to intergenic regions': read_n_create_set(intergenic),
             'Assigned to exons': read_n_create_set(exons),
             'Assigned to introns': read_n_create_set(introns),
-            'All UCEs': read_n_create_set(all_uces)}
+            'All UCEs in NEXUS dir': read_n_create_set(all_uces)}
 
 # plot venn diagram
 venn(all_data)
@@ -46,9 +46,15 @@ with open(os.path.join(output, 'CURE_stats.csv'),'w') as out_csv:
     out_csv.write('exon_and_intron, {}\n'.format(lbs['0111']))
     out_csv.write('intergenic, {}\n'.format(lbs['1001']))
 
+total_uces = (int(lbs['0001'])
+              + int(lbs['0011'])
+              + int(lbs['0101'])
+              + int(lbs['0111'])
+              + int(lbs['1001']))
 write_log('------------------------------------------------------')
 write_log('---------------------- Summary -----------------------') 
 write_log('------------------------------------------------------')
+write_log('{} UCEs in NEXUS dir:'.format(str(total_uces)))
 write_log('{} unassigned UCEs (accounted for intergenic)'.format(lbs['0001']))
 write_log('{} assigned to introns'.format(lbs['0011']))
 write_log('{} assigned to exons'.format(lbs['0101']))
