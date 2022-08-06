@@ -180,7 +180,7 @@ This information is stored in a table-like format in the `.csv` file, and depict
 
 The Venn diagram summarizing the test data looks like this: 
 
-<p align="center"><img src="misc/img/stats.png" alt="stats" width="60%"></p>
+<p align="center"><img src="misc/img/stats.png" alt="stats" height="30%"></p>
 
 The **All UCEs** group represent the UCEs present in the NEXUS dir. passed with the `--phyluce-nexus` argument.
 Numbers outside this yellow ellipse represent the UCEs present in the baits file that were not recovered by PHYLUCE (therefore, not present in the `--phyluce-nexus` directory).
