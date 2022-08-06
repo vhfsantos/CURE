@@ -9,7 +9,7 @@
 - [**Installation**](#installation)
 - [**How CURE works**](#how-cure-works)
   * [GeneRegion Strategy](#generegion-strategy)
-  * [**UCERegion** Strategy](#uceregion-strategy)
+  * [UCERegion Strategy](#uceregion-strategy)
 - [**Quick usage examples**](#quick-usage-examples)
   * [Running the test dataset for the GeneRegion strategy](#running-the-test-dataset-for-the-generegion-strategy)
     + [Running only one of the concatenating approaches of the GeneRegion strategy](#running-only-one-of-the-concatenating-approaches-of-the-generegion-strategy)
