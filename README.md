@@ -167,11 +167,11 @@ The main output files produced by **CURE** are the alignments of concatenated an
 
 ## Output files of **UCERegion** strategy
 
-**CURE** UCERegion generates three output subdirectories:
+**CURE UCERegion** generates three output subdirectories:
 
-* logfiles: stores all the log files generated in the analysis
-* partitioned-uces: stores all the alignments and their respective charsets files
-* PF2-input: stores the input file for a putative downstream analysis with PartitionFinder2
+* `logfiles/`: stores all the log files generated in the analysis
+* `partitioned-uces/´: stores all the alignments and their respective charsets files
+* ´PF2-input/´: stores the input file for a putative downstream analysis with PartitionFinder2
 
 ## Output files of **GeneRegion** strategy
 
