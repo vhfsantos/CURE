@@ -103,9 +103,7 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 For this strategy, you need to provide a folder with all the individual alignments you want to use, in `nexus` format (could be all your alignments or a subset).
 You need to have [SWSC-EN](https://github.com/Tagliacollo/PFinderUCE-SWSC-EN) included in your `PATH` variable, otherwise, you should pass the path to the `SWSCEN.py` script to the `--swsc` parameter.
 What **CURE** does is run the `SWSC-EN` in parallel and use `PHYLUCE` to split the alignments according to regions identified by SWSC.
-Then, **CURE** re-concatenates them, creating a charset file to be used in phylogenetic analyses to generate your gene trees, treating each UCE region (left flank, core, and right flank) as different partitions. 
-
-> Note that we provide the `./scripts/estimate-trees.sh` script for this last step. It automatically runs IQ-Tree in parallel, for a fast estimation of the gene trees using the output alignment files.
+Then, **CURE** re-concatenates them, creating a charset file to be used in phylogenetic analyses to generate your gene trees (see [**Estimating trees from output files**](#estimating-trees-from-output-files)), treating each UCE region (left flank, core, and right flank) as different partitions.
 
 # Quick usage examples
 
