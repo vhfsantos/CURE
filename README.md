@@ -4,8 +4,8 @@
 # Table of contents
 
 - [Introduction](#introduction)
-  * [**GeneRegion strategy** - curing based on the genes the UCEs are located](#--generegion-strategy-----curing-based-on-the-genes-the-uces-are-located)
-  * [**UCERegion strategy** - curing based on the internal UCE regions](#--uceregion-strategy-----curing-based-on-the-internal-uce-regions)
+  * [**GeneRegion strategy** - curing based on the genes the UCEs are located](##--generegion-strategy-----curing-based-on-the-genes-the-uces-are-located)
+  * [**UCERegion strategy** - curing based on the internal UCE regions](##--uceregion-strategy-----curing-based-on-the-internal-uce-regions)
 - [Installation](#installation)
 - [How CURE works](#how-cure-works)
   * [**GeneRegion** Strategy](#--generegion---strategy)
