@@ -31,7 +31,7 @@
 
 ## Curing based on the genes the UCEs are located
 
-In the **GeneRegion** strategy (Van Dam et al. 2021), **CURE** performs the curing process based on the genes in which each UCE is located. **CURE** can do it in two different ways:
+In the **GeneRegion** strategy ([Van Dam et al. 2021](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768)), **CURE** performs the curing process based on the genes in which each UCE is located. **CURE** can do it in two different ways:
 
 * _by gene_: concatenates all UCEs from the same gene and treats different genic regions (exons and introns) as different partitions;
 * _by genic region_: concatenates all UCEs from the same exons or introns of the same gene.
@@ -40,7 +40,7 @@ When using the **GeneRegion** strategy, the default behavior of **CURE** is to r
 
 ## Curing based on the internal UCE regions
 
-In the **UCERegion** strategy (Freitas et al. 2021), **CURE** performs the curing process based on the internal regions of each UCE (right flank, core, and left flank). It runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in parallel to speed up the process and creates charsets considering the left flank, core, and right flank as different partitions for each locus in the dataset.
+In the **UCERegion** strategy ([Freitas et al. 2021](https://academic.oup.com/mbe/article/38/3/1090/5976982)), **CURE** performs the curing process based on the internal regions of each UCE (right flank, core, and left flank). It runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in parallel to speed up the process and creates charsets considering the left flank, core, and right flank as different partitions for each locus in the dataset.
 
 # Installation
 
