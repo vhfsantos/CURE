@@ -1,8 +1,35 @@
 <p align="center"><img src="misc/logo.png" alt="CURE" width="100%"></p>
 
+
+# Table of contents
+
+* [Introduction](#introduction)
+        * [**GeneRegion strategy**: curing based on the genes the UCEs are located](##generegion-strategy-curing-based-on-the-genes-the-uces-are-located)
+        * [**UCERegion strategy**: curing based on the internal UCE regions](##ucerRegion-strategy-curing-based-on-the-internal-uce-regions)
+* [Installation](#installation)
+* [How CURE works](#how-cure-works)
+        * [**GeneRegion** Strategy](##generegion-strategy)
+        * [**UCERegion** Strategy](##uceregion-strategy)
+* [Quick usage examples](#quick-usage-examples)
+        * [Running the test dataset for the **GeneRegion** strategy](##running-the-test-dataset-for-the-generegion-strategy)
+			* [Running only one of the concatenating approaches of the **GeneRegion** strategy](###running-only-one-of-the-concatenating-approaches-of-the-generegion-strategy)
+				* [Only by gene](####only-by-gene)
+				* [Only by genic region](####only-by-genic-region)
+		* [Running the test dataset for the **UCERegion** strategy](##running-the-test-dataset-for-the-uceregion-strategy)
+* [Output files](#output-files)
+	* [Output files of **UCERegion** strategy](##output-files-of-uceregion-strategy)
+	* [Output files of **GeneRegion** strategy](##output-files-of-generegion-strategy)
+	* [Summary files](##summary-files)
+* [Estimating trees from output files](#estimating-trees-from-output-files)
+	* [Estimating trees for alignments from external sources](##estimating-trees-for-alignments-from-external-sources)
+* [Citation](#citation)
+* [License](#license)
+
+# Introduction
+
 **CURE** is an automated and parallel pipeline for the **C**uration of **U**ltraconse**R**ved **E**lements (UCEs) for species-tree reconstruction. It is an automation/adaptation of the strategies proposed by [Van Dam et al. 2021](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) (named **GeneRegion** strategy), and [Freitas et al. 2021](https://academic.oup.com/mbe/article/38/3/1090/5976982) (name **UCERegion** strategy).
 
-## Curing based on the genes the UCEs are located (GeneRegion strategy)
+## **GeneRegion strategy**: curing based on the genes the UCEs are located
 
 In the **GeneRegion** strategy (Van Dam et al. 2021), **CURE** performs the curing process based on the genes that each UCE is located. **CURE** can do it in two different ways:
 
@@ -11,18 +38,10 @@ In the **GeneRegion** strategy (Van Dam et al. 2021), **CURE** performs the curi
 
 When using the **GeneRegion** strategy, the default behavior of **CURE** is to run these two ways but this can be changed. The input files for the **GeneRegion** pipeline are the baits file used for UCE sequencing, the reference genome, an annotation file, and the UCE alignments produced by [phyluce](https://phyluce.readthedocs.io/en/latest/).
 
-## Curing based on the internal UCE regions (UCERegion strategy)
+## **UCERegion strategy**: curing based on the internal UCE regions
 
 In the **UCERegion** strategy (Freitas et al. 2021), **CURE** performs the curing process based on the internal regions of each UCE (right flank, core, and left flank). It runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in parallel to speed up the process, and creates charsets considering the left flank, core, and right flank as different partitions for each locus in the dataset.
 
-# Table of contents
-
-* [Installation](#installation)
-* [How CURE works](#how-cure-works)
-* [Quick usage examples](#quick-usage-examples)
-* [Output files](#output-files)
-* [Estimating trees from output files](#estimating-trees-from-output-files)
-* [License](#license)
 
 # Installation
 
@@ -227,6 +246,8 @@ scripts/estimate-trees.sh \
 ```
 
 > Note that you don't need to use both `--gene-region-out` and `--uce-region-out`. If you run **CURE** with only one of the strategies, you only need to use the appropriate parameter.
+
+## Estimating trees for alignments from external sources
 
 Moreover, `estimate-trees.sh` can be used to estimate trees from alignments from any other source; not necessarily those produced by **CURE**.
 In this case, you only need to use the parameter `--custom-alignments` instead of `--gene-region-out` or `--uce-region-out`.
