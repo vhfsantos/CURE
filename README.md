@@ -182,8 +182,8 @@ The Venn diagram summarizing the test data looks like this:
 
 <p align="center"><img src="misc/img/stats.png" alt="stats" width="30%"></p>
 
-The **All UCEs** group represent the UCEs present in the NEXUS dir. passed with the `--phyluce-nexus` argument.
-Numbers outside this yellow ellipse represent the UCEs present in the baits file that were not recovered by PHYLUCE (therefore, not present in the `--phyluce-nexus` directory).
+The "**All UCEs**" group represents the UCEs present in the NEXUS dir (`--phyluce-nexus` argument).
+Numbers outside this yellow ellipse represent the UCEs present in the baits file that were not present in the `--phyluce-nexus` directory (probably because they were not recovered upstream, by PHYLUCE)
 We called this group "All UCEs" because it represent all the UCEs **CURE** works with. 
 
 Note that **CURE** accounts for exons the UCEs assigned to both exon and intron (1, in this test data).
