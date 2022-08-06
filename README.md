@@ -31,7 +31,7 @@
 
 ## Curing based on the genes the UCEs are located
 
-In the **GeneRegion** strategy (Van Dam et al. 2021), **CURE** performs the curing process based on the genes that each UCE is located. **CURE** can do it in two different ways:
+In the **GeneRegion** strategy (Van Dam et al. 2021), **CURE** performs the curing process based on the genes in which each UCE is located. **CURE** can do it in two different ways:
 
 * _by gene_: concatenates all UCEs from the same gene and treats different genic regions (exons and introns) as different partitions;
 * _by genic region_: concatenates all UCEs from the same exons or introns of the same gene.
@@ -40,8 +40,7 @@ When using the **GeneRegion** strategy, the default behavior of **CURE** is to r
 
 ## Curing based on the internal UCE regions
 
-In the **UCERegion** strategy (Freitas et al. 2021), **CURE** performs the curing process based on the internal regions of each UCE (right flank, core, and left flank). It runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in parallel to speed up the process, and creates charsets considering the left flank, core, and right flank as different partitions for each locus in the dataset.
-
+In the **UCERegion** strategy (Freitas et al. 2021), **CURE** performs the curing process based on the internal regions of each UCE (right flank, core, and left flank). It runs SWSC-EN ([Tagliacollo & Lanfear 2018](https://academic.oup.com/mbe/article-abstract/35/7/1798/4969532)) in parallel to speed up the process and creates charsets considering the left flank, core, and right flank as different partitions for each locus in the dataset.
 
 # Installation
 
@@ -60,7 +59,7 @@ chmod +x CURE
 chmod +x scripts/*
 ```
 
-After done all installations, activate the cure environment and run **CURE** with no arguments. **CURE** will tell you if any dependencies are missing.
+After done all installations, activate the CURE environment and run **CURE** with no arguments. **CURE** will tell you if any dependencies are missing.
 
 ```
 conda activate cure
@@ -101,12 +100,12 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 
 ## **UCERegion** Strategy
 
-For this strategy, you need to provide a folder with all the individual alignments you want to use, in `nexus` format (could be all your alignemnts or a subset).
-You need to have [SWSC-EN](https://github.com/Tagliacollo/PFinderUCE-SWSC-EN) included in yout `PATH` variable, otherwise you should pass the path to the `SWSCEN.py` script to the `--swsc` parameter.
-What **CURE** does is basically run the `SWSC-EN` in paralell and use `PHYLUCE` to split the alignments according to regions identified by SWSC.
-Then, **CURE** re-concatenates them, creating a charset file to be used in phylogenetic analyses to generate your gene-trees, treating each UCE region (left flank, core, and right flank) as different partitions. 
+For this strategy, you need to provide a folder with all the individual alignments you want to use, in `nexus` format (could be all your alignments or a subset).
+You need to have [SWSC-EN](https://github.com/Tagliacollo/PFinderUCE-SWSC-EN) included in your `PATH` variable, otherwise, you should pass the path to the `SWSCEN.py` script to the `--swsc` parameter.
+What **CURE** does is run the `SWSC-EN` in parallel and use `PHYLUCE` to split the alignments according to regions identified by SWSC.
+Then, **CURE** re-concatenates them, creating a charset file to be used in phylogenetic analyses to generate your gene trees, treating each UCE region (left flank, core, and right flank) as different partitions. 
 
-> Note that we provide the `./scripts/estimate-trees.sh` script for this last step. It automatically runs IQ-Tree in parallel, for a fast estimation of the gene-trees using the output alignment files.
+> Note that we provide the `./scripts/estimate-trees.sh` script for this last step. It automatically runs IQ-Tree in parallel, for a fast estimation of the gene trees using the output alignment files.
 
 # Quick usage examples
 
@@ -166,23 +165,23 @@ If this is your case, you can either add the script to the `$PATH` or pass the p
 
 # Output files
 
-The main output files produced by **CURE** are the alignments of concatenated and cured UCEs. Each of the two strategies, however, produce different output files.
+The main output files produced by **CURE** are the alignments of concatenated and cured UCEs. Each of the two strategies, however, produces different output files.
 
 ## Output files of **UCERegion** strategy
 
 **CURE** UCERegion generates three output subdirectories:
 
 * logfiles: stores all the log files generated in the analysis
-* partitioned-uces: stores all the alignemnts and their respective charsets files
+* partitioned-uces: stores all the alignments and their respective charsets files
 * PF2-input: stores the input file for a putative downstream analysis with PartitionFinder2
 
 ## Output files of **GeneRegion** strategy
 
 If you run the **GeneRegion** strategy without `--only-by-gene` or `--only-by-genic-region`, both of the concatenating approaches will be done.
-In this case, your output dir will contain `concatenated-by-gene/` and `concatenated-by-genic-region/` dirs.
+In this case, your output-dir will contain `concatenated-by-gene/` and `concatenated-by-genic-region/` dirs.
 If you raised any of these flags, only the corresponding dir will be created.
 
-Besides, **GeneRegion** strategy creates the `intergenic-regions/` dir containing unmerged UCEs assigned to intergenic regions.
+Besides, the **GeneRegion** strategy creates the `intergenic-regions/` dir containing unmerged UCEs assigned to intergenic regions.
 
 Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEXUS format.
 Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are in NEXUS format.
@@ -195,7 +194,7 @@ The `CURE-intergenic.txt` file contains only the UCE names.
 ## Summary files
 
 **CURE** outputs the `CURE_stats.csv` and `CURE_stats.pdf` files summarizing the total number of UCEs assigned to each region. 
-This information is stored in a table-like format in the `.csv` file, and depicted in a Venn diagram in the `.pdf` file. 
+This information is stored in a table-like format in the `.csv` file and depicted in a Venn diagram in the `.pdf` file. 
 
 The Venn diagram summarizing the test data looks like this: 
 
@@ -203,7 +202,7 @@ The Venn diagram summarizing the test data looks like this:
 
 The "**All UCEs**" group represents the UCEs present in the NEXUS dir (`--phyluce-nexus` argument).
 Numbers outside this yellow ellipse represent the UCEs present in the baits file that were not present in the `--phyluce-nexus` directory (probably because they were not recovered upstream, by PHYLUCE)
-We called this group "All UCEs" because it represent all the UCEs **CURE** works with. 
+We called this group "All UCEs" because it represents all the UCEs **CURE** works with. 
 
 Note that **CURE** accounts for exons the UCEs assigned to both exon and intron (1, in this test data).
 Also, it accounts for intergenic regions the unassigned UCEs (84, in this test data).
@@ -216,7 +215,7 @@ Also, it accounts for intergenic regions the unassigned UCEs (84, in this test d
 This script runs IQ-tree in parallel using [GNU Parallel](https://www.gnu.org/software/parallel/) following the structure of the **CURE** output-dir.
 Then it prepares all inputs needed for a summary analysis with ASTRAL.
 
-For instance, if you run **CURE** setting `CURE-GeneRegion-output` as output directory for the **GeneRegion** strategy, and `CURE-UCERegion-output` for the **UCERegion** strategy, you can call `estimate-trees.sh` as the following:
+For instance, if you run **CURE** setting `CURE-GeneRegion-output` as the output directory for the **GeneRegion** strategy, and `CURE-UCERegion-output` for the **UCERegion** strategy, you can call `estimate-trees.sh` as the following:
 
 ```sh
 scripts/estimate-trees.sh \
