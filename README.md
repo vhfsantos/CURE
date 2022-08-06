@@ -159,7 +159,6 @@ The main output files produced by **CURE** are the alignments of concatenated an
 
 ## Output files of **GeneRegion** strategy
 
-
 If you run the **GeneRegion** strategy without `--only-by-gene` or `--only-by-genic-region`, both of the concatenating approaches will be done.
 In this case, your output dir will contain `concatenated-by-gene/` and `concatenated-by-genic-region/` dirs.
 If you raised any of these flags, only the corresponding dir will be created.
@@ -174,8 +173,21 @@ Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are
 Secondary outputs of this strategy include `CURE-exons.txt`, `CURE-introns.txt`, and `CURE-intergenic.txt`, which contains the names of UCEs assigned to each genic region, as well as the region ID (for exons) and gene ID (for exons and introns).
 The `CURE-intergenic.txt` file contains only the UCE names.
 
-Yet, **CURE** outputs the `CURE-summary.csv` file containing the number of UCEs assigned to exons, to introns, to both exon and intron, to intergenic regions, as well as the number of unassigned UCEs.
-UCEs assigned to both exon and intron are accounted for exons, and unassigned UCEs are accounted for intergenic regions.
+## Summary files
+
+**CURE** outputs the `CURE_stats.csv` and `CURE_stats.pdf` files summarizing the total number of UCEs assigned to each region. 
+This information is stored in a table-like format in the `.csv` file, and depicted in a Venn diagram in the `.pdf` file. 
+
+The Venn diagram summarizing the test data looks like this: 
+
+<p align="center"><img src="misc/img/stats.png" alt="stats" width="60%"></p>
+
+The **All UCEs** group represent the UCEs present in the NEXUS dir. passed with the `--phyluce-nexus` argument.
+Numbers outside this yellow ellipse represent the UCEs present in the baits file that were not recovered by PHYLUCE (therefore, not present in the `--phyluce-nexus` directory).
+We called this group "All UCEs" because it represent all the UCEs **CURE** works with. 
+
+Note that **CURE** accounts for exons the UCEs assigned to both exon and intron (1, in this test data).
+Also, it accounts for intergenic regions the unassigned UCEs (84, in this test data).
 
 **CURE** also maintains in the output directory the files produces by the uce_kit pipeline (`uce_kit_output/` dir)
 
