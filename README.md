@@ -252,8 +252,8 @@ So if you have a set of alignments (in Phylip, Fasta, or Nexus format) in a dire
 
 ```sh
 scripts/estimate-trees.sh \
-    --custom-alignments input-alignments/ \
-    --estimated-trees estimated-trees
+        --custom-alignments input-alignments/ \
+        --estimated-trees estimated-trees
 ```
 
 # Citation
