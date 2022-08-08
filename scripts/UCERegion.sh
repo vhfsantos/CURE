@@ -29,9 +29,7 @@ version "$VERSION"
   -o, --output            Output directory
 
 \e[4mOptional arguments\e[0m:
-  -t, --threads           Number of threads for the analysis (Default: 2)
-
-  -s, --swsc              Path to SWSCEN.py script (Default: PATH variable)"
+  -t, --threads           Number of threads for the analysis (Default: 2)"
 
 exit 2
 }
@@ -60,12 +58,12 @@ error_exit() {
 tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
 THREADS=2
-
-SWSC_PATH="SWSCEN.py"
+# Now SWSC is distributed by us!
+SWSC_PATH="$HOME_DIR/scripts/SWSC_EN/SWSCEN.py"
 
 # Option strings for arg parser
-SHORT=hp:o:t:s:
-LONG=help,phyluce-nexus:,output:,threads:,version:,swsc:
+SHORT=hp:o:t:
+LONG=help,phyluce-nexus:,output:,threads:,version:
 
 
 # Read options
@@ -85,10 +83,6 @@ while true ; do
 		;;
 		-p | --phyluce-nexus )
 		NEXUS_DIR="$2"
-		shift 2
-		;;
-		-s | --swsc )
-		SWSC_PATH="$2"
 		shift 2
 		;;
         -t | --threads )
@@ -114,9 +108,6 @@ if [ -z "${NEXUS_DIR}" ] || [ -z "${OUTPUT}" ]; then
 	error_exit "Please, supply all arguments correctly."
 fi
 
-tmp=$(realpath "$0")
-HOME_DIR=${tmp%/*}
-
 
 # Print parameters for debuggin
 echo "=========================================================================
@@ -129,7 +120,6 @@ echo "=========================================================================
 NEXUS: ${NEXUS_DIR}
 OUTDIR: ${OUTPUT}
 THREADS: $THREADS
-SWSC PATH: ${SWSC_PATH}
 -------------------------------------------------------------------------"
 
 #=============================================================
