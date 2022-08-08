@@ -75,6 +75,10 @@ The main inputs for this strategy are the UCE alignments and an annotated refere
 <p align="center"><img src="misc/img/input.png" alt="input" width="100%"></p>
 
 The first step of **CURE** is running a custom version of the `uce_type` tool described by [Van Dam et al. 2021](https://academic.oup.com/sysbio/article/70/2/307/5880562#227740768) and available at the [Cal Academy's repository](https://github.com/calacademy-research/ccgutils).
+
+> Note: `uce_type` is distributed by us with **CURE**. No previous installation of this tools is required.
+
+
 Briefly, this step assigns each UCE to an exon, intron, or intergenic region of the given reference genome
 
 <p align="center"><img src="misc/img/output1.png" alt="input" width="80%"></p>
@@ -101,16 +105,17 @@ These UCEs are just copied to the `intergenic_regions/` directory.
 ## **UCERegion** Strategy
 
 For this strategy, you need to provide a folder with all the individual alignments you want to use, in `nexus` format (could be all your alignments or a subset).
-You need to have [SWSC-EN](https://github.com/Tagliacollo/PFinderUCE-SWSC-EN) included in your `PATH` variable, otherwise, you should pass the path to the `SWSCEN.py` script to the `--swsc` parameter.
-What **CURE** does is run the `SWSC-EN` in parallel and use `PHYLUCE` to split the alignments according to regions identified by SWSC.
+**CURE** runs [SWSC-EN](https://github.com/Tagliacollo/PFinderUCE-SWSC-EN) in parallel and use `PHYLUCE` to split the alignments according to regions identified by SWSC.
 Then, **CURE** re-concatenates them, creating a charset file to be used in phylogenetic analyses to generate your gene trees (see [**Estimating trees from output files**](#estimating-trees-from-output-files)), treating each UCE region (left flank, core, and right flank) as different partitions.
+
+> Note: `SWSC` is distributed by us with **CURE**. No previous installation of this tools is required.
 
 # Quick usage examples
 
 ## Running the test dataset for the **GeneRegion** strategy
 
 You can test **CURE** with the test dataset.
-It usually takes about two minutes to run with 10 threads.
+It usually takes ~1 minute to run with 2 threads.
 With the command line below, **CURE** will run the **GeneRegion** strategy, concatenating both _by gene_ and _by genic region_.
 
 ```sh
@@ -158,8 +163,7 @@ CURE UCERegion  --phyluce-nexus test_data/uce_nexus/ \
                 --output ./CURE-UCERegion-output
 ```
 
-The above command should raise an error if the `SWSCEN.py` script is not in your `$PATH` variable.
-If this is your case, you can either add the script to the `$PATH` or pass the path for it in the `--swsc` parameter.
+This takes ~10 minutes with 6 threads.
 
 # Output files
 

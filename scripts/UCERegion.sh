@@ -29,9 +29,7 @@ version "$VERSION"
   -o, --output            Output directory
 
 \e[4mOptional arguments\e[0m:
-  -t, --threads           Number of threads for the analysis (Default: 2)
-
-  -s, --swsc              Path to SWSCEN.py script (Default: PATH variable)"
+  -t, --threads           Number of threads for the analysis (Default: 2)"
 
 exit 2
 }
@@ -60,12 +58,12 @@ error_exit() {
 tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
 THREADS=2
-
-SWSC_PATH="SWSCEN.py"
+# Now SWSC is distributed by us!
+SWSC_PATH="$HOME_DIR/SWSC_EN/SWSCEN.py"
 
 # Option strings for arg parser
-SHORT=hp:o:t:s:
-LONG=help,phyluce-nexus:,output:,threads:,version:,swsc:
+SHORT=hp:o:t:
+LONG=help,phyluce-nexus:,output:,threads:,version:
 
 
 # Read options
@@ -85,10 +83,6 @@ while true ; do
 		;;
 		-p | --phyluce-nexus )
 		NEXUS_DIR="$2"
-		shift 2
-		;;
-		-s | --swsc )
-		SWSC_PATH="$2"
 		shift 2
 		;;
         -t | --threads )
@@ -114,9 +108,6 @@ if [ -z "${NEXUS_DIR}" ] || [ -z "${OUTPUT}" ]; then
 	error_exit "Please, supply all arguments correctly."
 fi
 
-tmp=$(realpath "$0")
-HOME_DIR=${tmp%/*}
-
 
 # Print parameters for debuggin
 echo "=========================================================================
@@ -129,7 +120,6 @@ echo "=========================================================================
 NEXUS: ${NEXUS_DIR}
 OUTDIR: ${OUTPUT}
 THREADS: $THREADS
-SWSC PATH: ${SWSC_PATH}
 -------------------------------------------------------------------------"
 
 #=============================================================
@@ -234,16 +224,15 @@ mkdir -p ${SWSC_PARSE}
 # function to parse results
 SWSCParser(){
 	subgroup=$1
-	UCE_PREFIX=$2
-	SWSC_PARSE=$3
-	SUBGROUPS_CAT=$4
+	SWSC=$2
+	SUBGROUPS_CAT=$3
+	SWSC_PARSE=$4
 	OUTPUT=$5
-	SWSC=$6
 	# (1) extract flanks coordenates for this subgroup
 	   # 1st sed: adds 'charset' at the beggining of each line
 	   # 2nd sed: adds 'begin sets;' as first line
 	   # 3rd sed: adds 'end;' as last line
-	grep $UCE_PREFIX ${SWSC}/${subgroup}.nexus_entropy_partition_finder.cfg \
+	grep '_right\|_core\|_left' ${SWSC}/${subgroup}.nexus_entropy_partition_finder.cfg \
 		| sed 's/^/charset /g' \
 		| sed '1 i\begin sets\;' \
 		| sed -e '$aend;' > ${SWSC_PARSE}/${subgroup}.charsets
@@ -273,8 +262,8 @@ if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
         for sg in $(seq 1 $n_subgroups); do
 		# calls function in parallel
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
-                        SWSCParser $sg $UCE_PREFIX $SWSC_PARSE $SUBGROUPS_CAT \
-			$OUTPUT $SWSC > "${LOGDIR}"/swsc_parser.log 2>&1
+                        SWSCParser $sg ${SWSC} ${SUBGROUPS_CAT} ${SWSC_PARSE} \
+						${OUTPUT}> "${LOGDIR}"/swsc_parser.log 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
