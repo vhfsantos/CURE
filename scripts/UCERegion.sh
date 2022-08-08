@@ -204,8 +204,7 @@ if [ -z "$(ls -A "${SWSC}")" ]; then
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
                         $CONDA_PREFIX/bin/python $SWSC_PATH \
                         $( realpath ${SUBGROUPS_CAT}/${sg}/${sg}.nexus ) \
-                        $( realpath $SWSC ) 
-						#> "${LOGDIR}"/swsc.log 2>&1
+                        $( realpath $SWSC ) > "${LOGDIR}"/swsc.log 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
@@ -234,6 +233,7 @@ SWSCParser(){
 	   # 1st sed: adds 'charset' at the beggining of each line
 	   # 2nd sed: adds 'begin sets;' as first line
 	   # 3rd sed: adds 'end;' as last line
+	echo "first grep"
 	grep $UCE_PREFIX ${SWSC}/${subgroup}.nexus_entropy_partition_finder.cfg \
 		| sed 's/^/charset /g' \
 		| sed '1 i\begin sets\;' \
@@ -241,15 +241,18 @@ SWSCParser(){
 
 	# (2) remove old charsets from nexus file of this subgroup
 	   # sed: delete all line after 'begin sets;'
+	echo "s grep"
 	cat ${SUBGROUPS_CAT}/${subgroup}/${subgroup}.nexus \
 		| sed '/begin sets;/,$d' > ${SWSC_PARSE}/${subgroup}.alignment
 
 	# (3) create the new nexus file with flanks as charsets
+	echo "t grep"
 	cat ${SWSC_PARSE}/${subgroup}.alignment \
 		${SWSC_PARSE}/${subgroup}.charsets \
 		> ${SWSC_PARSE}/${subgroup}.nexus
 
 	# (4) call phyluce to split the nexus using the charsets
+	echo "f grep"
 	$CONDA_PREFIX/bin/phyluce_align_split_concat_nexus_to_loci \
 		--nexus ${SWSC_PARSE}/${subgroup}.nexus \
 		--output ${SWSC_PARSE}/${subgroup}/ --log-path ${OUTPUT}/tmp/\
@@ -265,7 +268,7 @@ if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
 		# calls function in parallel
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
                         SWSCParser $sg $UCE_PREFIX $SWSC_PARSE $SUBGROUPS_CAT \
-			$OUTPUT $SWSC > "${LOGDIR}"/swsc_parser.log 2>&1
+			            $OUTPUT $SWSC > "${LOGDIR}"/swsc_parser.log 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
