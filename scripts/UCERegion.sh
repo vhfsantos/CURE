@@ -232,7 +232,7 @@ SWSCParser(){
 	   # 1st sed: adds 'charset' at the beggining of each line
 	   # 2nd sed: adds 'begin sets;' as first line
 	   # 3rd sed: adds 'end;' as last line
-	grep grep '_right\|_core\|_left' ${SWSC}/${subgroup}.nexus_entropy_partition_finder.cfg \
+	grep '_right\|_core\|_left' ${SWSC}/${subgroup}.nexus_entropy_partition_finder.cfg \
 		| sed 's/^/charset /g' \
 		| sed '1 i\begin sets\;' \
 		| sed -e '$aend;' > ${SWSC_PARSE}/${subgroup}.charsets
