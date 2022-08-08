@@ -1,5 +1,6 @@
 <p align="center"><img src="misc/logo.png" alt="CURE" width="100%"></p>
 
+[![Github All Releases](https://img.shields.io/github/downloads/vhfsantos/CURE/total.svg)]()
 
 # Table of contents
 
