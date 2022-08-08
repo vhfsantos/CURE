@@ -59,7 +59,7 @@ tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
 THREADS=2
 # Now SWSC is distributed by us!
-SWSC_PATH="$HOME_DIR/scripts/SWSC_EN/SWSCEN.py"
+SWSC_PATH="$HOME_DIR/SWSC_EN/SWSCEN.py"
 
 # Option strings for arg parser
 SHORT=hp:o:t:
