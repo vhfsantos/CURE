@@ -228,7 +228,6 @@ SWSCParser(){
 	SWSC_PARSE=$3
 	SUBGROUPS_CAT=$4
 	OUTPUT=$5
-	SWSC=$6
 	# (1) extract flanks coordenates for this subgroup
 	   # 1st sed: adds 'charset' at the beggining of each line
 	   # 2nd sed: adds 'begin sets;' as first line
@@ -264,7 +263,7 @@ if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
 		# calls function in parallel
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
                         SWSCParser $sg $UCE_PREFIX $SWSC_PARSE $SUBGROUPS_CAT \
-			            $OUTPUT $SWSC > "${LOGDIR}"/swsc_parser.log 2>&1
+			            $OUTPUT > "${LOGDIR}"/swsc_parser.log 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
