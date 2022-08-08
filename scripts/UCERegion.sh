@@ -224,6 +224,10 @@ mkdir -p ${SWSC_PARSE}
 # function to parse results
 SWSCParser(){
 	subgroup=$1
+	SWSC=$2
+	SUBGROUPS_CAT=$3
+	SWSC_PARSE=$4
+	OUTPUT=$5
 	# (1) extract flanks coordenates for this subgroup
 	   # 1st sed: adds 'charset' at the beggining of each line
 	   # 2nd sed: adds 'begin sets;' as first line
@@ -258,7 +262,8 @@ if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
         for sg in $(seq 1 $n_subgroups); do
 		# calls function in parallel
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
-                        SWSCParser $sg > "${LOGDIR}"/swsc_parser.log 2>&1
+                        SWSCParser $sg ${SWSC} ${SUBGROUPS_CAT} ${SWSC_PARSE} \
+						${OUTPUT}> "${LOGDIR}"/swsc_parser.log 2>&1
                 "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
