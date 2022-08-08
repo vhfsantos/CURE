@@ -161,6 +161,8 @@ CURE UCERegion  --phyluce-nexus test_data/uce_nexus/ \
 The above command should raise an error if the `SWSCEN.py` script is not in your `$PATH` variable.
 If this is your case, you can either add the script to the `$PATH` or pass the path for it in the `--swsc` parameter.
 
+> This step might take ~
+
 # Output files
 
 The main output files produced by **CURE** are the alignments of concatenated and cured UCEs. Each of the two strategies, however, produces different output files.
