@@ -63,6 +63,7 @@ After done all installations, activate the CURE environment and run **CURE** wit
 ```
 conda activate cure
 ./CURE
+*You should always include the full path to the executable file
 ```
 
 # How CURE works
@@ -118,11 +119,11 @@ It usually takes ~1 minute to run with 2 threads.
 With the command line below, **CURE** will run the **GeneRegion** strategy, concatenating both _by gene_ and _by genic region_.
 
 ```sh
-CURE GeneRegion --baits test_data/baits.fasta  \
-                --reference test_data/ref.fa \
-                --gff test_data/ref.gff \
-                --phyluce-nexus test_data/uce_nexus/ \
-                --output ./CURE-GeneRegion-output
+./CURE GeneRegion --baits test_data/baits.fasta  \
+                  --reference test_data/ref.fa \
+                  --gff test_data/ref.gff \
+                  --phyluce-nexus test_data/uce_nexus/ \
+                  --output ./CURE-GeneRegion-output
 ```
 
 ### Running only one of the concatenating approaches of the **GeneRegion** strategy
@@ -133,23 +134,23 @@ However, you can raise the `--only-by-gene` or `--only-by-genic-region` flag to 
 #### Only by gene
 
 ```sh
-CURE GeneRegion --baits test_data/baits.fasta  \
-                --reference test_data/ref.fa \
-                --gff test_data/ref.gff \
-                --phyluce-nexus test_data/uce_nexus/ \
-                --output ./CURE-GeneRegion-output \
-                --only-by-gene
+./CURE GeneRegion --baits test_data/baits.fasta  \
+                  --reference test_data/ref.fa \
+                  --gff test_data/ref.gff \
+                  --phyluce-nexus test_data/uce_nexus/ \
+                  --output ./CURE-GeneRegion-output \
+                  --only-by-gene
 ```
 
 #### Only by genic region
 
 ```sh
-CURE GeneRegion --baits test_data/baits.fasta  \
-                --reference test_data/ref.fa \
-                --gff test_data/ref.gff \
-                --phyluce-nexus test_data/uce_nexus/ \
-                --output ./CURE-GeneRegion-output \
-                --only-by-genic-region
+./CURE GeneRegion --baits test_data/baits.fasta  \
+                  --reference test_data/ref.fa \
+                  --gff test_data/ref.gff \
+                  --phyluce-nexus test_data/uce_nexus/ \
+                  --output ./CURE-GeneRegion-output \
+                  --only-by-genic-region
 ```
 
 
@@ -158,8 +159,8 @@ CURE GeneRegion --baits test_data/baits.fasta  \
 To run the test dataset for the **UCERegion** strategy, use the following command line:
 
 ```sh
-CURE UCERegion  --phyluce-nexus test_data/uce_nexus/ \
-                --output ./CURE-UCERegion-output
+./CURE UCERegion  --phyluce-nexus test_data/uce_nexus/ \
+                  --output ./CURE-UCERegion-output
 ```
 
 This takes ~10 minutes with 6 threads.
