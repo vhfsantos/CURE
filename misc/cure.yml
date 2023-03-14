@@ -104,7 +104,6 @@ dependencies:
   - more-itertools=8.7.0=pyhd8ed1ab_0
   - mpi=1.0=openmpi
   - muscle=3.8.1551=hc9558a2_5
-  - nbformat=5.1.2=pyhd8ed1ab_1
   - ncurses=6.2=h58526e2_4
   - numpy=1.19.5=py36h2aa4a07_1
   - olefile=0.46=pyh9f0ad1d_1

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-VERSION=1.0.1
+VERSION=1.0.2
 
 Usage() {
 echo -e "
@@ -35,8 +35,8 @@ error_exit() {
 
 # Check dependencies
 check_deps() {
-	for app in $CONDA_PREFIX/bin/blastn $CONDA_PREFIX/bin/parallel $CONDA_PREFIX/bin/phyluce_align_concatenate_alignments; do
-        	command -v $app >/dev/null 2>&1 || \
+	for app in blastn parallel phyluce_align_concatenate_alignments; do
+        	command -v $CONDA_PREFIX/bin/$app >/dev/null 2>&1 || \
 			error_exit "Cannot find ${app} in your PATH variable\nDid you activate the cure environment?"
 	done
 }
@@ -54,7 +54,7 @@ degraded DNA. In prep.
 Bye\033[0m"
 }
 # Check deps
-#check_deps
+check_deps
 
 tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
@@ -71,11 +71,11 @@ case $COMMAND in
                 Usage; exit
                 ;;
                 GeneRegion )
-                ${HOME_DIR}/scripts/GeneRegion.sh --version $VERSION $ARGS
+                bash ${HOME_DIR}/scripts/GeneRegion.sh --version $VERSION $ARGS
                 BYEmsg
                 ;;
                 UCERegion )
-                ${HOME_DIR}/scripts/UCERegion.sh --version $VERSION $ARGS
+                bash ${HOME_DIR}/scripts/UCERegion.sh --version $VERSION $ARGS
                 BYEmsg
                 ;;
                 * )

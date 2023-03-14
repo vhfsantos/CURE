@@ -134,6 +134,12 @@ subgroups_dir="${OUTPUT}/tmp/001-subgroups"
 N_UCES=$(find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l)
 n_subgroups=$((`find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l`/16))
 
+# workaround when less than 16 nexus:
+if (( $n_subgroups == 0 )); then 
+	n_subgroups=1
+fi
+
+
 if [ -z "$(ls -A "${NEXUSCOPY}")" ]; then
 	log "Preparing input data..."
 	log "Splitted $N_UCES UCEs into $n_subgroups subgroups"
@@ -176,7 +182,7 @@ if [ -z "$(ls -A "${SUBGROUPS_CAT}")" ]; then
                         --alignments "${subgroups_dir}/$sg" \
                         --nexus --log "${LOGDIR}" \
                         --output "${SUBGROUPS_CAT}/$sg" > /dev/null 2>&1
-                "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
+                bash "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
         DONEmsg
@@ -205,7 +211,7 @@ if [ -z "$(ls -A "${SWSC}")" ]; then
                         $CONDA_PREFIX/bin/python $SWSC_PATH \
                         $( realpath ${SUBGROUPS_CAT}/${sg}/${sg}.nexus ) \
                         $( realpath $SWSC ) > "${LOGDIR}"/swsc.log 2>&1
-                "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
+                bash "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
         DONEmsg
@@ -232,7 +238,7 @@ SWSCParser(){
 	   # 1st sed: adds 'charset' at the beggining of each line
 	   # 2nd sed: adds 'begin sets;' as first line
 	   # 3rd sed: adds 'end;' as last line
-	grep '_right\|_core\|_left' ${SWSC}/${subgroup}.nexus_entropy_partition_finder.cfg \
+	grep '_right\|_core\|_left\|_all' ${SWSC}/${subgroup}.nexus_entropy_partition_finder.cfg \
 		| sed 's/^/charset /g' \
 		| sed '1 i\begin sets\;' \
 		| sed -e '$aend;' > ${SWSC_PARSE}/${subgroup}.charsets
@@ -264,7 +270,7 @@ if [ -z "$(ls -A "${SWSC_PARSE}")" ]; then
                 $CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
                         SWSCParser $sg ${SWSC} ${SUBGROUPS_CAT} ${SWSC_PARSE} \
 						${OUTPUT}> "${LOGDIR}"/swsc_parser.log 2>&1
-                "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
+                bash "${HOME_DIR}"/progress-bar.sh $sg "$n_subgroups"
         done
         $CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
         DONEmsg
@@ -336,6 +342,14 @@ search = rclusterf;" > ${UCES_CAT}/PF2-input/footer
 
 	# (6) Get alignment from tmp dir
 	mv ${UCES_CAT}/PF2-input/PF2-input.phylip "${OUTPUT}/PF2-input/"
+
+
+
+	### 1') Create charsets for IQ-tree
+	cat "${UCES_CAT}"/PF2-input/PF2-input.charsets \
+		| sed '1 i\#nexus' \
+		| sed '/charpartition combined/d' > "${OUTPUT}/UCEcharsets.nexus"
+
 else
 	warn "PF2 input already exists. Skipping"
 fi
@@ -397,7 +411,7 @@ if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 			--alignments "$uce" --phylip --log ${OUTPUT}/tmp/ \
 			--output "${CAT_UCES}"/NEXUS/"${uce_name}" > /dev/null 2>&1
-		"${HOME_DIR}"/progress-bar.sh $AUX "$N_UCES"
+		bash "${HOME_DIR}"/progress-bar.sh $AUX "$N_UCES"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	DONEmsg
