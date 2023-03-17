@@ -80,8 +80,8 @@ error_exit() {
 
 # Check dependencies
 check_deps() {
-	for app in $CONDA_PREFIX/bin/blastn $CONDA_PREFIX/bin/parallel $CONDA_PREFIX/bin/phyluce_align_concatenate_alignments; do
-        	command -v $app >/dev/null 2>&1 || \
+	for app in blastn parallel phyluce_align_concatenate_alignments; do
+        	command -v $CONDA_PREFIX/bin/$app >/dev/null 2>&1 || \
 			error_exit "Cannot find ${app} in your PATH variable\nDid you activate the cure environment?"
 	done
 }
@@ -427,7 +427,7 @@ if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 			--alignments "$dir" --nexus --log "${LOGDIR}" \
 			--output "${ALL_EXONS_DIR}"/"${GENEID__EXONID}" > /dev/null 2>&1
-		"${HOME_DIR}"/progress-bar.sh $AUX "$N_DIRS"
+		bash "${HOME_DIR}"/progress-bar.sh $AUX "$N_DIRS"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	DONEmsg
@@ -468,7 +468,7 @@ if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 			--alignments "$dir" --nexus --log "${LOGDIR}" \
 			--output "${ALL_INTRONS_DIR}"/"${GENEID}" > /dev/null 2>&1
-		"${HOME_DIR}"/progress-bar.sh $AUX "$N_DIRS"
+		bash "${HOME_DIR}"/progress-bar.sh $AUX "$N_DIRS"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	DONEmsg
@@ -583,7 +583,7 @@ if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 			--phylip --input-format nexus --log "${LOGDIR}" \
 			--output "${GENE_MERGED_BASEDIR}"/"${GENEID}" \
 			> /dev/null 2> /dev/null
-		"${HOME_DIR}"/progress-bar.sh $AUX "$N_PREPDIRS"
+		bash "${HOME_DIR}"/progress-bar.sh $AUX "$N_PREPDIRS"
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	DONEmsg
