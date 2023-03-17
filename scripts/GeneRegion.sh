@@ -23,14 +23,6 @@ warn() {
 DONEmsg() {
 	echo -e "[ CURE v$VERSION | $(date +%Y-%m-%d" "%H:%M:%S) ] Done!"
 }
-# "Bye" message function (green text)
-BYEmsg() {
-	echo -e "\033[1;32m[ CURE v$VERSION | $(date +%Y-%m-%d" "%H:%M:%S) ] ALL DONE!\033[0m"
-	echo -e "
-\033[1;32mThis is a goodbye message.
-Probably will have citation, mail contact, and more.
-Bye\033[0m"
-}
 
 # Usage function
 Usage() {
