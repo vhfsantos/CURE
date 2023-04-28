@@ -23,7 +23,7 @@ usage() {
 echo -e "
 =========================================================================
                                     CURE
-				   \e[4mC\e[0muration of \e[4mU\e[0mltraconse\e[4mR\e[0mved \e[4mE\e[0mlements
+        	\e[4mC\e[0muration of \e[4mU\e[0mltraconse\e[4mR\e[0mved \e[4mE\e[0mlements
           by Vinícius Franceschini-Santos & Felipe V Freitas
 -------------------------------------------------------------------------
                               estimate trees
@@ -180,11 +180,6 @@ if [ -z "${OUT}" ]; then
 	error_exit "Please, supply the output directory name."
 fi
 
-# Check if the outputs of CURE were provided
-if [ -z "${GeneRegion_OUT}" ] && [ -z "${UCERegion_OUT}" ]; then
- 	error_exit "Please, supply any output of CURE with --gene-region-out or --uce-region-out"
-fi
-
 # Check if none input was provided
 if [ -z "${GeneRegion_OUT}" ] && [ -z "${UCERegion_OUT}" ] && [ -z "${CUSTOM_ALI}" ]; then
  	error_exit "Please, supply the input alignments directory."
@@ -207,8 +202,8 @@ Run_IQtree_NEXUS() {
 	OUT_DIR="$2"
 	TODO="$3"
 	mkdir -p "${OUT_DIR}"
-	NEXUS=$(find "$NEXUS_DIR" -name *.nexus)
-	N_NEXUS=$(find "$NEXUS_DIR" -name *.nexus | wc -l)
+	NEXUS=$(find "$NEXUS_DIR" -name "*.nexus")
+	N_NEXUS=$(find "$NEXUS_DIR" -name "*.nexus" | wc -l)
 	AUX=0
 	if [ "$TODO" == "Run" ]; then
         	echo "- Estimating trees for files in $NEXUS_DIR"
@@ -216,12 +211,13 @@ Run_IQtree_NEXUS() {
 	fi
 	# run
 	for alignment in $NEXUS; do
+	        #echo "running $alignment"
 		AUX=$(( $AUX+1 ))
 		file=$(basename "$alignment")
 		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs $THREADS \
-			$CONDA_PREFIX/bin/iqtree -s "$alignment" --quiet --prefix "$OUT_DIR"/${file%.*} \
-			-bb 1000 -alrt 1000 --threads-max 1
-		${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
+			$CONDA_PREFIX/bin/iqtree -s "$alignment" --prefix "$OUT_DIR"/${file%.*} \
+			-bb 1000 -alrt 1000 --quiet --threads-max 1
+		bash ${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	echo "- Done"
@@ -234,8 +230,8 @@ Run_IQtree_PHYLIP() {
 	OUT_DIR="$2"
 	TODO="$3"
 	mkdir -p "${OUT_DIR}"
-	PHYLIP=$(find "$PHYLIP_DIR" -name *.phylip)
-	N_PHYLIP=$(find "$PHYLIP_DIR" -name *.phylip | wc -l)
+	PHYLIP=$(find "$PHYLIP_DIR" -name "*.phylip")
+	N_PHYLIP=$(find "$PHYLIP_DIR" -name "*.phylip" | wc -l)
 	AUX=0
 	if [ "$TODO" == "Run" ]; then
 	        echo "- Estimating trees for files in $PHYLIP_DIR"
@@ -249,7 +245,7 @@ Run_IQtree_PHYLIP() {
 			$CONDA_PREFIX/bin/iqtree -s "$alignment" -spp "$PHYLIP_DIR"/${file%.*}.charsets \
 			--quiet --prefix "$OUT_DIR"/${file%.*} \
 			-bb 1000 --threads-max 1
-		${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
+		bash ${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	echo "- Done"
@@ -277,7 +273,7 @@ Run_IQtree_CUSTOM() {
 			$CONDA_PREFIX/bin/iqtree -s "$alignment" --quiet \
 			--prefix "$OUT_DIR"/${file%.*} -bb 1000 -alrt 1000 \
 			--threads-max 1
-		${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
+		bash ${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	echo "- Done"
@@ -308,6 +304,7 @@ else
     echo "- Running IQ-Tree for CURE GeneRegion files"
 	echo "-------------------------------------------"
 	# Running for intergenic regions
+	mkdir -p "$IQTREE_OUT"/"intergenic-regions"
 	if [ -z "$(ls -A "$IQTREE_OUT"/"intergenic-regions")" ]; then
 		Run_IQtree_NEXUS "$GeneRegion_OUT"/intergenic-regions \
 		                 "$IQTREE_OUT"/intergenic-regions \
@@ -322,6 +319,7 @@ else
 
 	# Running for concatenated by genic region
 	if [ "$ONLY_BY_GENE" == "False" ]; then
+	        mkdir -p "$IQTREE_OUT"/"concatenated-by-genic-region"
 		if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-genic-region")" ]; then
 			Run_IQtree_NEXUS "$GeneRegion_OUT"/concatenated-by-genic-region \
 			                 "$IQTREE_OUT"/concatenated-by-genic-region \
@@ -354,6 +352,7 @@ else
 
 	# Create output concatenated by gene
 	if [ "$ONLY_BY_REGION" == "False" ]; then
+	        mkdir -p "$IQTREE_OUT"/"concatenated-by-gene"
 		if [ -z "$(ls -A "$IQTREE_OUT"/"concatenated-by-gene")" ]; then
 		    # $IQTREE_OUT"/"
 			Run_IQtree_PHYLIP "$GeneRegion_OUT"/concatenated-by-gene \
@@ -400,6 +399,7 @@ else
 	cat "$IQTREE_OUT"/UCERegion/*treefile \
 		> "$UR_ASTRAL"/partitioned-uces.tre
 
+fi
 echo "- All done!
 
 If you make use of CURE in your research, please cite:
