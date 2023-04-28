@@ -422,6 +422,7 @@ if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
 		uce_name=$(basename $uce)
 		cat $uce \
 		| sed 's/charpartition combined =.*//;s/.nexus//g' \
+		| sed '1i #NEXUS' \
 		> ${OUTPUT}/partitioned-uces/${uce_name}
 	done
 	DONEmsg

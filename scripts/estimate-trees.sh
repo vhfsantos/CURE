@@ -124,6 +124,7 @@ check_deps() {
 	done
 }
 
+
 # Read options
 OPTS=$(getopt --options $SHORT --long $LONG --name "$0" -- "$@")
 if [ $? != 0 ]; then error_exit "Failed to parse options...exiting."; fi
@@ -245,7 +246,7 @@ Run_IQtree_PHYLIP() {
 			$CONDA_PREFIX/bin/iqtree -s "$alignment" -spp "$PHYLIP_DIR"/${file%.*}.charsets \
 			--quiet --prefix "$OUT_DIR"/${file%.*} \
 			-bb 1000 --threads-max 1
-		bash ${HOME_DIR}/progress-bar.sh $AUX $N_NEXUS
+		bash ${HOME_DIR}/progress-bar.sh $AUX $N_PHYLIP
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	echo "- Done"
@@ -332,7 +333,7 @@ else
 			echo "- Preparing ASTRAL input (by genic region)"
 			mkdir -p $GR_BY_GENIC_REG
 			# only exons
-			cat "$IQTREE_OUT"/concatenated-by-genic-region/*__exon-*treefile \
+			cat "$IQTREE_OUT"/concatenated-by-genic-region/*__exon*treefile \
 				> "$GR_BY_GENIC_REG"/only-exons.tre
 			# only introns
 			cat "$IQTREE_OUT"/concatenated-by-genic-region/*__introns.treefile \
