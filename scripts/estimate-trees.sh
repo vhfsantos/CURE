@@ -405,6 +405,6 @@ echo "- All done!
 
 If you make use of CURE in your research, please cite:
 
-Freitas et al (2022). UCE phylogenomics, biogeography, and classification of long-horned 
+Freitas et al (2023). UCE phylogenomics, biogeography, and classification of long-horned 
 bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely 
 degraded DNA. In prep."
