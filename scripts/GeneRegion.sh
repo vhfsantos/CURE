@@ -648,7 +648,7 @@ rm -rf ${OUTPUT}/phyluce_align_concatenate_alignments.log
 DONEmsg
 echo "- All done!
 
-If you make use of the GENRegion strategy in your research, please cite also the original paper describing the method:
+If you make use of the GeneRegion strategy in your research, please cite also the original paper describing the method:
 
 Van Dam et al. (2021). Genomic Characterization and Curation of UCEs 
 Improves Species Tree Reconstruction. https://doi.org/10.1093/sysbio/syaa063."
