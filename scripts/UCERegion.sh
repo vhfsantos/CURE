@@ -304,7 +304,7 @@ if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 
 	# (3) Header of .cfg file
 	echo "## ALIGNMENT FILE ##
-alignment = PF2-input.phylip;
+alignment = alignment.phylip;
 
 ## BRANCHLENGTHS: linked | unlinked ##
 branchlengths = linked;
@@ -341,15 +341,15 @@ search = rclusterf;" > ${UCES_CAT}/PF2-input/footer
 		> "${OUTPUT}/PF2-input/PF2-input.cfg"
 
 	# (6) Get alignment from tmp dir
-	mv ${UCES_CAT}/PF2-input/PF2-input.phylip "${OUTPUT}/PF2-input/"
+	mv ${UCES_CAT}/PF2-input/PF2-input.phylip "${OUTPUT}/PF2-input/alignment.phylip"
 
 
 
 	### 1') Create charsets for IQ-tree
 	cat "${UCES_CAT}"/PF2-input/PF2-input.charsets \
 		| sed '1 i\#nexus' \
-		| sed '/charpartition combined/d' > "${OUTPUT}/UCEcharsets.nexus"
-
+		| sed '/charpartition combined/d' > "${OUTPUT}/PF2-input/partitionedUCEs.charsets"
+	DONEmsg
 else
 	warn "PF2 input already exists. Skipping"
 fi
@@ -384,7 +384,7 @@ if [ -z "$(ls -A "${CAT_UCES}")" ]; then
 				${CAT_UCES}/$uce_name
 		fi
     done
-	DONEmsg
+	
 else
 	warn "UCEs already prepared for concatenation. Skipping"
 fi
@@ -397,7 +397,6 @@ fi
 
 mkdir -p "${CAT_UCES}"/NEXUS/
 if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
-	log "Concatenating UCEs..."
 	# (2) concatenating with PHYLUCE in parallel
 	UCE_DIRS=$(find ${CAT_UCES} -mindepth 1 -type d)
 	N_UCES=$(find ${CAT_UCES} -mindepth 1 -type d | wc -l)
@@ -415,10 +414,16 @@ if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
 	done
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
 	DONEmsg
-
-	log "Writing final nexus files..."
-	# fix charsets and mv to output dir
-	for uce in $(find "${CAT_UCES}"/NEXUS/ -type f); do
+	
+	log "Writing final files..."
+		# mv phylip to output dir
+	for uce in $(find "${CAT_UCES}"/NEXUS/ -name "*.phylip" -type f ); do
+	uce_name=$(basename $uce)
+		mv $uce ${OUTPUT}/partitioned-uces/${uce_name}
+	done
+	
+	# fix charsets and mv them to output dir
+	for uce in $(find "${CAT_UCES}"/NEXUS/ -name "*.charsets" -type f ); do
 		uce_name=$(basename $uce)
 		cat $uce \
 		| sed 's/charpartition combined =.*//;s/.nexus//g' \
@@ -426,6 +431,7 @@ if [ -z "$(ls -A "${CAT_UCES}/NEXUS/")" ]; then
 		> ${OUTPUT}/partitioned-uces/${uce_name}
 	done
 	DONEmsg
+	
 else
 	warn "UCEs already concatenated. Skipping"
 fi
@@ -434,10 +440,14 @@ fi
 #====                       STEP 7:                       ====
 #====                  Remove tmp files                   ====
 #=============================================================
-
+	log "Removing temp files..."
 if test -f "${OUTPUT}/tmp/phyluce_align_concatenate_alignments.log"; then
 	rm -rf ${OUTPUT}/tmp/
 	DONEmsg
 else
 	warn "Temporary files already removed. Skipping"
 fi
+echo "If you make use of the GENRegion strategy in your research, please cite the original paper describing the method:
+
+Freitas et al (2021) Partitioned Gene-Tree Analyses and Gene-Based Topology Testing Help Resolve 
+Incongruence in a Phylogenomic Study of Host-Specialist Bees (Apidae: Eucerinae). https://doi.org/10.1093/molbev/msaa277."
