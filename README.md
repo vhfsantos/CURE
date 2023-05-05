@@ -94,7 +94,7 @@ When concatenating *by genic region*, **CURE** merges only UCEs from the region 
 It stores the results in `nexus` format inside the `concatenated_by_genic_region/` directory.
 Further phylogenetic analysis of UCEs merged with this approach would yield several phylogenetic trees, one originating from each region.
 
-<p align="center"><img src="misc/img/cat_by_region.png" alt="input" width="80%"></p>
+<p align="center"><img src="misc/img/cat_by_region-01.png" alt="input" width="80%"></p>
 
 For any of the two concatenating approaches, **CURE** leaves unmerged UCEs in intergenic regions.
 These UCEs are just copied to the `intergenic_regions/` directory.
