@@ -175,7 +175,7 @@ The main output files produced by **CURE** are the alignments of concatenated an
 
 * `logfiles/`: stores all the log files generated in the analysis
 * `partitioned-uces/`: stores all the alignments and their respective charsets files
-* `PF2-input/`: stores the input file for a putative downstream analysis with PartitionFinder2
+* `concatenated-uces/`: stores the concatenated alignment, a charset file with the results of SWSC-EN in nexus format and a input file for a putative downstream analysis with PartitionFinder2
 
 ## Output files of **GeneRegion** strategy
 
@@ -264,7 +264,7 @@ scripts/estimate-trees.sh \
 
 If you use **CURE** in your research, please cite:
 
-Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida, (2022). UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. In prep.
+Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida, (2023). UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. Insect Systematics and Diversity. https://doi.org/10.1093/isd/ixad012
 
 # License
 
