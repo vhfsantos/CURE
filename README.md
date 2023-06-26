@@ -176,6 +176,7 @@ The main output files produced by **CURE** are the alignments of concatenated an
 * `logfiles/`: stores all the log files generated in the analysis
 * `partitioned-uces/`: stores all the alignments and their respective charsets files
 * `PF2-input/`: stores the input file for a putative downstream analysis with PartitionFinder2
+* `UCEcharsets.nexus/`: here you have a charset file in nexus with the results of SWSC-EN analysis. The order of loci is the same in the phylip file in the PF2-input folder. You can use these two files to run ModelFinder2 in IQ-TREE instead of using PartitionFinder2 to combine the partitions.
 
 ## Output files of **GeneRegion** strategy
 
