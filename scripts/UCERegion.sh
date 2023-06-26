@@ -283,12 +283,12 @@ fi
 #====                Generating PF2 input                 ====
 #=============================================================
 
-UCES_CAT=${OUTPUT}/tmp/005-input-PF2/
+UCES_CAT=${OUTPUT}/tmp/005-concatenated-uces/
 mkdir -p ${UCES_CAT}
 
 
 if [ -z "$(ls -A "${UCES_CAT}")" ]; then
-	log "Generating input for PartitionFinder2..."
+	log "Generating concatenated files and PF2 input..."
 	# (1) Place all subgroups nexus to a same dir
 	for sg in $(seq 1 $n_subgroups); do
 	$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS"
@@ -300,7 +300,7 @@ if [ -z "$(ls -A "${UCES_CAT}")" ]; then
 	$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
 		--alignments "${UCES_CAT}" \
 		--phylip --log "${LOGDIR}" \
-		--output "${UCES_CAT}/PF2-input" > /dev/null 2>&1
+		--output "${UCES_CAT}/concatenated-uces" > /dev/null 2>&1
 
 	# (3) Header of .cfg file
 	echo "## ALIGNMENT FILE ##
@@ -316,39 +316,39 @@ models = GTR+G;
 model_selection = aicc;
 
 ## DATA BLOCKS: see manual for how to define ##
-[data_blocks]" > ${UCES_CAT}/PF2-input/header
+[data_blocks]" > ${UCES_CAT}/concatenated-uces/header
 
 	# (4) Body of .cfg file
 	   # 1st sed: delete all after charpartition combined
 	   # 2nd sed: remove 'begin sets;'
 	   # 3rd sed: remove 'charset ' from beggining of lines
-	cat "${UCES_CAT}"/PF2-input/PF2-input.charsets \
+	cat "${UCES_CAT}"/concatenated-uces/PF2-input.charsets \
 		| sed '/charpartition combined/,$d' \
 		| sed 's/begin sets;//g' \
 		| sed 's/^charset //g' | tail -n +3 \
-		> ${UCES_CAT}/PF2-input/body
+		> ${UCES_CAT}/concatenated-uces/body
 
 	# (5) Footer of .cfg file
 	echo "
 ## SCHEMES, search: all | user | greedy | rcluster | hcluster | kmeans ##
 [schemes]
-search = rclusterf;" > ${UCES_CAT}/PF2-input/footer
+search = rclusterf;" > ${UCES_CAT}/concatenated-uces/footer
 
-	mkdir -p "${OUTPUT}/PF2-input/"
-	cat ${UCES_CAT}/PF2-input/header \
-		${UCES_CAT}/PF2-input/body \
-		${UCES_CAT}/PF2-input/footer \
-		> "${OUTPUT}/PF2-input/PF2-input.cfg"
+	mkdir -p "${OUTPUT}/concatenated-uces/"
+	cat ${UCES_CAT}/concatenated-uces/header \
+		${UCES_CAT}/concatenated-uces/body \
+		${UCES_CAT}/concatenated-uces/footer \
+		> "${OUTPUT}/concatenated-uces/PF2-input.cfg"
 
 	# (6) Get alignment from tmp dir
-	mv ${UCES_CAT}/PF2-input/PF2-input.phylip "${OUTPUT}/PF2-input/"
+	mv ${UCES_CAT}/concatenated-uces/concatenated-uces-swscen.phylip "${OUTPUT}/concatenated-uces/"
 
 
 
 	### 1') Create charsets for IQ-tree
-	cat "${UCES_CAT}"/PF2-input/PF2-input.charsets \
+	cat "${UCES_CAT}"/concatenated-uces/PF2-input.charsets \
 		| sed '1 i\#nexus' \
-		| sed '/charpartition combined/d' > "${OUTPUT}/UCEcharsets.nexus"
+		| sed '/charpartition combined/d' > "${OUTPUT}/concatenated-uces-swscen.charsets"
 
 else
 	warn "PF2 input already exists. Skipping"
