@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-VERSION=1.0.2
+VERSION=1.0.3
 
 Usage() {
 echo -e "
@@ -47,9 +47,9 @@ BYEmsg() {
 	echo -e "
 \033[1;32mIf you make use of CURE in your research, please cite:
 
-Freitas et al (2022). UCE phylogenomics, biogeography, and classification of long-horned 
+Freitas et al (2023). UCE phylogenomics, biogeography, and classification of long-horned 
 bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely 
-degraded DNA. In prep.
+degraded DNA. Insect Systematics and Diversity. https://doi.org/10.1093/isd/ixad012
 
 Bye\033[0m"
 }
