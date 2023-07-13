@@ -264,7 +264,7 @@ scripts/estimate-trees.sh \
 
 If you use **CURE** in your research, please cite:
 
-Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida, (2023). UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. Insect Systematics and Diversity. https://doi.org/10.1093/isd/ixad012
+> [**Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida**. UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. _Insect Systematics and Diversity_, 2023](https://doi.org/10.1093/isd/ixad012)
 
 # License
 
