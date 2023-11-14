@@ -129,10 +129,10 @@ THREADS: $THREADS
 
 NEXUSCOPY=${OUTPUT}/tmp/000-nexus-copy/
 mkdir -p ${NEXUSCOPY}
-UCEs_in_subgroup=15
 subgroups_dir="${OUTPUT}/tmp/001-subgroups"
 N_UCES=$(find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l)
-n_subgroups=$((`find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l`/16))
+n_subgroups=$(echo "scale=0; (($(find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l) + ${THREADS} - 1) / ${THREADS})" | bc -l)
+UCEs_in_subgroup=$(echo "scale=0; (($(find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l) + $n_subgroups - 1) / $n_subgroups)" | bc -l)
 
 # workaround when less than 16 nexus:
 if (( $n_subgroups == 0 )); then 
