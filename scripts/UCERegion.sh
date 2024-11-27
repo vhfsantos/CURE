@@ -131,8 +131,8 @@ NEXUSCOPY=${OUTPUT}/tmp/000-nexus-copy/
 mkdir -p ${NEXUSCOPY}
 subgroups_dir="${OUTPUT}/tmp/001-subgroups"
 N_UCES=$(find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l)
-n_subgroups=$(echo "scale=0; (($(find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l) + ${THREADS} - 1) / ${THREADS})" | bc -l)
-UCEs_in_subgroup=$(echo "scale=0; (($(find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l) + $n_subgroups - 1) / $n_subgroups)" | bc -l)
+n_subgroups=$THREADS
+UCEs_in_subgroup=$(echo "scale=0; ($(find ${NEXUS_DIR} -maxdepth 1 -type f | wc -l) / $n_subgroups)" | bc -l)
 
 # workaround when less than 16 nexus:
 if (( $n_subgroups == 0 )); then 
@@ -321,11 +321,13 @@ model_selection = aicc;
 	# (4) Body of .cfg file
 	   # 1st sed: delete all after charpartition combined
 	   # 2nd sed: remove 'begin sets;'
-	   # 3rd sed: remove 'charset ' from beggining of lines
+	   # 3rd sed: remove 'charset ' from beggining of lines;
+	   # 4rd sed: remove ".nexus" from partition names
 	cat "${UCES_CAT}"/concatenated-uces/concatenated-uces.charsets \
 		| sed '/charpartition combined/,$d' \
 		| sed 's/begin sets;//g' \
 		| sed 's/^charset //g' | tail -n +3 \
+		| sed 's/.nexus//g' \
 		> ${UCES_CAT}/concatenated-uces/body
 
 	# (5) Footer of .cfg file
