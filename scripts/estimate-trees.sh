@@ -7,7 +7,8 @@ trap 'echo - Ignoring a SIGHUP received..' SIGHUP
 error_exit() {
 	msg=$1
 	>&2 echo -e "\033[1;31mERROR: ${msg}\033[0m"
-	usage
+	usage >&2
+	exit 2
 }
 
 function ctrl_c() {
@@ -18,97 +19,51 @@ function ctrl_c() {
 	exit 1
 
 }
-# usage
+# Help text for the supported command-line interface.
 usage() {
-echo -e "
-=========================================================================
-                                    CURE
-        	\e[4mC\e[0muration of \e[4mU\e[0mltraconse\e[4mR\e[0mved \e[4mE\e[0mlements
-          by Vinícius Franceschini-Santos & Felipe V Freitas
--------------------------------------------------------------------------
-                              estimate trees
--------------------------------------------------------------------------
+cat <<'HELP'
+CURE - estimate trees
 
-\e[4mUsage\e[0m:
- estimate-trees.sh --cure-out <path/to/cure-out> \\
-                   --iqtree-out <path/to/iqtree-out>
+Usage:
+  estimate-trees.sh --estimated-trees <output-dir> [input options] [options]
 
-\e[4mRequired arguments\e[0m:
- --gene-region-out           Path to alignments produced by CURE GeneRegion
- 
- --uce-region-out            Path to alignments produced by CURE UCERegion
- 
- --estimated-trees           Output directory name
+Input options (provide at least one):
+  --gene-region-out <dir>      CURE GeneRegion output directory
+  --uce-region-out <dir>       CURE UCERegion output directory
+  --custom-alignments <dir>    Directory of FASTA, PHYLIP, or NEXUS alignments
+                               (.fa, .fasta, .phy, .phylip, .nex, .nexus)
 
+Required output option:
+  --estimated-trees <dir>      Directory for IQ-TREE results and ASTRAL input
 
-\e[4mOptional arguments\e[0m:
- --threads                    Number of threads for the analysis (Default: 2)
- 
- --only-by-gene               Only estimate trees for 'concatenated-by-gene/' files
-                              (valid only if --gene-region-out is provided)
-							  
- --only-by-genic-region       Only estimate trees for 'concatenated-by-genic-region/' files
-                              (valid only if --gene-region-out is provided)
-							  
- --custom-alignments          Path to a custom alignment dir. Estimate trees using
-                              alignments in this dir, ignoring other inputs.
+Other options:
+  --threads <number>           Maximum concurrent tree estimations (default: 2)
+  --only-by-gene               Skip GeneRegion alignments concatenated by genic
+                               region; intergenic alignments are still included
+  --only-by-genic-region       Skip GeneRegion alignments concatenated by gene;
+                               intergenic alignments are still included
+  -h, --help                   Show this help and exit
 
+Examples:
+  estimate-trees.sh --gene-region-out CURE-GeneRegion-output \
+    --uce-region-out CURE-UCERegion-output --estimated-trees estimated-trees
 
-\e[4mExamples\e[0m:
+  estimate-trees.sh --gene-region-out CURE-GeneRegion-output \
+    --estimated-trees estimated-trees --only-by-gene
 
-If you run CURE using both GeneRegion and UCERegion strategies, you can estimate
-the trees of both outputs with the following:
+  estimate-trees.sh --custom-alignments input-alignments \
+    --estimated-trees estimated-trees
 
-    estimate-trees.sh \\
-        --gene-region-out CURE-GeneRegion-output \\
-        --uce-region-out CURE-UCERegion-output \\
-        --estimated-trees estimated-trees
-
-(If only one strategy was run, you can use the appropriate: --gene-region-out or --uce-region-out)
-
----
-
-To estimate trees only from alignments concatenated by gene (output of CURE GeneRegion), run:
-
-	estimate-trees.sh \\
-	    --gene-region-out CURE-GeneRegion-output \\
-	    --estimated-trees estimated-trees \\
-	    --only-by-gene
----
-
-To estimate trees only from alignments concatenated by genic region (output of CURE GeneRegion), run:
-
-	estimate-trees.sh \\
-	    --gene-region-out CURE-GeneRegion-output \\
-	    --estimated-trees estimated-trees \\
-	    --only-by-genic-region
-
----
-
-Also, you can use this script to estimate gene trees in parallel from alignments
-produced by any other tool rather than CURE. For so, just use --custom-alignments
-parameter:
-
-        estimate-trees.sh \\
-	    --custom-alignments input-alignments/ \\
-	    --estimated-trees estimated-trees
-
-
- ╔════════════════════════════════════════════════════════════════════════════════════╗
- ║                                          NOTE                                      ║
- ╠════════════════════════════════════════════════════════════════════════════════════╣
- ║ The parameters '--gene-region-out' and '--uce-region-out' must direct to           ║
- ║ the output directory produced by CURE GeneRegion and CURE UCERegion, respectively. ║ 
- ║ This script will enter this directory and look for the outputs produced by CURE.   ║
- ║ If you renamed any file or directory, it will raise an error.                      ║
- ╚════════════════════════════════════════════════════════════════════════════════════╝
- "
-exit 2
+The input options can be combined. For CURE inputs, keep the directory and file
+names produced by GeneRegion and UCERegion. Requires IQ-TREE and GNU Parallel
+in the active CURE environment. The two --only-by-* options require
+--gene-region-out and cannot be combined.
+HELP
 }
 
 # Option strings for arg parser
 SHORT=h
-LONG=help,gene-region-out:,uce-region-out:,estimated-trees:,threads:,only-by-gene,only-by-region,custom-alignments:
+LONG=help,gene-region-out:,uce-region-out:,estimated-trees:,threads:,only-by-gene,only-by-genic-region,custom-alignments:
 
 # Set deafult values
 tmp=$(realpath "$0")
@@ -126,8 +81,9 @@ check_deps() {
 
 
 # Read options
-OPTS=$(getopt --options $SHORT --long $LONG --name "$0" -- "$@")
-if [ $? != 0 ]; then error_exit "Failed to parse options...exiting."; fi
+if ! OPTS=$(getopt --options "$SHORT" --long "$LONG" --name "$0" -- "$@"); then
+	error_exit "Failed to parse options...exiting."
+fi
 eval set -- "$OPTS"
 
 # Extracting arguments
@@ -135,6 +91,7 @@ while true ; do
 	case "$1" in
 		-h | --help )
 		usage
+		exit 0
 		;;
 		--gene-region-out )
 		GeneRegion_OUT="$2"
@@ -184,6 +141,13 @@ fi
 # Check if none input was provided
 if [ -z "${GeneRegion_OUT}" ] && [ -z "${UCERegion_OUT}" ] && [ -z "${CUSTOM_ALI}" ]; then
  	error_exit "Please, supply the input alignments directory."
+fi
+
+if [ "$ONLY_BY_GENE" == "True" ] && [ "$ONLY_BY_REGION" == "True" ]; then
+	error_exit "Choose either --only-by-gene or --only-by-genic-region."
+fi
+if [ -z "${GeneRegion_OUT}" ] && { [ "$ONLY_BY_GENE" == "True" ] || [ "$ONLY_BY_REGION" == "True" ]; }; then
+	error_exit "The --only-by-* options require --gene-region-out."
 fi
 
 #creating outputs
@@ -405,6 +369,7 @@ echo "- All done!
 
 If you make use of CURE in your research, please cite:
 
-Freitas et al (2023). UCE phylogenomics, biogeography, and classification of long-horned 
+Freitas et al. (2023). UCE phylogenomics, biogeography, and classification of long-horned
 bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely 
-degraded DNA. In prep."
+degraded DNA. Insect Systematics and Diversity 7(4):3.
+https://doi.org/10.1093/isd/ixad012"

@@ -650,5 +650,6 @@ echo "- All done!
 
 If you make use of the GeneRegion strategy in your research, please cite also the original paper describing the method:
 
-Van Dam et al. (2021). Genomic Characterization and Curation of UCEs 
-Improves Species Tree Reconstruction. https://doi.org/10.1093/sysbio/syaa063."
+Van Dam et al. (2021). Genomic Characterization and Curation of UCEs
+Improves Species Tree Reconstruction. Systematic Biology 70(2):307-321.
+https://doi.org/10.1093/sysbio/syaa063"

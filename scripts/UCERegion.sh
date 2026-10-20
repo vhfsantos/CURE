@@ -449,7 +449,12 @@ if test -f "${OUTPUT}/tmp/phyluce_align_concatenate_alignments.log"; then
 else
 	warn "Temporary files already removed. Skipping"
 fi
-echo "If you make use of the GENRegion strategy in your research, please cite the original paper describing the method:
+echo "If you make use of the UCERegion strategy in your research, please cite the papers describing the strategy and SWSC-EN:
 
-Freitas et al (2021) Partitioned Gene-Tree Analyses and Gene-Based Topology Testing Help Resolve 
-Incongruence in a Phylogenomic Study of Host-Specialist Bees (Apidae: Eucerinae). https://doi.org/10.1093/molbev/msaa277."
+Freitas et al. (2021). Partitioned Gene-Tree Analyses and Gene-Based Topology Testing Help Resolve
+Incongruence in a Phylogenomic Study of Host-Specialist Bees (Apidae: Eucerinae).
+Molecular Biology and Evolution 38(3):1090-1100. https://doi.org/10.1093/molbev/msaa277
+
+Tagliacollo and Lanfear (2018). Estimating Improved Partitioning Schemes for
+Ultraconserved Elements. Molecular Biology and Evolution 35(7):1798-1811.
+https://doi.org/10.1093/molbev/msy069"

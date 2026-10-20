@@ -251,7 +251,7 @@ scripts/estimate-trees.sh \
 ## Estimating trees for alignments from external sources
 
 Moreover, `estimate-trees.sh` can be used to estimate trees from alignments from any other source; not necessarily those produced by **CURE**.
-In this case, you only need to use the parameter `--custom-alignments` instead of `--gene-region-out` or `--uce-region-out`.
+In this case, you can use the parameter `--custom-alignments` on its own or combine it with `--gene-region-out` and `--uce-region-out`.
 So if you have a set of alignments (in Phylip, Fasta, or Nexus format) in a directory called `input-alignments`, and want to run IQ-tree on them, you can call `estimate-trees.sh` as the following:
 
 ```sh
@@ -264,7 +264,7 @@ scripts/estimate-trees.sh \
 
 If you use **CURE** in your research, please cite:
 
-> [**Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida**. UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. _Insect Systematics and Diversity_, 2023](https://doi.org/10.1093/isd/ixad012)
+> [**Felipe V. Freitas, Michael G. Branstetter, Vinícius H. Franceschini-Santos, Achik Dorchin, Karen W. Wright, Margarita M. López-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida**. UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. _Insect Systematics and Diversity_ 7(4):3, 2023](https://doi.org/10.1093/isd/ixad012)
 
 # License
 
