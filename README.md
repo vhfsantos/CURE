@@ -177,6 +177,14 @@ The main output files produced by **CURE** are the alignments of concatenated an
 * `partitioned-uces/`: stores all the alignments and their respective charsets files
 * `concatenated-uces/`: stores the concatenated alignment, a charset file with the results of SWSC-EN in nexus format and a input file for a putative downstream analysis with PartitionFinder2
 
+Each UCERegion run writes logs to a separate `logfiles/run-.../` directory.
+`pipeline.log` records the output shown on screen, while `stages/` holds one
+log file per processing step. Output from parallel subgroup and UCE jobs is
+collected in that step's log, with headings identifying each job. If a step
+fails, CURE retains its logs and removes that step's temporary files. A later
+run using the same output directory resumes from the last completed step.
+After a successful run, the `tmp/` directory is removed.
+
 ## Output files of **GeneRegion** strategy
 
 If you run the **GeneRegion** strategy without `--only-by-gene` or `--only-by-genic-region`, both of the concatenating approaches will be done.
