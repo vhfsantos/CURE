@@ -177,6 +177,14 @@ The main output files produced by **CURE** are the alignments of concatenated an
 * `partitioned-uces/`: stores all the alignments and their respective charsets files
 * `concatenated-uces/`: stores the concatenated alignment, a charset file with the results of SWSC-EN in nexus format and a input file for a putative downstream analysis with PartitionFinder2
 
+Each UCERegion run writes logs to a separate `logfiles/run-.../` directory.
+`pipeline.log` records the output shown on screen, while `stages/` holds one
+log file per processing step. Output from parallel subgroup and UCE jobs is
+collected in that step's log, with headings identifying each job. If a step
+fails, CURE retains its logs and removes that step's temporary files. A later
+run using the same output directory resumes from the last completed step.
+After a successful run, the `tmp/` directory is removed.
+
 ## Output files of **GeneRegion** strategy
 
 If you run the **GeneRegion** strategy without `--only-by-gene` or `--only-by-genic-region`, both of the concatenating approaches will be done.
@@ -251,7 +259,7 @@ scripts/estimate-trees.sh \
 ## Estimating trees for alignments from external sources
 
 Moreover, `estimate-trees.sh` can be used to estimate trees from alignments from any other source; not necessarily those produced by **CURE**.
-In this case, you only need to use the parameter `--custom-alignments` instead of `--gene-region-out` or `--uce-region-out`.
+In this case, you can use the parameter `--custom-alignments` on its own or combine it with `--gene-region-out` and `--uce-region-out`.
 So if you have a set of alignments (in Phylip, Fasta, or Nexus format) in a directory called `input-alignments`, and want to run IQ-tree on them, you can call `estimate-trees.sh` as the following:
 
 ```sh
@@ -264,7 +272,7 @@ scripts/estimate-trees.sh \
 
 If you use **CURE** in your research, please cite:
 
-> [**Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida**. UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. _Insect Systematics and Diversity_, 2023](https://doi.org/10.1093/isd/ixad012)
+> [**Felipe V. Freitas, Michael G. Branstetter, Vinícius H. Franceschini-Santos, Achik Dorchin, Karen W. Wright, Margarita M. López-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida**. UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. _Insect Systematics and Diversity_ 7(4):3, 2023](https://doi.org/10.1093/isd/ixad012)
 
 # License
 
