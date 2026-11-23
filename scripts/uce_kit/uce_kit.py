@@ -14,7 +14,7 @@ AATTTCCTAGTTAAAACCCTCCCTTGCTGACAAGGGACTGAAAGAGTTTTAAATCACAGATGTAGAGTATCAAATGCAAT
 
 from __future__ import print_function # only using print for test function but make sure workins in python3 and python2
 import sys, os.path
-import re, operator, subprocess
+import re, operator, shlex, subprocess
 
 # we parse the Uce fasta header line as a class method because we want to add all of the uce's probes
 # to the same Uce object instance. So we can call parse_line and check to see if the uce
@@ -304,7 +304,6 @@ def filter_uce_match_m8_file(m8_filename, pct_match = 99.0, len_match = 120, exc
     # also exclude any lines where the scaffold name in fld 2 has a prefix in exclude_prefixes
     uce_info = [] # each entry will be a 3 value tuple
     uce_nm_map = {} # 10Jul2019 to keep track if we have already seen this uce
-    last_nm = ""
 
     fh = open(m8_filename, "r")
     for tsv in fh:
@@ -318,7 +317,7 @@ def filter_uce_match_m8_file(m8_filename, pct_match = 99.0, len_match = 120, exc
 
         probe_nm = flds[0] # consists of uce name and probe number e.g. uce-501_p1 or uce-36_6
         scaff_nm = flds[1]
-        pos = flds[8] if flds[8] < flds[9] else flds[9]
+        pos = min(int(flds[8]), int(flds[9]))
 
         # JBH 10Jul2019 change method for determining uce to include (was based on _p1 which doesn't necessarily hold)
         ''' # old method
@@ -327,10 +326,9 @@ def filter_uce_match_m8_file(m8_filename, pct_match = 99.0, len_match = 120, exc
             continue
         '''
         # new method, takes first one and ignores others with same prefix before _p[0-9]+
-        uce_nm = re.sub("_p[0-9]+$", "", probe_nm)
-        if uce_nm in uce_nm_map:
-            continue
-        uce_nm_map[ uce_nm ] = pos
+        # BLAST keeps the first FASTA token. Some bait sets attach metadata
+        # directly after the probe number (e.g. uce-5_p2-design:...).
+        uce_nm = re.sub(r"_p[0-9]+(?:[-:].*)?$", "", probe_nm)
         
         prefix_ok = True
         for p in exclude_prefixes:
@@ -339,15 +337,14 @@ def filter_uce_match_m8_file(m8_filename, pct_match = 99.0, len_match = 120, exc
                 break
         if not prefix_ok:
             continue
-        
-        # make sure we aren't trying to put in one that we just appended
-        if last_nm == probe_nm:
+        if uce_nm in uce_nm_map:
             continue
-        last_nm = probe_nm
+        uce_nm_map[uce_nm] = pos
         
         tup = (uce_nm, scaff_nm, int(pos), flds[2], flds[3])
         uce_info.append(tup)
-     
+    fh.close()
+
     # sort by scaffold name in tup[1] then pos in tup[2]   
     uce_info.sort(key = operator.itemgetter(1, 2))
     for tup in uce_info:
@@ -380,7 +377,7 @@ def execute_cmdline(cmdline, outfile=None, msg_to_stderr=None):
     if msg_to_stderr != None:
         sys.stderr.write(msg_to_stderr)
         
-    retcode = subprocess.call ( cmdline.rstrip().split(" "), stdout=fh )
+    retcode = subprocess.call(cmdline if isinstance(cmdline, list) else shlex.split(cmdline), stdout=fh)
     
     if fh != None:
         fh.close()
@@ -398,7 +395,7 @@ def blat_uces(uces, genome, output):
     settings = "-stepSize=5 -repMatch=100000 -out=blast8 -minScore=100"
     cmdline = "{} {} {} {} {}".format(pgm, settings, genome, uces, output)
     sys.stderr.write("Searching for uces: {}\n".format(cmdline))
-    retcode = subprocess.call( cmdline.split(" ") )
+    retcode = subprocess.call([pgm] + shlex.split(settings) + [genome, uces, output])
     return retcode
 
 
@@ -412,7 +409,8 @@ def blast_uces(uces, genome, eVal, addtl_args = ""):
         return -1
 
     evalue = "-evalue " + eVal
-    if addtl_args.find("-evalue ") > -1: # can't define same arg twice for blast utilities
+    extra = addtl_args if isinstance(addtl_args, list) else shlex.split(addtl_args)
+    if "-evalue" in extra: # can't define same arg twice for blast utilities
         evalue = ""
     
     ext = [".nin",".nhr",".nsq"] # extensions of files created by makeblastdb added to the genome fasta filename
@@ -421,7 +419,7 @@ def blast_uces(uces, genome, eVal, addtl_args = ""):
     if not db_exists:
         cmdline = "makeblastdb -in {} -dbtype nucl".format(genome)
         sys.stderr.write(cmdline)
-        retcode = subprocess.call ( cmdline.split(" "), stdout=sys.stderr )
+        retcode = subprocess.call(["makeblastdb", "-in", genome, "-dbtype", "nucl"], stdout=sys.stderr)
         if retcode != 0:
             sys.stderr.write("error {} creating blast db\n".format(retcode))
             return
@@ -429,7 +427,8 @@ def blast_uces(uces, genome, eVal, addtl_args = ""):
         
     cmdline = "blastn -query {} -db {} -outfmt 6 {} {}".format(uces, genome, evalue, addtl_args)
     sys.stderr.write("Searching for uces: {}\n".format(cmdline))
-    retcode = subprocess.call ( cmdline.rstrip(" ").split(" ") )
+    retcode = subprocess.call(["blastn", "-query", uces, "-db", genome,
+                               "-outfmt", "6"] + shlex.split(evalue) + extra)
     return retcode
 
 def run_pipeline(ops, output_dir):
@@ -459,7 +458,7 @@ def run_pipeline(ops, output_dir):
     if cmd_exists("blat") or cmd_exists("blatq"):
         rc = blat_uces(uce, genome, m8_file)
     else: # could not find blat or blatq, run blast
-        rc = blast_uces(uce, genome, ops.evalue, "-out " + m8_file)
+        rc = blast_uces(uce, genome, ops.evalue, ["-out", m8_file])
 
     if rc != 0:
         return
@@ -470,21 +469,24 @@ def run_pipeline(ops, output_dir):
     addtl = "" if len(ops.filter_exclude_list) == 0 else " ".join(ops.filter_exclude_list) + " "
     sys.stderr.write("Step 2 of 4: filter_tsv {} {}>{}\n".format(m8_file, addtl, filt_file))
     fh_uce_locs = open(filt_file, 'w')
-    filter_uce_match_m8_file(m8_filename = m8_file, exclude_prefixes = ops.filter_exclude_list, fout = fh_uce_locs)
+    filter_uce_match_m8_file(m8_filename = m8_file, pct_match = ops.pct,
+                             len_match = ops.len,
+                             exclude_prefixes = ops.filter_exclude_list, fout = fh_uce_locs)
     fh_uce_locs.close()
 
     # Step 3 add_introns_to_gff.py galGal4.gff >galGal4.with_introns.gff
     # next line modified by vhfsantos, 2021
     new_gff_name = output_dir+"/"+os.path.basename(gff) + ".with.introns"
-    cmdline = wd+"add_introns_to_gff.py {}".format(ops.gff)
+    cmdline = [sys.executable, wd+"add_introns_to_gff.py", ops.gff]
     retcode = execute_cmdline(cmdline, new_gff_name, "Step 3 of 4: {} >{}\n".format(cmdline, new_gff_name))
     
     # Step 4 uce_gff_lines.py galGal4_uce_locations.tsv galGal4_with_introns.gff >galGal4_uce_type_summary.txt
     # next line modified by vhfsantos, 2021
     summary_fname = "{}.uce_kit_summary".format(output_dir+"/"+os.path.basename(genome))
-    cmdline = wd+"uce_gff_lines.py {} {}".format(uce_locs_name, new_gff_name)
-    cmdline += " -lines" if ops.gff_lines else ""
-    cmdline += " " + " ".join(ops.gff_exclude_list) if len(ops.gff_exclude_list) > 0 else ""
+    cmdline = [sys.executable, wd+"uce_gff_lines.py", uce_locs_name, new_gff_name]
+    if ops.gff_lines:
+        cmdline.append("-lines")
+    cmdline.extend(ops.gff_exclude_list)
     retcode = execute_cmdline(cmdline, summary_fname, "Step 4 of 4: {} > {} \n\n".format(cmdline, summary_fname))
     
     sys.stderr.write("\n")
@@ -651,13 +653,19 @@ def getops(argv, min_args = 0, exit_code = 1):
         options.genome = argv[3]
         options.gff = argv[4]
         options.gff_exclude_list = []; options.filter_exclude_list = []
+        options.pct = 99.0; options.len = 120
         excl_list = options.gff_exclude_list
         options.gff_lines = False
         output_dir = argv[5]
         
-        for ix in range(6, len(argv)-1):
+        ix = 6
+        while ix < len(argv):
             arg = argv[ix]
             sys.stderr.write("{} :: {}\n". format(ix, arg))
+            if arg in ('-pct', '--min-identity'):
+                options.pct = float(argv[ix + 1]); ix += 2; continue
+            if arg in ('-len', '--min-length'):
+                options.len = int(argv[ix + 1]); ix += 2; continue
             if arg[0] == '-': # -filt sets up for filter prefix exclusion list else the list is for the gff type to exclude
                 if arg[:4] == "-lin": # add -lines to step 4 so gff lines included
                     options.gff_lines = True
@@ -665,6 +673,7 @@ def getops(argv, min_args = 0, exit_code = 1):
                     excl_list = options.filter_exclude_list if arg[:5] == "-filt" else options.gff_exclude_list
             else:
                 excl_list.append(arg)
+            ix += 1
 
                 
     elif not options.action == "merge":

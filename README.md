@@ -177,15 +177,25 @@ The main output files produced by **CURE** are the alignments of concatenated an
 * `partitioned-uces/`: stores all the alignments and their respective charsets files
 * `concatenated-uces/`: stores the concatenated alignment, a charset file with the results of SWSC-EN in nexus format and a input file for a putative downstream analysis with PartitionFinder2
 
+Each UCERegion run writes logs to a separate `logfiles/run-.../` directory.
+`pipeline.log` records the output shown on screen, while `stages/` holds one
+log file per processing step. Output from parallel subgroup and UCE jobs is
+collected in that step's log, with headings identifying each job. If a step
+fails, CURE retains its logs and removes that step's temporary files. A later
+run using the same output directory resumes from the last completed step.
+After a successful run, the `tmp/` directory is removed.
+
 ## Output files of **GeneRegion** strategy
 
 If you run the **GeneRegion** strategy without `--only-by-gene` or `--only-by-genic-region`, both of the concatenating approaches will be done.
 In this case, your output-dir will contain `concatenated-by-gene/` and `concatenated-by-genic-region/` dirs.
 If you raised any of these flags, only the corresponding dir will be created.
 
-Besides, the **GeneRegion** strategy creates the `intergenic-regions/` dir containing unmerged UCEs assigned to intergenic regions.
+The **GeneRegion** strategy also creates `intergenic-regions/` for confirmed intergenic UCEs, `unassigned-regions/` for UCEs that did not map to the reference, and `unclassified-mapped/` for mapped UCEs without a supported exon, intron, or intergenic classification (for example, loci in lncRNA features). These directories keep the original, unmerged NEXUS alignments. Only confirmed intergenic loci are included as intergenic input by `estimate-trees.sh`.
 
-Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEXUS format.
+Probe matches require at least 99% identity and 120 aligned bases by default. Use `--min-identity` and `--min-length` with `CURE GeneRegion` to change these thresholds. Lower thresholds can admit ambiguous matches and should be checked against the mapping output. Use a new output directory when changing reference files, baits, or thresholds.
+
+Alignments in `concatenated-by-genic-region/` and the three unmerged UCE directories are in NEXUS format.
 Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are in NEXUS format.
 
 > To avoid troubles with further phylogenetic analysis, **CURE** replaces "-" with "_" in the gene and exon ID.
@@ -197,6 +207,7 @@ The `CURE-intergenic.txt` file contains only the UCE names.
 
 **CURE** outputs the `CURE_stats.csv` and `CURE_stats.pdf` files summarizing the total number of UCEs assigned to each region. 
 This information is stored in a table-like format in the `.csv` file and depicted in a Venn diagram in the `.pdf` file. 
+In the CSV, `unassigned` counts loci not located in the reference; `unclassified_mapped` counts loci located there but without a supported region category. Neither group is treated as confirmed intergenic.
 
 The Venn diagram summarizing the test data looks like this: 
 
@@ -251,7 +262,7 @@ scripts/estimate-trees.sh \
 ## Estimating trees for alignments from external sources
 
 Moreover, `estimate-trees.sh` can be used to estimate trees from alignments from any other source; not necessarily those produced by **CURE**.
-In this case, you only need to use the parameter `--custom-alignments` instead of `--gene-region-out` or `--uce-region-out`.
+In this case, you can use the parameter `--custom-alignments` on its own or combine it with `--gene-region-out` and `--uce-region-out`.
 So if you have a set of alignments (in Phylip, Fasta, or Nexus format) in a directory called `input-alignments`, and want to run IQ-tree on them, you can call `estimate-trees.sh` as the following:
 
 ```sh
@@ -264,7 +275,7 @@ scripts/estimate-trees.sh \
 
 If you use **CURE** in your research, please cite:
 
-> [**Felipe V. Freitas, Michael G. Branstetter, Vinicius H. Franceschini-Santos, Achik Dorchin, Karen Wright, Margarita Lopez-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida**. UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. _Insect Systematics and Diversity_, 2023](https://doi.org/10.1093/isd/ixad012)
+> [**Felipe V. Freitas, Michael G. Branstetter, Vinícius H. Franceschini-Santos, Achik Dorchin, Karen W. Wright, Margarita M. López-Uribe, Terry Griswold, Fernando A. Silveira, Eduardo A. B. Almeida**. UCE phylogenomics, biogeography, and classification of long-horned bees (Hymenoptera: Apidae: Eucerini), with insights on using specimens with extremely degraded DNA. _Insect Systematics and Diversity_ 7(4):3, 2023](https://doi.org/10.1093/isd/ixad012)
 
 # License
 

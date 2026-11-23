@@ -1,92 +1,84 @@
 #!/usr/bin/env python
 # coding: utf-8
-# read from stdin and write to stdout inserting introns between exon lines of a gff3 format file
-# change to read from stdin if no args or assume first arg is the gff file on which to add introns
-# use -g option to replace the exon line descriptions with the appropriate geneid
+# Copy a GFF3 file to stdout and add introns between exons of the same transcript.
 
 import sys
+from collections import defaultdict
 
-def add_introns(infile, outfile, geneid_for_exon = False):
-    def to_int(digits_str):  # do not throw a ValueError exception if input happens to not be a string of just digits
-        return int(digits_str) if digits_str.isdigit() else 0
 
-    cur_flds = []; geneid = ""
-    for gff_ln in infile:
-        if len(gff_ln) < 3 or gff_ln[0] == "#":  # output empty or comment lines
-            outfile.write(gff_ln)
-            continue
-        
-        lst_flds = list(cur_flds)  # copy the last non-comment line fields
-        cur_flds = gff_ln.split("\t")
-        
-        too_short = len(cur_flds) < 5 or len(lst_flds) < 5
-        if too_short:
-            outfile.write(gff_ln)
-            continue
-        
-        cur_type = cur_flds[2].lower()
-        if cur_type == "gene":  # remember the geneid to associate it with the intron
-            geneid = cur_flds[8].split(";")[0]
-        
-        if cur_type != "exon" or lst_flds[2].lower() != "exon":
-            if geneid_for_exon and cur_type == "exon":
-                cur_flds[8] = geneid
-                gff_ln = "\t".join(cur_flds) + "\n"
-                
-            outfile.write(gff_ln)
-            continue
-        
-        # last line and current line both are exon lines, this is where to insert the intron line        
-        cur_beg = to_int(cur_flds[3]); cur_end = to_int(cur_flds[4])
-        lst_beg = to_int(lst_flds[3]); lst_end = to_int(lst_flds[4])
-        
-        if cur_beg==0 or cur_end==0 or lst_beg==0 or lst_end==0:
-            # we expected positive integers but didn't get them
-            outfile.write(gff_ln)
-            continue
-        
-        if lst_end < cur_beg:  # positive strand
-            int_beg = lst_end + 1
-            int_end = cur_beg - 1
-        else:  # negative strand
-            int_beg = cur_end + 1
-            int_end = lst_beg - 1
-        
-        intron = "\t".join([ lst_flds[0], "Insert","intron", str(int_beg),str(int_end), lst_flds[5],lst_flds[6],lst_flds[7], geneid ]) + "\n"
-        outfile.write(intron)  # output intron line
-        
-        if geneid_for_exon and cur_type == "exon":
-             cur_flds[8] = geneid
-             gff_ln = "\t".join(cur_flds) + "\n"
+def attributes(field):
+    return dict(part.split('=', 1) for part in field.split(';') if '=' in part)
 
-        outfile.write(gff_ln)  # output current exon line
-        
+
+def add_introns(infile, outfile, geneid_for_exon=False):
+    transcript_gene = {}
+    exons = defaultdict(list)
+    current_gene = ''
+
+    for line in infile:
+        if not line or line.startswith('#'):
+            outfile.write(line)
+            continue
+        fields = line.rstrip('\n').split('\t')
+        if len(fields) < 9:
+            outfile.write(line)
+            continue
+
+        kind = fields[2].lower()
+        attrs = attributes(fields[8])
+        if kind == 'gene':
+            current_gene = attrs.get('ID', '')
+        elif kind in ('mrna', 'transcript', 'ncrna', 'lnc_rna', 'rrna',
+                      'trna', 'primary_transcript', 'pseudogenic_transcript'):
+            transcript_id = attrs.get('ID')
+            gene_id = attrs.get('Parent', '').split(',')[0]
+            if transcript_id and gene_id:
+                transcript_gene[transcript_id] = gene_id
+        elif kind == 'exon':
+            if geneid_for_exon and current_gene:
+                fields[8] = 'ID=' + current_gene
+                line = '\t'.join(fields) + '\n'
+            if fields[3].isdigit() and fields[4].isdigit():
+                start, end = int(fields[3]), int(fields[4])
+                if 0 < start <= end:
+                    for parent in attrs.get('Parent', '').split(','):
+                        if parent:
+                            exons[(parent, fields[0], fields[6])].append((start, end))
+        outfile.write(line)
+
+    for (parent, scaffold, strand), intervals in exons.items():
+        gene_id = transcript_gene.get(parent)
+        if not gene_id and parent.startswith('gene-'):
+            gene_id = parent
+        if not gene_id:
+            continue
+        intervals.sort()
+        last_end = intervals[0][1]
+        for start, end in intervals[1:]:
+            if start > last_end + 1:
+                outfile.write('\t'.join((scaffold, 'Insert', 'intron',
+                    str(last_end + 1), str(start - 1), '.', strand, '.',
+                    'ID=' + gene_id)) + '\n')
+            last_end = max(last_end, end)
+
+
 def main(argv):
     gff_file = sys.stdin
     geneid_for_exon = False
-    for ix in range(1, len(argv)):
-        arg = argv[ix]
-        if arg == "-h":
-            usage = "\n    add_introns_to_gff.py [<gff_file>] [-g]\n\n    No <gff_file> reads from stdin\n    -g will replace exon description with gene's ID\n\n"
-            sys.stderr.write(usage)
-            sys.exit(0)
-        elif arg == "-g":
+    for arg in argv[1:]:
+        if arg == '-h':
+            sys.stderr.write('\n    add_introns_to_gff.py [<gff_file>] [-g]\n\n'
+                             '    No <gff_file> reads from stdin.\n'
+                             "    -g replaces exon descriptions with the gene's ID.\n\n")
+            return
+        elif arg == '-g':
             geneid_for_exon = True
         else:
-            gff_file = arg
-
-    if gff_file == sys.stdin:
-        sys.stderr.write("reading gff from stdin. for usage, use -h option.\n")
-    else:
-        gff_file = open(gff_file, 'r')
-
+            gff_file = open(arg, 'r')
     add_introns(gff_file, sys.stdout, geneid_for_exon)
+    if gff_file is not sys.stdin:
+        gff_file.close()
+
 
 if __name__ == '__main__':
-    from signal import signal, SIGPIPE, SIG_DFL
-    signal(SIGPIPE,SIG_DFL) # don't complain if pipe closes output (head or less commands will cause this)
-    
-    try:
-        main(sys.argv)
-    except (KeyboardInterrupt, SystemExit): # don't do stack trace for Ctrl+C
-        sys.exit(0)
+    main(sys.argv)

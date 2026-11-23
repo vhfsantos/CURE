@@ -53,6 +53,10 @@ version "$VERSION"
   \e[4mOptional arguments\e[0m:
   -t, --threads           Number of threads for the analysis (Default: 2)
 
+  --min-identity          Minimum bait/genome identity, 0-100 (Default: 99)
+
+  --min-length            Minimum aligned probe length (Default: 120)
+
   -f, --filter-string     UCEs whose name beggins with this string will be discarted (Default: "_")
 
   --only-by-gene          Concatenate UCEs only by gene. Concatenation by genic region will not
@@ -88,13 +92,15 @@ if [ $# -eq 0 ]; then usage; fi
 tmp=$(realpath "$0")
 HOME_DIR=${tmp%/*}
 THREADS=2
+MIN_IDENTITY=99
+MIN_LENGTH=120
 ONLY_BY_GENE="False"
 ONLY_BY_REGION="False"
 FILTER="_"
 
 # Option strings for arg parser
 SHORT=hb:r:g:p:o:f:t:
-LONG=help,baits:,version:,reference:,gff:,phyluce-nexus:,output:,filter-string:,threads:,only-by-gene,only-by-genic-region
+LONG=help,baits:,version:,reference:,gff:,phyluce-nexus:,output:,filter-string:,threads:,min-identity:,min-length:,only-by-gene,only-by-genic-region
 
 
 # Read options
@@ -126,6 +132,14 @@ while true ; do
 		;;
 		-t | --threads )
 		THREADS="$2"
+		shift 2
+		;;
+		--min-identity )
+		MIN_IDENTITY="$2"
+		shift 2
+		;;
+		--min-length )
+		MIN_LENGTH="$2"
 		shift 2
 		;;
 		-g | --gff )
@@ -165,6 +179,32 @@ if [ -z "${NEXUS_DIR}" ] || [ -z "${BAITS_FILE}" ] || \
 	error_exit "Please, supply all arguments correctly."
 fi
 
+[[ "$THREADS" =~ ^[1-9][0-9]*$ ]] || error_exit "--threads must be a positive integer"
+[[ "$MIN_LENGTH" =~ ^[1-9][0-9]*$ ]] || error_exit "--min-length must be a positive integer"
+[[ "$MIN_IDENTITY" =~ ^([0-9]+)(\.[0-9]+)?$ ]] || error_exit "--min-identity must be between 0 and 100"
+awk -v n="$MIN_IDENTITY" 'BEGIN { exit !(n >= 0 && n <= 100) }' || error_exit "--min-identity must be between 0 and 100"
+GENOME=$(basename "$REFERENCE_GENOME")
+UCE_KIT_SUMMARY="${OUTPUT}/uce_kit_output/${GENOME}.uce_kit_summary"
+UCE_KIT_PARAMETERS="${OUTPUT}/uce_kit_output/parameters.txt"
+EXPECTED_PARAMETERS=$(printf '%s\n' "$BAITS_FILE" "$REFERENCE_GENOME" "$GFF" "$NEXUS_DIR" \
+	"$FILTER" "$MIN_IDENTITY" "$MIN_LENGTH" "$ONLY_BY_GENE" "$ONLY_BY_REGION")
+if [[ -f "$UCE_KIT_SUMMARY" ]]; then
+	[[ -f "$UCE_KIT_PARAMETERS" ]] || error_exit "Existing uce_kit results have no parameter record; use a new output directory"
+	[[ "$(cat "$UCE_KIT_PARAMETERS")" == "$EXPECTED_PARAMETERS" ]] || error_exit "Existing uce_kit results used different inputs or thresholds; use a new output directory"
+fi
+if [[ -f "$OUTPUT/GeneRegion.complete" ]]; then
+	log "GeneRegion already completed in $OUTPUT"
+	exit 0
+fi
+if [[ -d "$OUTPUT/tmp" || -f "$OUTPUT/CURE_stats.csv" ]]; then
+	warn "Previous GeneRegion run was incomplete; restarting classification"
+	rm -rf -- "$OUTPUT/tmp" "$OUTPUT/concatenated-by-gene" \
+		"$OUTPUT/concatenated-by-genic-region" "$OUTPUT/intergenic-regions" \
+		"$OUTPUT/unassigned-regions" "$OUTPUT/unclassified-mapped"
+	rm -f -- "$OUTPUT/CURE-exons.txt" "$OUTPUT/CURE-introns.txt" \
+		"$OUTPUT/CURE-intergenic.txt" "$OUTPUT/CURE_stats.csv" "$OUTPUT/CURE_stats.pdf"
+fi
+
 # Checking if both flags were signed
 if [ "$ONLY_BY_GENE" == "True" ] && [ "$ONLY_BY_REGION" == "True" ]; then
 	error_exit "Please, chose one: --only-by-gene or --only-by-genic-region"
@@ -187,6 +227,8 @@ THREADS: $THREADS
 ONLY_BY_GENE? $ONLY_BY_GENE
 ONLY_BY_GENIC_REGION? $ONLY_BY_REGION
 FILTER_STRING $FILTER
+MIN_IDENTITY $MIN_IDENTITY
+MIN_LENGTH $MIN_LENGTH
 -------------------------------------------------------------------------"
 
 #=============================================================
@@ -223,16 +265,15 @@ mkdir -p "${OUTPUT}"/uce_kit_output
 LOGDIR="${OUTPUT}"/logfiles/
 mkdir -p "${LOGDIR}"
 
-GENOME=$(basename "${REFERENCE_GENOME}")
-UCE_KIT_SUMMARY="${OUTPUT}/uce_kit_output/${GENOME}.uce_kit_summary"
-
 if [[ ! -f "${UCE_KIT_SUMMARY}" ]]; then
+	printf '%s\n' "$EXPECTED_PARAMETERS" > "$UCE_KIT_PARAMETERS"
 	log "Running uce_kit.py..."
 	$CONDA_PREFIX/bin/python "${HOME_DIR}"/uce_kit/uce_kit.py run_pipeline \
 		"${BAITS_FILE}" \
 		"${REFERENCE_GENOME}" \
 		"${GFF}" "${OUTPUT}"/uce_kit_output \
-		-lines -merge -filt "$FILTER" > "${LOGDIR}"/uce_kit.log 2>&1
+		-lines -merge -filt "$FILTER" -pct "$MIN_IDENTITY" -len "$MIN_LENGTH" > "${LOGDIR}"/uce_kit.log 2>&1
+	[[ -s "$UCE_KIT_SUMMARY" ]] || error_exit "uce_kit produced no classification summary; see ${LOGDIR}/uce_kit.log"
 	DONEmsg
 	else
 		warn "Script uce_kit.py already run. Skipping..."
@@ -247,6 +288,7 @@ fi
 # Let's beggin with exons.
 EXONCOUNT=0
 NEXUSTOCONCAT=${OUTPUT}/tmp/00-characterized-uces/
+mkdir -p "${NEXUSTOCONCAT}/exons" "${NEXUSTOCONCAT}/introns"
 if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 	log "Assinging UCEs to exons..."
 	EXONS=$(mktemp)
@@ -270,7 +312,7 @@ if [ ! -f "${OUTPUT}/CURE-exons.txt" ]; then
 		> "$EXONS"
 	# Run ParseResults for exons.
 	$CONDA_PREFIX/bin/python "${HOME_DIR}"/parse_results.py "$EXONS" \
-	                "$FILTER" "${OUTPUT}"/CURE-exons.txt exon
+	                "$FILTER" "${OUTPUT}"/CURE-exons.txt exon "${GFF}"
 	# Read output from script.
 	# Lines are uce name, exon ID and gene ID.
 	# So, copy uce name from nexus dir to gene/exon dir.
@@ -372,14 +414,16 @@ ALL_UCES=$(mktemp)
 cat "${OUTPUT}/CURE-intergenic.txt" >> $UCE_IN_INTER
 cat "${OUTPUT}/CURE-exons.txt" | cut -f1 | uniq >> $UCE_IN_EXONS
 cat "${OUTPUT}/CURE-introns.txt" | cut -f1 | uniq >> $UCE_IN_INTRONS
-for i in $(ls $NEXUS_DIR); do echo $i; done >> $ALL_UCES
+find "$NEXUS_DIR" -maxdepth 1 -type f -name '*.nexus' -printf '%f\n' > "$ALL_UCES"
 
 # plot venn diagram and get statistics
 
-${CONDA_PREFIX}/bin/python "${HOME_DIR}"/CURE_GeneRegion_plot_venn.py \
-	$UCE_IN_INTER $UCE_IN_EXONS $UCE_IN_INTRONS $ALL_UCES ${OUTPUT} $VERSION
-# move unassigned to intergenic dir
-mv ${NEXUSCOPYex}/* "$INTERGENIC_DIR"
+"${CONDA_PREFIX}/bin/python" "${HOME_DIR}/CURE_GeneRegion_plot_venn.py" \
+	"$UCE_IN_INTER" "$UCE_IN_EXONS" "$UCE_IN_INTRONS" "$ALL_UCES" "$OUTPUT" "$VERSION" \
+	"${OUTPUT}/uce_kit_output/$(basename "${REFERENCE_GENOME%.*}")_uce_locations.tsv"
+"${CONDA_PREFIX}/bin/python" "${HOME_DIR}/gene_region_remainder.py" \
+	"$NEXUSCOPYex" "$OUTPUT" \
+	"${OUTPUT}/uce_kit_output/$(basename "${REFERENCE_GENOME%.*}")_uce_locations.tsv"
 
 #=============================================================
 #====                       STEP 3:                       ====
@@ -403,25 +447,7 @@ mkdir -p "$ALL_EXONS_DIR"
 
 if [ -z "$(ls -A "${ALL_EXONS_DIR}")" ]; then
 	log "Merging UCEs in the same exons..."
-	DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d)
-	N_DIRS=$(find "${NEXUSTOCONCAT}"/exons/ -mindepth 2 -type d | wc -l)
-	AUX=0
-	for dir in $DIRS; do
-		# Output dir is named as gene-[geneID]__exon-[exonID]/
-		# (separated by two underscores)
-		GENEID__EXONID=$(echo "$dir" | rev \
-			| cut -d "/" -f 1,2 | rev | sed 's/\//__/g' | \
-			sed 's/-/_/g')
-		GENEID=$(echo "$dir" | rev | cut -d "/" -f 2 | rev)
-		AUX=$(( AUX + 1 ))
-		# concatenate with phyluce in parallel
-		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
-			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
-			--alignments "$dir" --nexus --log "${LOGDIR}" \
-			--output "${ALL_EXONS_DIR}"/"${GENEID__EXONID}" > /dev/null 2>&1
-		bash "${HOME_DIR}"/progress-bar.sh $AUX "$N_DIRS"
-	done
-	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
+	"$CONDA_PREFIX/bin/python" "${HOME_DIR}/gene_region_concat.py" exon "${NEXUSTOCONCAT}/exons" "$ALL_EXONS_DIR" "${LOGDIR}/exon-concatenation" --threads "$THREADS"
 	DONEmsg
 else
 	warn "Already concatenated UCEs from same exons. Skipping..."
@@ -448,21 +474,7 @@ mkdir -p "$ALL_INTRONS_DIR"
 
 if [ -z "$(ls -A "${ALL_INTRONS_DIR}")" ]; then
 	log "Merging UCEs in introns of the same gene..."
-	DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d)
-	N_DIRS=$(find "${NEXUSTOCONCAT}"/introns/ -mindepth 1 -type d | wc -l)
-	AUX=0
-	for dir in $DIRS; do
-		# the output dir will be named as gene-[geneID]
-		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev  | \
-			sed 's/-/_/g')
-		AUX=$(( AUX + 1 ))
-		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
-			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
-			--alignments "$dir" --nexus --log "${LOGDIR}" \
-			--output "${ALL_INTRONS_DIR}"/"${GENEID}" > /dev/null 2>&1
-		bash "${HOME_DIR}"/progress-bar.sh $AUX "$N_DIRS"
-	done
-	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
+	"$CONDA_PREFIX/bin/python" "${HOME_DIR}/gene_region_concat.py" intron "${NEXUSTOCONCAT}/introns" "$ALL_INTRONS_DIR" "${LOGDIR}/intron-concatenation" --threads "$THREADS"
 	DONEmsg
 else
 	warn "Already concatenate UCEs from same introns. Skipping..."
@@ -562,22 +574,7 @@ mkdir -p "$GENE_MERGED_BASEDIR"
 
 if [ -z "$(ls -A "${GENE_MERGED_BASEDIR}")" ]; then
 	log "Concatenating UCEs by gene..."
-	PREPDIRS=$(find "${GENE_MERGED_PREP_BASEDIR}" -mindepth 1 -type d)
-	N_PREPDIRS=$(find "${GENE_MERGED_PREP_BASEDIR}" -mindepth 1 -type d | wc -l)
-	AUX=0
-	for dir in $PREPDIRS; do
-		GENEID=$(echo "$dir" | rev | cut -d "/" -f 1 | rev | \
-			sed 's/-/_/g')
-		AUX=$(( AUX + 1 ))
-		$CONDA_PREFIX/bin/sem --will-cite --id $$ --max-procs "$THREADS" \
-			$CONDA_PREFIX/bin/phyluce_align_concatenate_alignments \
-			--alignments "$dir" \
-			--phylip --input-format nexus --log "${LOGDIR}" \
-			--output "${GENE_MERGED_BASEDIR}"/"${GENEID}" \
-			> /dev/null 2> /dev/null
-		bash "${HOME_DIR}"/progress-bar.sh $AUX "$N_PREPDIRS"
-	done
-	$CONDA_PREFIX/bin/sem --will-cite --id $$ --wait
+	"$CONDA_PREFIX/bin/python" "${HOME_DIR}/gene_region_concat.py" gene "$GENE_MERGED_PREP_BASEDIR" "$GENE_MERGED_BASEDIR" "${LOGDIR}/gene-concatenation" --threads "$THREADS"
 	DONEmsg
 else
 	warn "Concatenation by gene already done. Skipping..."
@@ -643,12 +640,20 @@ if [ "$ONLY_BY_GENE" == "False" ]; then
 fi
 
 log "Removing temporary files..."
-rm -rf ${OUTPUT}/tmp
-rm -rf ${OUTPUT}/phyluce_align_concatenate_alignments.log
+for result_dir in "$BY_GENE_DIR" "$BY_REGION_DIR" "$INTERGENIC_DIR" \
+	"$OUTPUT/unassigned-regions" "$OUTPUT/unclassified-mapped"; do
+	if [[ -d "$result_dir" ]] && [[ -n "$(find "$result_dir" -type f -empty -print -quit)" ]]; then
+		error_exit "An empty result was found in $result_dir; see $LOGDIR"
+	fi
+done
+rm -rf -- "$OUTPUT/tmp"
+rm -f -- "$OUTPUT/phyluce_align_concatenate_alignments.log"
+touch "$OUTPUT/GeneRegion.complete"
 DONEmsg
 echo "- All done!
 
 If you make use of the GeneRegion strategy in your research, please cite also the original paper describing the method:
 
-Van Dam et al. (2021). Genomic Characterization and Curation of UCEs 
-Improves Species Tree Reconstruction. https://doi.org/10.1093/sysbio/syaa063."
+Van Dam et al. (2021). Genomic Characterization and Curation of UCEs
+Improves Species Tree Reconstruction. Systematic Biology 70(2):307-321.
+https://doi.org/10.1093/sysbio/syaa063"
