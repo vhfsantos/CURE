@@ -39,9 +39,9 @@ Required output option:
 Other options:
   --threads <number>           Maximum concurrent tree estimations (default: 2)
   --only-by-gene               Skip GeneRegion alignments concatenated by genic
-                               region; intergenic alignments are still included
+                               region; confirmed intergenic alignments are included
   --only-by-genic-region       Skip GeneRegion alignments concatenated by gene;
-                               intergenic alignments are still included
+                               confirmed intergenic alignments are included
   -h, --help                   Show this help and exit
 
 Examples:

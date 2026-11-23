@@ -65,18 +65,17 @@ if [ $# -eq 0 ]; then Usage; fi
 
 # Parse commands and arguments
 COMMAND=$1
-ARGS=$(echo "${@:2}")
 
 case $COMMAND in
                 -h | --help )
                 Usage; exit
                 ;;
                 GeneRegion )
-                bash ${HOME_DIR}/scripts/GeneRegion.sh --version $VERSION $ARGS
+                bash "${HOME_DIR}/scripts/GeneRegion.sh" --version "$VERSION" "${@:2}"
                 BYEmsg
                 ;;
                 UCERegion )
-                bash ${HOME_DIR}/scripts/UCERegion.sh --version $VERSION $ARGS
+                bash "${HOME_DIR}/scripts/UCERegion.sh" --version "$VERSION" "${@:2}"
                 BYEmsg
                 ;;
                 * )

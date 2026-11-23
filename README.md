@@ -191,9 +191,11 @@ If you run the **GeneRegion** strategy without `--only-by-gene` or `--only-by-ge
 In this case, your output-dir will contain `concatenated-by-gene/` and `concatenated-by-genic-region/` dirs.
 If you raised any of these flags, only the corresponding dir will be created.
 
-Besides, the **GeneRegion** strategy creates the `intergenic-regions/` dir containing unmerged UCEs assigned to intergenic regions.
+The **GeneRegion** strategy also creates `intergenic-regions/` for confirmed intergenic UCEs, `unassigned-regions/` for UCEs that did not map to the reference, and `unclassified-mapped/` for mapped UCEs without a supported exon, intron, or intergenic classification (for example, loci in lncRNA features). These directories keep the original, unmerged NEXUS alignments. Only confirmed intergenic loci are included as intergenic input by `estimate-trees.sh`.
 
-Alignments in `concatenated-by-region/` and `intergenic-regions/` dir are in NEXUS format.
+Probe matches require at least 99% identity and 120 aligned bases by default. Use `--min-identity` and `--min-length` with `CURE GeneRegion` to change these thresholds. Lower thresholds can admit ambiguous matches and should be checked against the mapping output. Use a new output directory when changing reference files, baits, or thresholds.
+
+Alignments in `concatenated-by-genic-region/` and the three unmerged UCE directories are in NEXUS format.
 Alignments in `concatenated-by-gene/` are in PHYLIP format, and its charsets are in NEXUS format.
 
 > To avoid troubles with further phylogenetic analysis, **CURE** replaces "-" with "_" in the gene and exon ID.
@@ -205,6 +207,7 @@ The `CURE-intergenic.txt` file contains only the UCE names.
 
 **CURE** outputs the `CURE_stats.csv` and `CURE_stats.pdf` files summarizing the total number of UCEs assigned to each region. 
 This information is stored in a table-like format in the `.csv` file and depicted in a Venn diagram in the `.pdf` file. 
+In the CSV, `unassigned` counts loci not located in the reference; `unclassified_mapped` counts loci located there but without a supported region category. Neither group is treated as confirmed intergenic.
 
 The Venn diagram summarizing the test data looks like this: 
 
